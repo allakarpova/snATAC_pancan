@@ -109,24 +109,10 @@ if (!is.null(meta.path)) {
   all.rna <- AddMetaData(all.rna, metadata = my.metadata)
 }
 all.rna$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell_column]])))
-
+DefaultAssay(all.rna) <- 'RNA'
+all.rna <- all.rna %>%  DietSeurat(assay = 'RNA', counts = TRUE, data = TRUE)
 all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
 
-#cat ('Normalizing merged regular RNA object\n')
-#reg.rna <- runAllNormalization (reg.rna, dims = 30)
-
-
-DefaultAssay(reg.rna) <- 'RNA'
-combo.rna <- readRDS(comboRNA.path) 
-DefaultAssay(combo.rna) <- 'RNA'
-combo.rna <- combo.rna %>%  DietSeurat(assay = 'RNA', counts = TRUE, data = TRUE)
-reg.rna <- reg.rna %>% DietSeurat(assay ='RNA', counts = TRUE, data = TRUE)
-
-
-all.rna <- merge(x=reg.rna, y=combo.rna)
-
-remove(combo.rna, reg.rna)
-gc()
 
 all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
 all.rna$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
