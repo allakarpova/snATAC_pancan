@@ -190,7 +190,7 @@ conditions %>% walk (function(column) {
     integrated <- doIntegration(int.sub, 
                                 annotations.f = annotations, 
                                 k.w = ifelse(conditions=='B-cell_Plasma', 28, 100),
-                                k.filter = ifelse(conditions=='B-cell_Plasma', 100, 200))
+                                k.filter = ifelse(conditions=='B-cell_Plasma', 50, 200))
     
     saveRDS(integrated, paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
   } else {
