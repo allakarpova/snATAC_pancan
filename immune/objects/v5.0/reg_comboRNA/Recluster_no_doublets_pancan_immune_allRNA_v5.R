@@ -105,7 +105,7 @@ all.rna <- readRDS(input.path)
 # add meta data if provided
 if (!is.null(meta.path)) {
   my.metadata <- fread(meta.path, data.table = F) %>% 
-    data.frame(row.names = 1, check.rows = F, check.names = F) %>% pull(all_of(cell_column))
+    data.frame(row.names = 1, check.rows = F, check.names = F) %>% select(all_of(cell_column))
   all.rna <- AddMetaData(all.rna, metadata = my.metadata)
 }
 all.rna$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell_column]])))
