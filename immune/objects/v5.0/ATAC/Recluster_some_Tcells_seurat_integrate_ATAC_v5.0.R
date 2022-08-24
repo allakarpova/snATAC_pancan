@@ -169,7 +169,7 @@ panc.my <- readRDS(input.path)
 panc.my <- AddMetaData(panc.my, my.metadata)
 
 #subset unclear clusters in hope to get better resolution
-panc.my <- subset(x = panc.my, subset = seurat_clusters %in% (0,2,3,4,10,11,8,13,24,28))
+panc.my <- subset(x = panc.my, subset = seurat_clusters %in% c(0,2,3,4,10,11,8,13,24,28))
 print(dim(panc.my))
 
 # #remove redundant fragment files
