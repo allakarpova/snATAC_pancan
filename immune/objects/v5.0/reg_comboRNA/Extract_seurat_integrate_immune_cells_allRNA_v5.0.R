@@ -136,6 +136,7 @@ if(!file.exists(paste0('PanImmune_merged_regularRNA_normalized_', add_filename, 
     data.frame(row.names = 1, check.rows = F, check.names = F)
   my.metadata$is_immune <- grepl('Plasma|B-cells|T-cell|DC|Macro|Mast|Microglia|NK|Treg|Immune|Gran|Mono|MAIT', as.character(unlist(my.metadata[[cell_column]])))
   cancers.with.immune <- my.metadata %>% filter(is_immune & data.type == 'snATAC') %>% pull(Cancer)
+  cancers.with.immune <- cancers.with.immune[-which(cancers.with.immune=='OV')] #remove ovarian cancer because the only snRNA sample with immune cells is weird VF031V1-Tm1Y1
   merged.obj.path <- merged.obj.path[names(merged.obj.path) %in% cancers.with.immune]
   
   
@@ -150,10 +151,11 @@ if(!file.exists(paste0('PanImmune_merged_regularRNA_normalized_', add_filename, 
       if (!grepl('CRC_', colnames(obj)[1])) {
         obj <- RenameCells(object = obj, new.names = paste('CRC', colnames(obj), sep = '_')) # I hate that it is different
       }
-      print(head(obj@meta.data))
+      #print(head(obj@meta.data))
     }
     
     obj <- AddMetaData(obj, my.metadata)
+    print(head(obj@meta.data))
     ct <- obj@meta.data %>% pull(cell_column) %>% unique %>% sort
     print(ct)
     stopifnot(!is.na(ct))
