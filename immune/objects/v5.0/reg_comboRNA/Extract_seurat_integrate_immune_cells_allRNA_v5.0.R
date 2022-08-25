@@ -174,6 +174,10 @@ if(!file.exists(paste0('PanImmune_merged_regularRNA_normalized_', add_filename, 
       cat('removing C3N-01816\n')
       obj.my <- subset(x = obj.my, subset = Case_ID %in% c('C3N-01816'), invert = TRUE)
     }
+    if (c('VF031V1-Tm1Y1') %in% obj.my$Piece_ID) {
+      cat('removing VF031V1-Tm1Y1\n')
+      obj.my <- subset(x = obj.my, subset = Piece_ID %in% c('VF031V1-Tm1Y1'), invert = TRUE)
+    }
     
     print(dim(obj.my))
     return(obj.my)
