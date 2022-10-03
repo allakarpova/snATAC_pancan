@@ -164,7 +164,7 @@ setwd(out_path)
 
 panc.my <- readRDS(input.path)
 print(dim(panc.my))
-panc.my <- subset(x = panc.my, subset = TSS.enrichemnt >= tss.cut)
+panc.my <- subset(x = panc.my, subset = TSS.enrichment >= tss.cut)
 print(dim(panc.my))
 
 #remove redundant fragment files
