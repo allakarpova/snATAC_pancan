@@ -99,7 +99,7 @@ options(future.globals.maxSize = 50 * 1024^3) # for 250 Gb RAM
 all.rna <- readRDS(input.path)
 # add meta data if provided
 if (!is.null(meta.path)) {
-  my.metadata <- fread(meta.path, data.table = F) %>% 
+  my.metadata <- fread(meta.path, header = TRUE, data.table = F) %>% 
     data.frame(row.names = 1, check.rows = F, check.names = F) %>% select(all_of(cell_column))
   all.rna <- AddMetaData(all.rna, metadata = my.metadata)
 }
