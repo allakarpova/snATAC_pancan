@@ -149,7 +149,7 @@ cell_column <- opt$cell_type_column
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
-my.metadata <- fread(meta.path, data.table = F) %>% 
+my.metadata <- fread(meta.path, data.table = F, header=TRUE) %>% 
   data.frame(row.names = 1, check.rows = F, check.names = F)
 
 
