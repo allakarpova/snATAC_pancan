@@ -157,6 +157,7 @@ panc.my <- readRDS(input.path)
 panc.my <- AddMetaData(panc.my, my.metadata)
 
 panc.my$to_split <- is.na(unlist(panc.my[[cell_column]]))
+panc.my$to_split[panc.my$Chemistry=='snATAC'] <- TRUE
 
 panc.my.labeled <- subset(panc.my, to_split, invert=TRUE)
 panc.my.unlabeled <- subset(panc.my, to_split)
