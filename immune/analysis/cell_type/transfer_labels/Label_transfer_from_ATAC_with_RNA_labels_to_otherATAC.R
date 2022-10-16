@@ -19,8 +19,8 @@ suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(doParallel))
 
-runAllNormalization <- function(obj, dims) {
-  #### run normalization to get initial clusters ###
+runNormalization <- function(obj, dims) {
+  #### run normalization 
   ########
   obj <- obj %>% 
     RunTFIDF() %>%
@@ -28,17 +28,7 @@ runAllNormalization <- function(obj, dims) {
     RunSVD(
       reduction.key = 'LSI_',
       reduction.name = 'lsi',
-      irlba.work = 400 ) %>% 
-    FindNeighbors(
-      reduction = 'lsi',
-      dims = 2:dims ) %>% 
-    FindClusters(
-      algorithm = 3,
-      resolution = 1,
-      verbose = FALSE
-    ) %>% 
-    RunUMAP(dims = 2:dims,
-            reduction = 'lsi')
+      irlba.work = 400 )
   return(obj)
 }
 
@@ -163,12 +153,14 @@ panc.my.labeled <- subset(panc.my, to_split, invert=TRUE)
 panc.my.unlabeled <- subset(panc.my, to_split)
 
 cat('Integrate objects with RNA labels and without\n')
+panc.my.labeled <- runNormalization(panc.my.labeled)
 int.labeled <- doIntegration(panc.my.labeled, k.w=100)
 saveRDS(int.labeled, paste0('PanImmune_comboATAC_with_comboRNA_labels_integrated_', add_filename, '.rds'))
 
 DimPlot(int.labeled, reduction = "umap", group.by = cell_column, label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Reference labeled")
 ggsave(paste0('Dimplot_comboATAC_with_comboRNA_labels_integrated_', add_filename, '_',cell_column,'.pdf'), width = 6.5, height = 6)
 
+panc.my.unlabeled <- runNormalization(panc.my.unlabeled)
 int.unlabeled <- doIntegration(panc.my.unlabeled, k.w=100)
 saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
 
