@@ -41,6 +41,14 @@ doIntegration <- function (int.sub.f, k.w = 100) {
   
   print(table(int.sub.f$Batches))
   
+  if(any(table(int.sub.f$Batches)< 1000)) {
+    int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ int.sub.f$Cancer,
+                                   int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
+                                   TRUE ~ int.sub.f$Chemistry)
+    print(table(int.sub.f$Batches))
+  }
+  
+  
   atac.split <- SplitObject(int.sub.f, split.by = 'Batches')
   
   atac.split <- map(atac.split, function(obj) {
@@ -149,21 +157,32 @@ panc.my <- AddMetaData(panc.my, my.metadata)
 panc.my$to_split <- is.na(unlist(panc.my[[cell_column]]))
 panc.my$to_split[panc.my$Chemistry=='snATAC'] <- TRUE
 
-panc.my.labeled <- subset(panc.my, to_split, invert=TRUE)
-panc.my.unlabeled <- subset(panc.my, to_split)
 
-cat('Integrate objects with RNA labels and without\n')
-panc.my.labeled <- runNormalization(panc.my.labeled)
-int.labeled <- doIntegration(panc.my.labeled, k.w=100)
-saveRDS(int.labeled, paste0('PanImmune_comboATAC_with_comboRNA_labels_integrated_', add_filename, '.rds'))
+if(!file.exists(paste0('PanImmune_comboATAC_with_comboRNA_labels_integrated_', add_filename, '.rds'))) {
+  panc.my.labeled <- subset(panc.my, to_split, invert=TRUE)
+  cat('Normalize object with RNA labels\n')
+  panc.my.labeled <- runNormalization(panc.my.labeled)
+  cat('Integrate object with RNA labels\n')
+  int.labeled <- doIntegration(panc.my.labeled, k.w=100)
+  saveRDS(int.labeled, paste0('PanImmune_comboATAC_with_comboRNA_labels_integrated_', add_filename, '.rds'))
+  
+  DimPlot(int.labeled, reduction = "umap", group.by = cell_column, label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Reference labeled")
+  ggsave(paste0('Dimplot_comboATAC_with_comboRNA_labels_integrated_', add_filename, '_',cell_column,'.pdf'), width = 6.5, height = 6)
+  
+} else {
+  int.labeled <- readRDS(paste0('PanImmune_comboATAC_with_comboRNA_labels_integrated_', add_filename, '.rds'))
+}
 
-DimPlot(int.labeled, reduction = "umap", group.by = cell_column, label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Reference labeled")
-ggsave(paste0('Dimplot_comboATAC_with_comboRNA_labels_integrated_', add_filename, '_',cell_column,'.pdf'), width = 6.5, height = 6)
-
-panc.my.unlabeled <- runNormalization(panc.my.unlabeled)
-int.unlabeled <- doIntegration(panc.my.unlabeled, k.w=100)
-saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
-
+if(!file.exists(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))) {
+  panc.my.unlabeled <- subset(panc.my, to_split)
+  cat('Normalize object without RNA labels\n')
+  panc.my.unlabeled <- runNormalization(panc.my.unlabeled)
+  cat('Integrate object without RNA labels\n')
+  int.unlabeled <- doIntegration(panc.my.unlabeled, k.w=100)
+  saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
+} else{
+  int.unlabeled <- readRDS(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
+}
 
 # compute UMAP and store the UMAP model
 cat('Run UMAP on integrated labeled object and save the model\n')
