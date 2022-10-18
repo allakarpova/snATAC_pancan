@@ -180,8 +180,15 @@ if(!file.exists(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_fil
   cat('Integrate object without RNA labels\n')
   int.unlabeled <- doIntegration(panc.my.unlabeled, k.w=100)
   saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
+  
+  DimPlot(int.unlabeled, reduction = "umap", group.by = 'Cancer', label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Query unlabeled")
+  ggsave(paste0('Dimplot_all_other_ATAC_unlabeled_integrated_', add_filename, '_Cancer.pdf'), width = 6.5, height = 6)
+  
 } else{
   int.unlabeled <- readRDS(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '.rds'))
+  DimPlot(int.unlabeled, reduction = "umap", group.by = 'Cancer', label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Query unlabeled")
+  ggsave(paste0('Dimplot_all_other_ATAC_unlabeled_integrated_', add_filename, '_Cancer.pdf'), width = 6.5, height = 6)
+  
 }
 
 # compute UMAP and store the UMAP model
