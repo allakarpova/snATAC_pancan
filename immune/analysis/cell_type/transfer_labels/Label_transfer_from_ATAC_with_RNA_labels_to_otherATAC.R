@@ -150,7 +150,7 @@ setwd(out_path)
 my.metadata <- fread(meta.path, data.table = F, header=TRUE) %>% 
   data.frame(row.names = 1, check.rows = F, check.names = F)
 
-
+colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v5.0/Colors_panatac_v2.0.rds')
 panc.my <- readRDS(input.path)
 panc.my <- AddMetaData(panc.my, my.metadata)
 
