@@ -203,7 +203,7 @@ cat('Run FindTransferAnchors\n')
 transfer.anchors <- FindTransferAnchors(
   reference = int.labeled,
   query = int.unlabeled, 
-  reference.reduction = "integrated_lsi",
+  reference.reduction = "lsi",
   reduction = "lsiproject",
   dims = 2:50
 )
@@ -215,8 +215,8 @@ int.unlabeled <- MapQuery(
   reference = int.labeled,
   query = int.unlabeled,
   refdata =  as.charater(int.labeled@meta.data[,cell_column]),
-  reference.reduction = "integrated_lsi",
-  new.reduction.name = "ref.int.lsi",
+  reference.reduction = "lsi",
+  new.reduction.name = "ref.lsi",
   reduction.model = 'umap'
 )
 
@@ -227,14 +227,24 @@ p2 <- DimPlot(int.unlabeled, reduction = "ref.umap", group.by = "predicted.id", 
 p1 | p2
 ggsave(paste0('Dimplot_labeled_transferred_', add_filename, '_cell_type_predicted.pdf'), width = 12, height = 4.5)
 
-p1 <- DimPlot(combo.obj, reduction = "umap", group.by = "Cancer",cols = colors$Cancer, label = TRUE, repel = TRUE, pt.size = 0.0005)  + ggtitle("Reference")
-p2 <- DimPlot(int.obj, reduction = "ref.umap", group.by = "Cancer", cols = colors$Cancer, label = TRUE, repel = TRUE)  + ggtitle("Query")
+p1 <- DimPlot(int.labeled, reduction = "umap", group.by = "Cancer",cols = colors$Cancer, label = TRUE, repel = TRUE, pt.size = 0.0005)  + ggtitle("Reference")
+p2 <- DimPlot(int.unlabeled, reduction = "ref.umap", group.by = "Cancer", cols = colors$Cancer, label = TRUE, repel = TRUE)  + ggtitle("Query")
 p1 | p2
-ggsave(paste0(add_filename, '_cancer.pdf'), width = 12, height = 4.5)
+ggsave(paste0('Dimplot_labeled_transferred_', add_filename, '_cancer.pdf'), width = 12, height = 4.5)
 
+predicted.df <- int.unlabeled@meta.data %>% dplyr::select(predicted.id) 
+known.df <- int.labeled@meta.data %>% dplyr::select(dplyr::any_of(cell_column)) 
+colnames(predicted.df) <- 'cell_type_combined'
+colnames(known.df) <- 'cell_type_combined'
 
+panc.my <- AddMetaData(panc.my, rbind(predicted.df, known.df))
+DimPlot(panc.my, reduction = "umap", group.by = "cell_type_combined", label = TRUE, repel = TRUE, pt.size = 0.0005)
+ggsave(paste0('Dimplot_allRNA3_', add_filename, '_cell_type_combined.pdf'), width = 12, height = 4.5)
 
-saveRDS(int.obj, paste0(add_filename, '_10142021.rds'))
+int.unlabeled@meta.data %>% dplyr::select(predicted.id) %>% 
+    fwrite(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_predicted_labels.txt'), sep='\t', row.names = TRUE)
+
+saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_labelled.rds'))
 
 
 
