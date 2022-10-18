@@ -189,38 +189,44 @@ if(!file.exists(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_fil
   
 }
 
-cat('Normalize each object without integration\n')
-int.labeled <- runNormalization(int.labeled)
-int.unlabeled <- runNormalization(int.unlabeled)
-
-# compute UMAP and store the UMAP model
-cat('Run UMAP on integrated labeled object and save the model\n')
-int.labeled <- RunUMAP(int.labeled, reduction = "integrated_lsi", dims = 2:50, return.model = TRUE)
-
-plan("multicore", workers = 20)
-options(future.globals.maxSize = 500 * 1024^3) # for 500 Gb RAM
-
-# find transfer anchors
-cat('Run FindTransferAnchors\n')
-transfer.anchors <- FindTransferAnchors(
-  reference = int.labeled,
-  query = int.unlabeled, 
-  reference.reduction = "lsi",
-  reduction = "lsiproject",
-  dims = 2:50
-)
-
-cat('Run MapQuery\n')
-# map query onto the reference dataset
-int.unlabeled <- MapQuery(
-  anchorset = transfer.anchors,
-  reference = int.labeled,
-  query = int.unlabeled,
-  refdata =  as.character(int.labeled@meta.data[,cell_column]),
-  reference.reduction = "lsi",
-  new.reduction.name = "ref.lsi",
-  reduction.model = 'umap'
-)
+if(!file.exists(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_labelled.rds'))) {
+  cat('Normalize each object without integration\n')
+  int.labeled <- runNormalization(int.labeled)
+  int.unlabeled <- runNormalization(int.unlabeled)
+  
+  # compute UMAP and store the UMAP model
+  cat('Run UMAP on integrated labeled object and save the model\n')
+  int.labeled <- RunUMAP(int.labeled, reduction = "integrated_lsi", dims = 2:50, return.model = TRUE)
+  
+  plan("multicore", workers = 20)
+  options(future.globals.maxSize = 500 * 1024^3) # for 500 Gb RAM
+  
+  # find transfer anchors
+  cat('Run FindTransferAnchors\n')
+  transfer.anchors <- FindTransferAnchors(
+    reference = int.labeled,
+    query = int.unlabeled, 
+    reference.reduction = "lsi",
+    reduction = "lsiproject",
+    dims = 2:50
+  )
+  
+  cat('Run MapQuery\n')
+  # map query onto the reference dataset
+  int.unlabeled <- MapQuery(
+    anchorset = transfer.anchors,
+    reference = int.labeled,
+    query = int.unlabeled,
+    refdata =  as.character(int.labeled@meta.data[,cell_column]),
+    reference.reduction = "lsi",
+    new.reduction.name = "ref.lsi",
+    reduction.model = 'umap'
+  )
+  
+  saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_labelled.rds'))
+} else {
+  int.unlabeled <- readRDS(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_labelled.rds'))
+}
 
 
 p1 <- DimPlot(int.labeled, reduction = "umap", group.by = cell_column, label = TRUE, repel = TRUE) + NoLegend() + ggtitle("Reference")
@@ -246,7 +252,6 @@ ggsave(paste0('Dimplot_allRNA3_', add_filename, '_cell_type_combined.pdf'), widt
 int.unlabeled@meta.data %>% dplyr::select(predicted.id) %>% 
     fwrite(paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_predicted_labels.txt'), sep='\t', row.names = TRUE)
 
-saveRDS(int.unlabeled, paste0('PanImmune_all_other_ATAC_unlabeled_integrated_', add_filename, '_labelled.rds'))
 
 
 
