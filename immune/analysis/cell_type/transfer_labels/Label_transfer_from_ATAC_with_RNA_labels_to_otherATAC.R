@@ -216,7 +216,7 @@ int.unlabeled <- MapQuery(
   anchorset = transfer.anchors,
   reference = int.labeled,
   query = int.unlabeled,
-  refdata =  as.charater(int.labeled@meta.data[,cell_column]),
+  refdata =  as.character(int.labeled@meta.data[,cell_column]),
   reference.reduction = "lsi",
   new.reduction.name = "ref.lsi",
   reduction.model = 'umap'
