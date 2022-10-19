@@ -250,8 +250,9 @@ colnames(known.df) <- 'cell_type_combined'
 
 head(rbind(predicted.df, known.df))
 panc.my <- AddMetaData(panc.my, rbind(predicted.df, known.df))
-DimPlot(panc.my, reduction = "umap", group.by = "cell_type_combined", label = TRUE, repel = TRUE, pt.size = 0.0005)
-ggsave(paste0('Dimplot_allRNA3_', add_filename, '_cell_type_combined.pdf'), width = 12, height = 4.5)
+
+DimPlot(panc.my, reduction = "umap", group.by = "cell_type_combined", label = TRUE, repel = TRUE, pt.size = 0.0005) + NoLegend()
+ggsave(paste0('Dimplot_allRNA3_', add_filename, '_cell_type_combined.pdf'), width = 8, height = 7)
 
 
 
