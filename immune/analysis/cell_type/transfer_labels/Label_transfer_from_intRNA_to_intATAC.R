@@ -87,6 +87,8 @@ options(future.globals.maxSize = 250 * 1024^3) # for 250 Gb RAM
 cat('Run Gene ACTIVITY\n')
 gene.activities <- GeneActivity(panc.atac, features = VariableFeatures(panc.rna))
 
+saveRDS(gene.activities, paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.pdf'))
+
 # add gene activities as a new assay
 panc.atac[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
 
