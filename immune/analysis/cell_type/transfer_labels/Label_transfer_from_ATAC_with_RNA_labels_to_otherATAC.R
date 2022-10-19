@@ -249,7 +249,7 @@ known.df <- int.labeled@meta.data %>% dplyr::select(dplyr::any_of(cell_column))
 colnames(predicted.df) <- 'cell_type_combined'
 colnames(known.df) <- 'cell_type_combined'
 
-fwrite(rbind(predicted.df, known.df), paste0('PanImmune_all_ATAC_', add_filename, '_cell_type_combined_labels.txt'))
+fwrite(rbind(predicted.df, known.df), paste0('PanImmune_all_ATAC_', add_filename, '_cell_type_combined_labels.txt'),  sep='\t', row.names = TRUE)
 
 head(rbind(predicted.df, known.df))
 panc.my <- AddMetaData(panc.my, rbind(predicted.df, known.df))
