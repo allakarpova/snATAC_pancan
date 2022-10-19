@@ -252,7 +252,7 @@ head(rbind(predicted.df, known.df))
 panc.my <- AddMetaData(panc.my, rbind(predicted.df, known.df))
 
 DimPlot(panc.my, group.by = "cell_type_combined", label = TRUE, repel = TRUE, pt.size = 0.0005) + NoLegend()
-ggsave(paste0('Dimplot_allRNA3_', add_filename, '_cell_type_combined.pdf'), width = 8, height = 7)
+ggsave(paste0('Dimplot_all_ATAC_', add_filename, '_cell_type_combined.pdf'), width = 8, height = 7)
 
 
 
