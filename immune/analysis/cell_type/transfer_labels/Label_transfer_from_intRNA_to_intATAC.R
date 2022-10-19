@@ -81,6 +81,9 @@ panc.rna <- readRDS(input.path.rna)
 panc.atac <- readRDS(input.path.atac)
 panc.rna <- AddMetaData(panc.rna, my.metadata)
 
+plan("multicore", workers = 20)
+options(future.globals.maxSize = 250 * 1024^3) # for 250 Gb RAM
+
 cat('Run Gene ACTIVITY\n')
 gene.activities <- GeneActivity(panc.atac, features = VariableFeatures(panc.rna))
 
