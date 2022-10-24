@@ -1,4 +1,4 @@
-# subset immune cells from the ATAC object and recall peaks with MACS2
+# subset not doublets and integrate
 ###libraries
 ##################
 library(future)

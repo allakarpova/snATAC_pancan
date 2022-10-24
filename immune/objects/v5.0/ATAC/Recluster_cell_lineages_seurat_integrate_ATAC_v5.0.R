@@ -59,9 +59,16 @@ runAllNormalization <- function(obj, dims) {
 
 doIntegration <- function (int.sub.f, annotations.f, k.w = 100, k.filter = 200) {
   int.sub.f$Data.source <- ifelse(int.sub.f$Cancer == 'PBMC', '10x', 'DingLab')
-  int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
-                               int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
-                               TRUE ~ int.sub.f$Chemistry)
+  if(conditions=='B-cell_Plasma') {
+    int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ 'PBMC',
+                                   int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
+                                   TRUE ~ int.sub.f$Chemistry)
+  }  else {
+    int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
+                                   int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
+                                   TRUE ~ int.sub.f$Chemistry)
+  }
+  
   
   print(table(int.sub.f$Batches))
   
@@ -164,9 +171,9 @@ int$cell_lin <- case_when(grepl('NK|CD|Treg|Tfh|MAIT|ILC|dnT|gdT|T-cell', int$ce
                           grepl('DC|Macro|Micro|Mast|Mono', int$cell_type_v5_atac) ~ 'Myeloid',
                           grepl('B-cell|Plasma', int$cell_type_v5_atac) ~ 'B-cell_Plasma',
                           TRUE ~ int$cell_type_v5_atac)
-print(head(int@meta.data, n = 5))
+#print(head(int@meta.data, n = 5))
 
-conditions <- c('T-cells_NK', 'Myeloid', 'B-cell_Plasma')
+conditions <- c( 'B-cell_Plasma','T-cells_NK', 'Myeloid')
 
 conditions %>% walk (function(column) {
   print(column)
