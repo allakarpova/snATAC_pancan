@@ -101,6 +101,7 @@ if(!file.exists(paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.rds'))
 panc.atac[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
 
 # normalize gene activities
+cat('Add gene activities to ATAC object\n')
 DefaultAssay(panc.atac) <- "ACTIVITY"
 panc.atac <- NormalizeData(panc.atac)
 panc.atac <- ScaleData(panc.atac, features = rownames(panc.atac))
