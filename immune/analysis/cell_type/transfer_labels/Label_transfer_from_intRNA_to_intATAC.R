@@ -87,10 +87,15 @@ options(future.globals.maxSize = 250 * 1024^3) # for 250 Gb RAM
 print(head(VariableFeatures(panc.rna)))
 length(VariableFeatures(panc.rna))
 
-cat('Run Gene ACTIVITY\n')
-gene.activities <- GeneActivity(panc.atac, features = VariableFeatures(panc.rna))
-
-saveRDS(gene.activities, paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.pdf'))
+if(!file.exists(paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.rds'))) {
+  cat('Run Gene ACTIVITY\n')
+  gene.activities <- GeneActivity(panc.atac, features = VariableFeatures(panc.rna))
+  
+  saveRDS(gene.activities, paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.rds'))
+  
+} else {
+  gene.activities <- readRDS(paste0('Panimmune_all_ATAC_GENEACTIVITY', add_filename, '.rds'))
+}
 
 # add gene activities as a new assay
 panc.atac[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
@@ -106,7 +111,7 @@ cat('Run FindTransferAnchors\n')
 DefaultAssay(panc.rna) <- "integrated"
 DefaultAssay(panc.atac) <- "ACTIVITY"
 transfer.anchors <- FindTransferAnchors(reference = panc.rna, 
-                                        query = panc.atac, features = VariableFeatures(object = panc.rna),
+                                        query = panc.atac, features = VariableFeatures(object = panc.rna),normalization.method = 'SCT',
                                         reference.assay = "integrated", query.assay = "ACTIVITY", reduction = "cca")
 
 cat('Run TransferData\n')
