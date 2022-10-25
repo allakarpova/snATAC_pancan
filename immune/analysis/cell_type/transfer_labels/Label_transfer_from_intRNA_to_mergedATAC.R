@@ -106,6 +106,11 @@ DefaultAssay(panc.atac) <- "ACTIVITY"
 panc.atac <- NormalizeData(panc.atac)
 panc.atac <- ScaleData(panc.atac, features = rownames(panc.atac))
 
+DefaultAssay(panc.atac) <- "ATAC_immune"
+panc.atac <-  panc.atac %>% 
+  FindTopFeatures(min.cutoff = 500) %>%
+  RunTFIDF() %>%
+  RunSVD()
 
 # Identify anchors
 cat('Run FindTransferAnchors\n')
