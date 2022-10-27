@@ -51,9 +51,10 @@ panc<- readRDS(input.path)
 
 c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2) %>% walk(function(resol) {
   panc <- FindClusters(panc, resolution = resol, algorithm = 1)
+  print(head(panc@meta.data))
 })
 
-head(panc@meta.data)
+
 cluster.tb <- panc@meta.data %>% select(dplyr::contains('res.'))
 fwrite(cluster.tb, paste0('Clusters_res0.1_to_2_alg1_', add_filename, '.txt'), sep='\t', row.names = TRUE)
 
