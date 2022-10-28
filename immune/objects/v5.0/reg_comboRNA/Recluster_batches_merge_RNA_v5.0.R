@@ -47,7 +47,8 @@ runAllNormalization <- function(obj, dims=30) {
       assay = 'RNA',
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
-      return.only.var.genes = T
+      return.only.var.genes = T,
+      verbose = FALSE
     ) %>%
     RunPCA(assay = 'SCT', do.print = FALSE) %>%
     RunUMAP(dims = 1:dims, assay = 'SCT')
