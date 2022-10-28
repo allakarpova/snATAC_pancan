@@ -132,7 +132,7 @@ walk(atac.split, function(obj) {
   
   saveRDS(obj, glue::glue('PanImmune_{batch}_merged_ATAC_{add_filename}.rds'))
   p2 <- DimPlot(obj, group.by = cell_type_column, label = TRUE)
-  ggsave(glue::glue('Dimplot_{batch}_{add_filename}_{cell_type_column}.pdf'), plot = p2, width = 7, height = 4.5)
+  ggsave(glue::glue('Dimplot_{batch}_{add_filename}_{cell_type_column}.pdf'), plot = p2, width = 12, height = 6)
   
   p2 <- DimPlot(obj, group.by = "Cancer", cols = colors$Cancer, label = TRUE)
   ggsave(glue::glue('Dimplot_{batch}_{add_filename}_Cancer.pdf'), plot = p2, width = 5.5, height = 4.5)
