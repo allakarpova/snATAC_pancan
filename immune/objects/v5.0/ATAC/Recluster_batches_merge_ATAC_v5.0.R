@@ -102,7 +102,7 @@ out_path <- opt$output
 add_filename <- opt$extra
 annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
 meta.path <- opt$metadata.file
-cell_column <- opt$cell_type_column
+cell_type_column <- opt$cell_type_column
 colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v5.0/Colors_panatac_v2.0.rds')
 
 
