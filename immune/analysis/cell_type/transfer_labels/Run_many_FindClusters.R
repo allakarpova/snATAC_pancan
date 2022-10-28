@@ -49,7 +49,7 @@ setwd(out_path)
 panc<- readRDS(input.path)
 
 for (resol in c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2)) {
-  panc <- FindClusters(panc, resolution = resol, algorithm = 4)
+  panc <- FindClusters(panc, resolution = resol, algorithm = 4, method = "igraph")
   print(head(panc@meta.data))
 }
 
