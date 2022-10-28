@@ -35,6 +35,7 @@ suppressMessages(library(doParallel))
 
 
 runAllNormalization <- function(obj, dims=30) {
+  DefaultAssay(obj) <- 'RNA'
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
   s.genes <- cc.genes$s.genes
   g2m.genes <- cc.genes$g2m.genes
