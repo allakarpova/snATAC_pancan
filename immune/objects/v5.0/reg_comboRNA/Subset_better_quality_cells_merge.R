@@ -101,8 +101,8 @@ setwd(out_path)
 cat('opening object \n')
 obj <- readRDS(input.path)
 
-obj <- subset(obj, subset = nFeature_RNA > opt&nfeature_min &
-                nCount_RNA > opt&ncount_min)
+obj <- subset(obj, subset = nFeature_RNA > opt$nfeature_min &
+                nCount_RNA > opt$ncount_min)
 
 obj <- runAllNormalization(obj, dims = 40)
 
