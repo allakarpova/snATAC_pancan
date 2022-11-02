@@ -28,28 +28,34 @@ suppressMessages(library(stringr))
 ####################################
 
 
-runAllNormalization <- function(obj, dims) {
-  #### run normalization to get initial clusters ###
-  ########
-  obj <- obj %>% 
-    RunTFIDF() %>%
-    FindTopFeatures(min.cutoff = 500) %>% 
-    RunSVD(
-      reduction.key = 'LSI_',
-      reduction.name = 'lsi',
-      irlba.work = 400 ) %>% 
-    FindNeighbors(
-      reduction = 'lsi',
-      dims = 2:dims ) %>% 
-    FindClusters(
-      algorithm = 3,
-      resolution = 1,
+runAllNormalization <- function(obj, dims=30) {
+  DefaultAssay(obj) <- 'RNA'
+  obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
+  s.genes <- cc.genes$s.genes
+  g2m.genes <- cc.genes$g2m.genes
+  
+  obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
+  
+  obj <- obj %>%
+    SCTransform(
+      assay = 'RNA',
+      vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
+      conserve.memory = T,
+      return.only.var.genes = T,
       verbose = FALSE
-    ) %>% 
-    RunUMAP(dims = 2:dims,
-            reduction = 'lsi')
+    ) %>%
+    RunPCA(assay = 'SCT', do.print = FALSE) %>%
+    RunUMAP(dims = 1:dims, assay = 'SCT')
+  
+  obj <- NormalizeData(obj, assay = 'RNA')
+  obj <- FindNeighbors(object = obj,  dims = 1:dims)
+  obj <- FindClusters(object = obj,resolution = 1, verbose = FALSE)
   return(obj)
+  
 }
+
+filter <- dplyr::filter
+select <- dplyr::select
 
 
 ############################################
