@@ -94,6 +94,7 @@ opt = parse_args(opt_parser)
 input.path <- opt$input.object
 out_path <- opt$output
 add_filename <- opt$extra
+colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v5.0/Colors_panatac_v2.0.rds')
 
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
