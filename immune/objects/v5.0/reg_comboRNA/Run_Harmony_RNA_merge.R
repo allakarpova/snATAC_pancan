@@ -27,21 +27,8 @@ suppressMessages(library(harmony))
 
 
 runHarmonyNormalization <- function(obj, dims=30, column = 'Piece_ID') {
-  DefaultAssay(obj) <- 'RNA'
-  obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
-  s.genes <- cc.genes$s.genes
-  g2m.genes <- cc.genes$g2m.genes
-  
-  obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
-  
+
   obj <- obj %>%
-    SCTransform(
-      assay = 'RNA',
-      vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
-      conserve.memory = T,
-      return.only.var.genes = T,
-      verbose = FALSE
-    ) %>%
     RunPCA(assay = 'SCT', do.print = FALSE) %>%
     RunHarmony(column, reduction = 'pca', assay.use = 'SCT') %>%
     FindNeighbors(reduction = "harmony", dims = 2:dims) %>%
