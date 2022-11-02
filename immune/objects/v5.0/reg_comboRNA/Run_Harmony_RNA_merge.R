@@ -18,7 +18,7 @@ suppressMessages(library(data.table))
 suppressMessages(library(future))
 suppressMessages(library(optparse))
 suppressMessages(library(stringr))
-
+suppressMessages(library(harmony))
 ################################
 
 #####################################
