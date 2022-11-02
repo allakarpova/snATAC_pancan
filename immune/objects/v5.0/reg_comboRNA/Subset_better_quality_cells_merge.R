@@ -108,7 +108,7 @@ obj <- runAllNormalization(obj, dims = 40)
 
 batch <- obj$Batches %>% unique
 
-saveRDS(obj, glue::glue('PanImmune_{batch}_merged_ATAC_{add_filename}.rds'))
+saveRDS(obj, glue::glue('PanImmune_{batch}_merged_RNA_{add_filename}.rds'))
 
 p2 <- DimPlot(obj, group.by = "Cancer", cols = colors$Cancer, label = TRUE)
 ggsave(glue::glue('Dimplot_{batch}_{add_filename}_Cancer.pdf'), plot = p2, width = 5.5, height = 4.5)
