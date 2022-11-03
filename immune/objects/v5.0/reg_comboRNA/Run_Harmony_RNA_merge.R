@@ -91,7 +91,7 @@ cat('opening object \n')
 obj <- readRDS(input.path)
 
 
-obj <- runAllNormalization(obj, dims = 40, column=ct)
+obj <- runHarmonyNormalization(obj, dims = 40, column=ct)
 
 batch <- obj$Batches %>% unique
 
