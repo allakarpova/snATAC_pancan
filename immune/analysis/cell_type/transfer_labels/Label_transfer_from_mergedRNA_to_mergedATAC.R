@@ -123,16 +123,21 @@ panc.rna <-  panc.rna %>% SCTransform(
   vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
   conserve.memory = T,
   return.only.var.genes = T
-)
+) %>%
+  RunPCA(assay = 'SCT', do.print = FALSE)
 
 transfer.anchors <- FindTransferAnchors(reference = panc.rna, 
                                         query = panc.atac, features = VariableFeatures(object = panc.rna), 
                                         normalization.method = 'SCT',
-                                        reference.assay = "SCT", query.assay = "ACTIVITY", reduction = "cca")
+                                        reference.assay = "SCT", 
+                                        query.assay = "ACTIVITY", 
+                                        reduction = "cca")
 
 cat('Run TransferData\n')
-celltype.predictions <- TransferData(anchorset = transfer.anchors, refdata = as.character(panc.rna@meta.data[,cell_column]),
-                                     weight.reduction = panc.atac[["lsi"]], dims = 2:50)
+celltype.predictions <- TransferData(anchorset = transfer.anchors, 
+                                     refdata = as.character(panc.rna@meta.data[,cell_column]),
+                                     weight.reduction = panc.atac[["lsi"]], 
+                                     dims = 2:50)
 
 panc.atac <- AddMetaData(panc.atac, metadata = celltype.predictions)
 
