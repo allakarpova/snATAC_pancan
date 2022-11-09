@@ -72,6 +72,11 @@ option_list = list(
               default="./", 
               help="output folder path",
               metavar="character"),
+  make_option(c("-e", "--extra"),
+              type="character",
+              default="./", 
+              help="add unique string identifier for your data",
+              metavar="character"),
   make_option(c("--metadata.rna"),
               type="character",
               default=NULL, 
@@ -90,9 +95,10 @@ opt = parse_args(opt_parser)
 input.path.rna <- opt$input.rna.object
 input.path.atac <- opt$input.atac.object
 out_path <- opt$output
+add_filename <- opt$extra
 meta.rna.path <- opt$metadata.rna
 meta.atac.path <- opt$metadata.atac
-cancer = opt$cancer
+
 
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
