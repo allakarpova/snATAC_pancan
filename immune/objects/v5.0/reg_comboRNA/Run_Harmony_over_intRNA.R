@@ -114,8 +114,6 @@ saveRDS(obj, glue::glue('PanImmune_merged_RNA_{add_filename}_harmony_{ct}.rds'))
 p2 <- DimPlot(obj, group.by = "Cancer", cols = colors$Cancer, label = TRUE)
 ggsave(glue::glue('Dimplot_{add_filename}_Cancer.pdf'), plot = p2, width = 5.5, height = 4.5)
 
-p2 <- DimPlot(obj, group.by = "cell_type_v5.3_Tcell", label = TRUE)
-ggsave(glue::glue('Dimplot_{add_filename}_cell_type_v5.3_Tcell.pdf'), plot = p2, width = 12, height = 7)
 
 p2 <- DimPlot(obj, group.by = "seurat_clusters", label = TRUE)
 ggsave(glue::glue('Dimplot_{add_filename}_seurat_clusters.pdf'), plot = p2, width = 6, height = 4.5)
@@ -132,6 +130,8 @@ ggsave(glue::glue('Dimplot_{add_filename}_{ct}.pdf'), plot = p2, width = 12, hei
 fwrite(cbind(Embeddings(obj, reduction='umap'), obj@meta.data), glue::glue('Panimmune_merged_RNA_{add_filename}_harmony_{ct}_metadata.tsv'),
        sep='\t', row.names = T)
 
+p2 <- DimPlot(obj, group.by = "cell_type_v5.3_Tcell", label = TRUE)
+ggsave(glue::glue('Dimplot_{add_filename}_cell_type_v5.3_Tcell.pdf'), plot = p2, width = 12, height = 7)
 
 ################
 
