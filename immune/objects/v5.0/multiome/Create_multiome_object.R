@@ -109,10 +109,6 @@ colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_free
 r.obj <- readRDS(input.path.rna)
 a.obj <- readRDS(input.path.atac)
 
-rna.meta <- fread(meta.rna.path) %>% data.frame(row.names = 1)
-atac.meta <- fread(meta.atac.path) %>% data.frame(row.names = 1)
-
-
 combo.cells <- intersect(colnames(panc.rna), colnames(panc.atac)) 
  
 a.obj <- subset(a.obj, cells = combo.cells)
