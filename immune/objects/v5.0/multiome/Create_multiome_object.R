@@ -29,8 +29,9 @@ normalize_multiome <- function(obj,dims = 50) {
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       return.only.var.genes = T,
-      verbose = FALSE
-    )
+      verbose = FALSE) %>% 
+    RunPCA(assay = 'SCT', do.print = FALSE) %>%
+    RunUMAP(dims = 2:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
   DefaultAssay(obj) <- "ATAC_immune"
   
   obj <- obj %>% 
@@ -106,6 +107,9 @@ setwd(out_path)
 
 colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v5.0/Colors_panatac_v2.0.rds')
 
+#if (!file.exists( glue::glue("PanImmune_merged_RNA_ATAC_{add_filename}.rds"))) {
+  
+
 r.obj <- readRDS(input.path.rna)
 a.obj <- readRDS(input.path.atac)
 
@@ -122,7 +126,9 @@ r.obj <- normalize_multiome(r.obj)
 cat('done \n')
 
 saveRDS(r.obj, glue::glue("PanImmune_merged_RNA_ATAC_{add_filename}.rds"))
-
+#} else {
+#  r.obj <- readRDS(glue::glue("PanImmune_merged_RNA_ATAC_{add_filename}.rds"))
+#}
 p1 <- DimPlot(r.obj, reduction = "rna.umap", group.by = "seurat_clusters", label = TRUE, label.size = 2.5, repel = TRUE) + ggtitle("RNA")
 p2 <- DimPlot(r.obj, reduction = "atac.umap", group.by = "seurat_clusters", label = TRUE, label.size = 2.5, repel = TRUE) + ggtitle("ATAC")
 p3 <- DimPlot(r.obj, reduction = "wnn.umap", group.by = "seurat_clusters", label = TRUE, label.size = 2.5, repel = TRUE) + ggtitle("WNN")
