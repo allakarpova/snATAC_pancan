@@ -31,7 +31,7 @@ normalize_multiome <- function(obj,dims = 50) {
       return.only.var.genes = T,
       verbose = FALSE) %>% 
     RunPCA(assay = 'SCT', do.print = FALSE) %>%
-    RunUMAP(dims = 2:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
+    RunUMAP(dims = 1:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
   DefaultAssay(obj) <- "ATAC_immune"
   
   obj <- obj %>% 
