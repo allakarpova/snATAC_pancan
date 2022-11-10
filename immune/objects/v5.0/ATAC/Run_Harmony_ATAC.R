@@ -36,15 +36,11 @@ suppressMessages(library(doParallel))
 
 runHarmonyNormalization <- function(obj, dims) {
   obj$Data.source <- ifelse(obj$Cancer == 'PBMC', '10x', 'DingLab')
-  if(conditions=='B-cell_Plasma') {
-    obj$Batches <- case_when(obj$Cancer %in% c('PBMC') ~ 'PBMC',
-                                   obj$Cancer %in% c('MM') ~ obj$Cancer,
-                                   TRUE ~ obj$Chemistry)
-  }  else {
+  
     obj$Batches <- case_when(obj$Cancer %in% c('PBMC') ~ paste(obj$Cancer, obj$data.type, sep = '__'),
                              obj$Cancer %in% c('MM') ~ obj$Cancer,
                                    TRUE ~ obj$Chemistry)
-  }
+  
   #### run normalization to get initial clusters ###
   ########
   obj <- obj %>% 
