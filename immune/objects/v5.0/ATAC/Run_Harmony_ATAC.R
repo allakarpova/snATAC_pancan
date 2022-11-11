@@ -52,6 +52,7 @@ runHarmonyNormalization <- function(obj, dims) {
       irlba.work = 400 ) %>% 
     RunHarmony( group.by.vars = c("Batches"), 
                 reduction = 'lsi', 
+                assay.use = 'ATAC_immune',
                 project.dim = F, 
                 max.iter.harmony = 20)
     FindNeighbors(
