@@ -358,7 +358,7 @@ if(cancer.type == 'BRCA') {
                                                                                 grepl('Normal_duct', cell_type) ~ 'Normal epithelial cells',
                                                                                 grepl('Immune', cell_type) ~ 'Immune cells',
                                                                                 TRUE ~ cell_type))
-})
+}
 print(paste('Cells not cell typed:', sum(is.na(total.metadata$cell_type.harmonized))))
 
 #now label transfer did not work well for some samples in regular ATAC, I updated some cell types
