@@ -179,7 +179,7 @@ if(cancer.type == 'BRCA') {
                                                                                 cell_type =='T' | grepl('CD4_T|CD8|T-cells|2', cell_type) ~ 'T-cells',
                                                                                 cell_type =='B' | grepl('B-cells', cell_type) ~ 'B-cells',
                                                                                 grepl('Plasma', cell_type) ~ 'Plasma',
-                                                                                grepl('Macro|Kupffer', cell_type) ~ 'Macrophages',
+                                                                                grepl('Macro|Kupffer|Kuppfer', cell_type) ~ 'Macrophages',
                                                                                 grepl('DC', cell_type) ~ 'DC',
                                                                                 grepl('Hepatocyte', cell_type) ~ 'Hepatocytes',
                                                                                 grepl('Cholangiocytes', cell_type) ~ 'Cholangiocytes',
@@ -194,8 +194,8 @@ if(cancer.type == 'BRCA') {
                                                                                 grepl('Pericyte', cell_type) ~ 'Pericytes',
                                                                                 grepl('Oligodendrocyte', cell_type) ~ 'Oligodendrocytes',
                                                                                 grepl('Neuron', cell_type) ~ 'Neurons',
-                                                                                grepl('Enterocyte', cell_type) ~ 'Enterocytes',
-                                                                                grepl('Epithelial', cell_type) ~ 'Epithelial',
+                                                                                grepl('Enterocyte', cell_type) ~ 'Normal epithelial cells',
+                                                                                grepl('Epithelial', cell_type) ~ 'Normal epithelial cells',
                                                                                 TRUE ~ cell_type))
 } else if (cancer.type == 'ccRCC') {
   total.metadata <- total.metadata %>% mutate(cell_type.harmonized = case_when (grepl('Endothelial|Endo', cell_type) ~ 'Endothelial',          
