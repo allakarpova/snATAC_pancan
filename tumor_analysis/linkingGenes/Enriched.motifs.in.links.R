@@ -56,8 +56,6 @@ cancer <- opt$cancer
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
-dir.create('out')
-dir.create('plots')
 
 all.links.no.gained.tumor.normal <- fread(links_path)
 peaks.to.test <- all.links.no.gained.tumor.normal %>% filter(Cancer==cancer) %>% pull(peak) %>% unique
