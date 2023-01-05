@@ -74,7 +74,7 @@ obj <- AddMotifs(
 
 c('BRCA','HNSCC', 'CRC', 'CESC', 'PDAC', 'OV', 'UCEC') %>% walk(function(cancer) {
   peaks.to.test <- all.links.no.gained.tumor.normal %>% filter(Cancer==cancer) %>% pull(peak) %>% unique
-  
+  Idents(obj) <- 'cell_type.harmonized.cancer.rna'
   #find peaks accessible in tumor cells
   open.peaks <- AccessiblePeaks(obj, idents = 'Tumor')
   
