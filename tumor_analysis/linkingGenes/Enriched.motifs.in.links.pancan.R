@@ -73,9 +73,18 @@ obj <- AddMotifs(
 )
 
 c('BRCA','HNSCC', 'CRC', 'CESC', 'PDAC', 'OV', 'UCEC') %>% walk(function(cancer) {
-  peaks.to.test <- all.links.no.gained.tumor.normal %>% filter(Cancer==cancer) %>% pull(peak) %>% unique
-  Idents(obj) <- 'cell_type.harmonized.cancer.rna'
+  common.peaks.with.links <- all.links.no.gained.tumor.normal %>% distinct(Cancer,peak) %>% 
+    group_by(peak) %>% tally() %>% filter(n>1) %>% pull(peak) %>% unique
+  cancer.peaks.with.links <- all.links.no.gained.tumor.normal %>% filter(Cancer==cancer) %>% pull(peak) %>% unique
+  
+  Idents(obj) <- 'Cancer'
+  open.cancer.peaks <- AccessiblePeaks(obj, idents = cancer)
+  
+  peaks.to.test <- intersect(open.cancer.peaks, 
+                             setdiff(cancer.peaks.with.links, common.peaks.with.links))
+  
   #find peaks accessible in tumor cells
+  Idents(obj) <- 'cell_type.harmonized.cancer.rna'
   open.peaks <- AccessiblePeaks(obj, idents = 'Tumor')
   
   # match the overall GC content in the peak set
@@ -94,7 +103,7 @@ c('BRCA','HNSCC', 'CRC', 'CESC', 'PDAC', 'OV', 'UCEC') %>% walk(function(cancer)
   )
   
   
-  fwrite(enriched.motifs, glue::glue('Enriched.motifs.{cancer}.bckgr.All.cancers.open.peaks.GC.tsv'), sep='\t', row.names = F, col.names = T)
+  fwrite(enriched.motifs, glue::glue('Enriched.motifs.{cancer}.unique.cancer.peaks.with.links.bckgr.All.open.peaks.GC.tsv'), sep='\t', row.names = F, col.names = T)
   
   
 })
