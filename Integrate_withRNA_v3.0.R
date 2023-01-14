@@ -86,6 +86,7 @@ DefaultAssay(rna) <- 'RNA'
 rna <- NormalizeData(rna,assay = 'RNA')
 
 DefaultAssay(atac) <- 'ATACGeneActivity'
+atac <- NormalizeData(atac,assay = 'ATACGeneActivity')
 
 
 if(!is.null(meta.path)) {
@@ -93,12 +94,13 @@ if(!is.null(meta.path)) {
     data.frame(row.names = 1)
   rna <- AddMetaData(rna,meta)
 }
-atac <- NormalizeData(
-  object = atac,
-  assay = 'ATACGeneActivity',
-  normalization.method = 'LogNormalize'#,
-  #scale.factor = median(atac$nCount_ATACGeneActivity)
-)
+
+# atac <- NormalizeData(
+#   object = atac,
+#   assay = 'ATACGeneActivity',
+#   normalization.method = 'LogNormalize'#,
+#   #scale.factor = median(atac$nCount_ATACGeneActivity)
+# )
 
 cat('doing FindTransferAnchors\n')
 transfer.anchors <- FindTransferAnchors(
