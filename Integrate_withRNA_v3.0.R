@@ -86,7 +86,7 @@ DefaultAssay(rna) <- 'RNA'
 rna <- NormalizeData(rna,assay = 'RNA')
 
 DefaultAssay(atac) <- 'ATACGeneActivity'
-atac <- NormalizeData(atac,assay = 'ATACGeneActivity')
+#atac <- NormalizeData(atac,assay = 'ATACGeneActivity')
 
 
 if(!is.null(meta.path)) {
