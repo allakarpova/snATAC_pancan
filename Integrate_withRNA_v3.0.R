@@ -84,7 +84,7 @@ atac@assays$ATAC@key <- 'atac_'
 
 DefaultAssay(rna) <- 'RNA'
 rna <- NormalizeData(rna,assay = 'RNA')
-
+rna <- FindVariableFeatures(rna)
 DefaultAssay(atac) <- 'ATACGeneActivity'
 #atac <- NormalizeData(atac,assay = 'ATACGeneActivity')
 
