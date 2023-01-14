@@ -116,7 +116,7 @@ cat('doing TransferData\n')
 predicted.labels <- TransferData(
   anchorset = transfer.anchors,
   reference = rna,
-  refdata = ct.column,
+  refdata = as.character(rna@meta.data[,ct.column]),
   weight.reduction = atac[['lsi']],
   dims = 2:30
 )
