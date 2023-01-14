@@ -96,8 +96,8 @@ if(!is.null(meta.path)) {
 atac <- NormalizeData(
   object = atac,
   assay = 'ATACGeneActivity',
-  normalization.method = 'LogNormalize',
-  scale.factor = median(atac$nCount_ATACGeneActivity)
+  normalization.method = 'LogNormalize'#,
+  #scale.factor = median(atac$nCount_ATACGeneActivity)
 )
 
 cat('doing FindTransferAnchors\n')
