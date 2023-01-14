@@ -83,8 +83,9 @@ atac=readRDS(sample_atac)
 atac@assays$ATAC@key <- 'atac_'
 
 DefaultAssay(rna) <- 'RNA'
-rna <- NormalizeData(rna, assay='RNA')
-DefaultAssay(atac) <- 'RNA'
+rna <- NormalizeData(rna,assay = 'RNA')
+
+DefaultAssay(atac) <- 'ATACGeneActivity'
 
 
 if(!is.null(meta.path)) {
@@ -94,9 +95,9 @@ if(!is.null(meta.path)) {
 }
 atac <- NormalizeData(
   object = atac,
-  assay = 'RNA',
+  assay = 'ATACGeneActivity',
   normalization.method = 'LogNormalize',
-  scale.factor = median(atac$nCount_RNA)
+  scale.factor = median(atac$nCount_ATACGeneActivity)
 )
 
 cat('doing FindTransferAnchors\n')
@@ -105,7 +106,7 @@ transfer.anchors <- FindTransferAnchors(
   query = atac,
   features = VariableFeatures(object = rna), 
   reference.assay = "RNA", 
-  query.assay = "RNA", 
+  query.assay = "ATACGeneActivity", 
   reduction = 'cca'
 )
 
