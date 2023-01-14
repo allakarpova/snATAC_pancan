@@ -78,7 +78,9 @@ setwd(out_path)
 
 
 rna=readRDS(sample_rna)
+rna@assays$ATAC@key <- 'atac_'
 atac=readRDS(sample_atac)
+atac@assays$ATAC@key <- 'atac_'
 
 DefaultAssay(rna) <- 'RNA'
 rna <- NormalizeData(rna, assay='RNA')
