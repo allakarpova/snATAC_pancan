@@ -11,7 +11,7 @@ suppressMessages(library(optparse))
 suppressMessages(library(future))
 
 
-meta <- fread('/diskmnt/Projects/snATAC_primary/04_celltyped_rds/cell_type_snRNA_merged/v7.0_data_freeze/All_225_samples_metadata_data_freeze_v7.0.tsv')%>% data.frame(row.names = 1)
+meta <- fread('/diskmnt/Projects/snATAC_primary/04_celltyped_rds/cell_type_snRNA_merged/v7.0_data_freeze/All_snRNA_samples_metadata_data_freeze_v7.0.tsv')%>% data.frame(row.names = 1)
 
 cat('PDAC \n')
 cat('opening object \n')
