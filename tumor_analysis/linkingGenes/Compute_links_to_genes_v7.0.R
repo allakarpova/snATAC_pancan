@@ -56,7 +56,7 @@ DimPlot(obj, group.by = 'seurat_clusters', label=TRUE,reduction = "wnn.umap")
 ggsave(paste0('plots/Dimplot_seurat_clusters_res2_', out.obj, '.pdf'), width = 10, height = 10)
 
 
-tb <- table(panc$seurat_clusters, panc$Piece_ID) %>% 
+tb <- table(obj$seurat_clusters, obj$Case_ID) %>% 
   as.data.frame.matrix() 
 tb <- tb/rowSums(tb)
 print(tb)
