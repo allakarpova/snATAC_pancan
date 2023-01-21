@@ -76,6 +76,8 @@ message('subsetting bad clusters out')
 obj <- subset(obj, seurat_clusters %in% shared.clusters, invert=TRUE)
 print(dim(obj))
 
+min.cells.num <- 0.05*ncol(obj)
+print(min.cells.num)
 # first compute the GC content for each peak
 obj <- RegionStats(obj, genome = BSgenome.Hsapiens.UCSC.hg38)
 
@@ -85,6 +87,7 @@ obj <- LinkPeaks(
   peak.assay = "pancan",
   distance = 5e+05,
   n_sample = 1000,
+  min.cells = min.cells.num,
   expression.assay = "SCT"
 )
 
