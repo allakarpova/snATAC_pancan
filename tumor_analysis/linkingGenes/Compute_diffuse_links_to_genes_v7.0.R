@@ -24,7 +24,12 @@ option_list = list(
               type="character",
               default="./", 
               help="output folder path",
-              metavar="character")
+              metavar="character"),
+  make_option(c("-r", "--doremoval"),
+              type="logical",
+              default=TRUE, 
+              help="Remove multi case clusters? TRUE if you use tumor cells, FALSE if you use normal cells",
+              metavar="logical")
   
 );
 
@@ -65,32 +70,34 @@ frag <- Fragments(obj@assays$pancan)
 #this will remove fragment objects with just 1 or 0 cells because they fail FeatureMatrix function
 frag.filtered <- frag[do.call( 'c', lapply(frag, function(x) length(x@cells) > 1))]
 
-#this part finds and removes shitty clusters
-obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 1, verbose = T, resolution=2)
-DimPlot(obj, group.by = 'seurat_clusters', label=TRUE,reduction = "wnn.umap")
-ggsave(paste0('plots/Dimplot_seurat_clusters_res2_', out.obj, '.pdf'), width = 10, height = 10)
-
-DimPlot(obj, group.by = 'Case_ID', label=TRUE,reduction = "wnn.umap")
-ggsave(paste0('plots/Dimplot_Case_ID_', out.obj, '.pdf'), width = 10, height = 10)
-tb <- table(obj$seurat_clusters, obj$Case_ID) %>% 
-  as.data.frame.matrix() 
-tb <- tb/rowSums(tb)
-print(tb)
-
-shared.clusters <- rownames(tb)[rowSums(tb < 0.7) > (ncol(tb)-1)]
-print(shared.clusters)
-
-tohighlight <- rownames(filter(obj@meta.data, seurat_clusters %in% shared.clusters))
-DimPlot(obj, cells.highlight = tohighlight, reduction = "wnn.umap")
-ggsave(paste0('plots/Dimplot_doublet_clusters_', out.obj, '.pdf'), width = 10, height = 10)
-
-print(dim(obj))
-message('subsetting bad clusters out')
-obj <- subset(obj, seurat_clusters %in% shared.clusters, invert=TRUE)
-print(dim(obj))
-
+if (opt$doremoval) {
+  #this part finds and removes shitty clusters
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 1, verbose = T, resolution=2)
+  DimPlot(obj, group.by = 'seurat_clusters', label=TRUE,reduction = "wnn.umap")
+  ggsave(paste0('plots/Dimplot_seurat_clusters_res2_', out.obj, '.pdf'), width = 10, height = 10)
+  
+  DimPlot(obj, group.by = 'Case_ID', label=TRUE,reduction = "wnn.umap")
+  ggsave(paste0('plots/Dimplot_Case_ID_', out.obj, '.pdf'), width = 10, height = 10)
+  tb <- table(obj$seurat_clusters, obj$Case_ID) %>% 
+    as.data.frame.matrix() 
+  tb <- tb/rowSums(tb)
+  print(tb)
+  
+  shared.clusters <- rownames(tb)[rowSums(tb < 0.7) > (ncol(tb)-1)]
+  print(shared.clusters)
+  
+  tohighlight <- rownames(filter(obj@meta.data, seurat_clusters %in% shared.clusters))
+  DimPlot(obj, cells.highlight = tohighlight, reduction = "wnn.umap")
+  ggsave(paste0('plots/Dimplot_doublet_clusters_', out.obj, '.pdf'), width = 10, height = 10)
+  
+  print(dim(obj))
+  message('subsetting bad clusters out')
+  obj <- subset(obj, seurat_clusters %in% shared.clusters, invert=TRUE)
+  print(dim(obj))
+}
 min.cells.num <- 0.05*ncol(obj)
 print(min.cells.num)
+
 
 # remove pancan assay
 DefaultAssay(obj)<-'SCT'
