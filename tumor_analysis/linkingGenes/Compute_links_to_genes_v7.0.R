@@ -59,7 +59,6 @@ DimPlot(obj, group.by = 'Case_ID', label=TRUE,reduction = "wnn.umap")
 ggsave(paste0('plots/Dimplot_Case_ID_', out.obj, '.pdf'), width = 10, height = 10)
 
 
-
 tb <- table(obj$seurat_clusters, obj$Case_ID) %>% 
   as.data.frame.matrix() 
 tb <- tb/rowSums(tb)
@@ -72,6 +71,10 @@ tohighlight <- rownames(filter(obj@meta.data, seurat_clusters %in% shared.cluste
 DimPlot(obj, cells.highlight = tohighlight, reduction = "wnn.umap")
 ggsave(paste0('plots/Dimplot_doublet_clusters_', out.obj, '.pdf'), width = 10, height = 10)
 
+print(dim(obj))
+message('subsetting bad clusters out')
+obj <- subset(obj, seurat_clusters %in% shared.clusters, invert=TRUE)
+print(dim(obj))
 
 # first compute the GC content for each peak
 obj <- RegionStats(obj, genome = BSgenome.Hsapiens.UCSC.hg38)
