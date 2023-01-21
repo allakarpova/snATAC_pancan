@@ -55,6 +55,10 @@ obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 1, verbose = T, resolu
 DimPlot(obj, group.by = 'seurat_clusters', label=TRUE,reduction = "wnn.umap")
 ggsave(paste0('plots/Dimplot_seurat_clusters_res2_', out.obj, '.pdf'), width = 10, height = 10)
 
+DimPlot(obj, group.by = 'Case_ID', label=TRUE,reduction = "wnn.umap")
+ggsave(paste0('plots/Dimplot_Case_ID_', out.obj, '.pdf'), width = 10, height = 10)
+
+
 
 tb <- table(obj$seurat_clusters, obj$Case_ID) %>% 
   as.data.frame.matrix() 
