@@ -123,7 +123,7 @@ matrix.counts <- FeatureMatrix(
 
 obj[['X100kb']] <- CreateChromatinAssay(counts = matrix.counts,
                                                  annotation = annot,
-                                                 genome = 'hg38',
+                                                 #genome = 'hg38',
                                                  fragments = frag.filtered, 
                                                   min.features = -1)
 
