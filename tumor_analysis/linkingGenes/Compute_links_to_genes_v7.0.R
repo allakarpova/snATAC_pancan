@@ -8,7 +8,7 @@ suppressMessages(library(future))
 plan("multicore", workers =10)
 options(future.globals.maxSize = 50 * 1024^3)
 suppressMessages(library(optparse))
-suppressMessages(library(googlesheets4))
+ 
 suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
 
 
@@ -49,7 +49,6 @@ dir.create('plots')
 out.obj <- str_replace(input_path, pattern = 'rds', replacement = 'linked.rds')
 out.obj <- str_split(out.obj, '[/]')[[1]][str_count(out.obj, '/')+1]
 
-
 cat('opening object \n')
 obj <- readRDS(input_path)
 DefaultAssay(obj) <- "pancan"
@@ -82,7 +81,8 @@ if (opt$doremoval) {
   obj <- subset(obj, seurat_clusters %in% shared.clusters, invert=TRUE)
   print(dim(obj))
 }
-min.cells.num <- 0.05*ncol(obj)
+
+min.cells.num <- 0.005*ncol(obj)
 print(min.cells.num)
 
 # first compute the GC content for each peak
