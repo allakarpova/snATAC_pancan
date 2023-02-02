@@ -82,7 +82,7 @@ if (opt$doremoval) {
   print(dim(obj))
 }
 
-min.cells.num <- 0.005*ncol(obj)
+min.cells.num <- 0.00005*ncol(obj)
 print(min.cells.num)
 
 # first compute the GC content for each peak
@@ -94,7 +94,7 @@ obj <- LinkPeaks(
   peak.assay = "pancan",
   distance = 5e+05,
   n_sample = 1000,
-  min.cells = min.cells.num,
+  #min.cells = min.cells.num,
   expression.assay = "SCT"
 )
 
