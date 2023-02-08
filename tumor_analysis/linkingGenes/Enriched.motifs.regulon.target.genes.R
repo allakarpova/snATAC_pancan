@@ -95,7 +95,8 @@ regulons.tf %>% walk(function(tf) {
   peaks.to.test.against <- interesting.connections %>% 
     filter(!(gene %in% tf.targets) & Cancer == cancer.type)  %>% pull(peak) %>% unique
   
-  
+  print(length(peaks.to.test))
+  print(length(peaks.to.test))
   # match the overall GC content in the peak set
   meta.feature <- GetAssayData(obj, assay = "pancan", slot = "meta.features")
   peaks.matched <- MatchRegionStats(
