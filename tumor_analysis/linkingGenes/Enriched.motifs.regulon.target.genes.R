@@ -55,8 +55,8 @@ genes.gained <- all.links.filtered %>%
 interesting.connections <- all.links.filtered %>% 
   filter(!(paste(gene, Cancer, sep ='_') %in% genes.gained)) %>% 
   ungroup() %>% 
-  dplyr::select(-cnv, -N.cells.with.cnv, -cnv.pct) %>% distinct() %>%
-  filter(Enhancer.scEn != "" | Enhancer.GH != "") # only include links from enhancers or promoter/enhancers
+  dplyr::select(-cnv, -N.cells.with.cnv, -cnv.pct) %>% distinct() #%>%
+  #filter(Enhancer.scEn != "" | Enhancer.GH != "") # only include links from enhancers or promoter/enhancers
 
 
 cat('opening object \n')
