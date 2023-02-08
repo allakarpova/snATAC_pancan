@@ -12,7 +12,7 @@ suppressMessages(library(optparse))
 suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
 suppressMessages(library(JASPAR2020))
 library(motifmatchr)
-
+library(TFBSTools)
 
 ###options###
 ######################
