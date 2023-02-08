@@ -110,6 +110,6 @@ regulons.tf %>% walk(function(tf) {
     features = peaks.to.test,
     background=peaks.matched
   )
-  fwrite(glue::glue('Enriched_motifs_in_links_with_{tf}_targets_in_{cancer.type}.tsv'), sep='\t')
+  fwrite(enriched.motifs, glue::glue('Enriched_motifs_in_links_with_{tf}_targets_in_{cancer.type}.tsv'), sep='\t')
 })
 
