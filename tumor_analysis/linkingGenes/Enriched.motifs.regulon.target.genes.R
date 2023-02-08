@@ -55,7 +55,8 @@ genes.gained <- all.links.filtered %>%
 interesting.connections <- all.links.filtered %>% 
   filter(!(paste(gene, Cancer, sep ='_') %in% genes.gained)) %>% 
   ungroup() %>% 
-  dplyr::select(-cnv, -N.cells.with.cnv, -cnv.pct) %>% distinct()
+  dplyr::select(-cnv, -N.cells.with.cnv, -cnv.pct) %>% distinct() %>%
+  filter(Enhancer.scEn != "" | Enhancer.GH != "") # only include links from enhancers or promoter/enhancers
 
 
 cat('opening object \n')
@@ -98,8 +99,10 @@ regulons.tf %>% walk(function(tf) {
   print(length(peaks.to.test))
   print(length(peaks.to.test.against))
   
-  if(length(peaks.to.test)>5) {
-    tryCatch({
+  if(length(peaks.to.test) > 5) {
+    print('do shit')
+    #tryCatch({
+      
       # match the overall GC content in the peak set
       meta.feature <- GetAssayData(obj, assay = "pancan", slot = "meta.features")
       peaks.matched <- MatchRegionStats(
@@ -115,10 +118,10 @@ regulons.tf %>% walk(function(tf) {
         background=peaks.matched
       )
       fwrite(enriched.motifs, glue::glue('Enriched_motifs_in_links_with_{tf}_targets_in_{cancer.type}.tsv'), sep='\t')
-    }, error = function(e) {
-      message(e)
-      data.frame()
-    })
+    # }, error = function(e) {
+    #   message(e)
+    #   data.frame()
+    # })
   }
   
 })
