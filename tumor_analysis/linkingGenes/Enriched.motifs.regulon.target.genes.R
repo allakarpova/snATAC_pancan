@@ -96,27 +96,30 @@ regulons.tf %>% walk(function(tf) {
     filter(!(gene %in% tf.targets) & Cancer == cancer.type)  %>% pull(peak) %>% unique
   
   print(length(peaks.to.test))
-  print(length(peaks.to.test))
+  print(length(peaks.to.test.against))
   
-  tryCatch({
-    # match the overall GC content in the peak set
-    meta.feature <- GetAssayData(obj, assay = "pancan", slot = "meta.features")
-    peaks.matched <- MatchRegionStats(
-      meta.feature = meta.feature[peaks.to.test.against, ],
-      query.feature = meta.feature[peaks.to.test, ],
-      n = 5000
-    )
-    
-    enriched.motifs <- FindMotifs(
-      #assay = 'pancan',
-      object = obj,
-      features = peaks.to.test,
-      background=peaks.matched
-    )
-    fwrite(enriched.motifs, glue::glue('Enriched_motifs_in_links_with_{tf}_targets_in_{cancer.type}.tsv'), sep='\t')
-  }, error = function(e) {
-    message(e)
-    data.frame()
-  })
+  if(length(peaks.to.test)>5) {
+    tryCatch({
+      # match the overall GC content in the peak set
+      meta.feature <- GetAssayData(obj, assay = "pancan", slot = "meta.features")
+      peaks.matched <- MatchRegionStats(
+        meta.feature = meta.feature[peaks.to.test.against, ],
+        query.feature = meta.feature[peaks.to.test, ],
+        n = 5000
+      )
+      
+      enriched.motifs <- FindMotifs(
+        #assay = 'pancan',
+        object = obj,
+        features = peaks.to.test,
+        background=peaks.matched
+      )
+      fwrite(enriched.motifs, glue::glue('Enriched_motifs_in_links_with_{tf}_targets_in_{cancer.type}.tsv'), sep='\t')
+    }, error = function(e) {
+      message(e)
+      data.frame()
+    })
+  }
+  
 })
 
