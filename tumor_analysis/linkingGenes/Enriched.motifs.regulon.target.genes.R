@@ -80,6 +80,9 @@ current.regulons <- fread('/diskmnt/Projects/snATAC_analysis/tumor_Alla/SCENIC_t
 current.regulons %>% head()
 regulons.tf <- current.regulons$Regulon_1 %>% unique
 
+scenic.target <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v7.0/snRNA/SCENIC_results/UpdatedByFreq.0.8_regulons.20220124.rds')
+names(scenic.target) <- str_replace(string = names(scenic.target), pattern = "[(][+][)]", replacement = '')
+
 
 regulons.tf %>% walk(function(tf) {
   print(tf)
