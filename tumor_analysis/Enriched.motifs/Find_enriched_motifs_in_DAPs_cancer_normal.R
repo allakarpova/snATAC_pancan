@@ -154,6 +154,9 @@ if (cancer.type=='BRCA') {
     open.peaks <- AccessiblePeaks(obj, idents = c(glue::glue("{c}__Tumor"), n))
     enriched.m <- findEnrichedMotifs(cancer=c, open.peaks)
     fwrite(enriched.m, glue::glue('Motifs_enriched_in_{c}_cancer_vs_{n}.tsv'), row.names = F, sep='\t')
+    depleted.m <- findDepletedMotifs(cancer=c, open.peaks)
+    fwrite(depleted.m, glue::glue('Motifs_depleted_in_{c}_cancer_vs_{n}.tsv'), row.names = F, sep='\t')
+    
   })
   
 } else {
@@ -161,6 +164,9 @@ if (cancer.type=='BRCA') {
     open.peaks <- AccessiblePeaks(obj, idents = c("Tumor", normal))
     enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
     fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+    depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
+    fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+    
 }
 
 
