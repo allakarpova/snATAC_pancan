@@ -81,7 +81,7 @@ option_list = list(
               type="character",
               default=NULL, 
               help="cancer type",
-              metavar="character"),
+              metavar="character")
   
 );
 
