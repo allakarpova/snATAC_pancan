@@ -133,12 +133,13 @@ if (cancer.type %in% c('ccRCC', 'PDAC', 'CRC')) {
   Idents(obj) <- 'cell_type.harmonized.cancer'
 }
 
+table(Idents(obj))
 if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
   obj$Cancer <- case_when(obj$Piece_ID %in% c("HT268B1-Th1H3", "HT029B1-S1PC", "HT035B1-S1PA",
                                               "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
                                               "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
                           TRUE ~ 'BRCA')
-  obj$Cancer_cell_type <- case_when(obj$cell_type.harmonized.cancer=='Tumor' ~ paste(obj$Cancer, obj$cell_type.harmonized.cancer, sep='__'),
+  obj$Cancer_cell_type <- case_when(obj$cell_type.harmonized.cancer=='Tumor' ~ paste(cancer.type, 'Tumor', sep='__'),
                                     TRUE ~ obj$cell_type.harmonized.cancer)
   Idents(obj) <- 'Cancer_cell_type'
 }
