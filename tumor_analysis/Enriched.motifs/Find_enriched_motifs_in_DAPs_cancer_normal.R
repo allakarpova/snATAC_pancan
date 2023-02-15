@@ -138,7 +138,7 @@ if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
                                               "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
                                               "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
                           TRUE ~ 'BRCA')
-  obj$Cancer_cell_type <- case_when(obj$cell_type.harmonized.cancer=='Tumor', paste(obj$Cancer, obj$cell_type.harmonized.cancer, sep='__'),
+  obj$Cancer_cell_type <- case_when(obj$cell_type.harmonized.cancer=='Tumor' ~ paste(obj$Cancer, obj$cell_type.harmonized.cancer, sep='__'),
                                     TRUE ~ obj$cell_type.harmonized.cancer)
   Idents(obj) <- 'Cancer_cell_type'
 }
