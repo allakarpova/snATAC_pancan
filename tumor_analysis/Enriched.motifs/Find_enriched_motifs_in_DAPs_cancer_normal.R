@@ -133,7 +133,7 @@ if (cancer.type %in% c('ccRCC', 'PDAC', 'CRC')) {
   Idents(obj) <- 'cell_type.harmonized.cancer'
 }
 
-if (cancer.type=='BRCA') {
+if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
   obj$Cancer <- case_when(obj$Piece_ID %in% c("HT268B1-Th1H3", "HT029B1-S1PC", "HT035B1-S1PA",
                                               "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
                                               "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
@@ -145,19 +145,21 @@ if (cancer.type=='BRCA') {
 
 table(Idents(obj))
 
-cancer.normal.pairs <- data.frame(Cancer = c('PDAC', 'ccRCC', "CRC", 'UCEC', 'CESC', 'GBM', 'MM', 'OV', 'HNSCC', 'SKCM'),
-                                  Normal = c('Ductal-like2', 'Proximal Tubule', 'Distal Stem Cells', 'Secretory Endometrial epithelial cells', 
+cancer.normal.pairs <- data.frame(Cancer = c('BRCA', 'BRCA_Basal', 'PDAC', 'ccRCC', "CRC", 'UCEC', 'CESC', 'GBM', 'MM', 'OV', 'HNSCC', 'SKCM'),
+                                  Normal = c('Luminal mature', 'Luminal progenitor', 
+                                             'Ductal-like2', 'Proximal Tubule', 'Distal Stem Cells', 'Secretory Endometrial epithelial cells', 
                                              'Normal squamous cells', 'OPC', 'B-cells', 'Secretory Endometrial epithelial cells', 'Normal squamous cells', 'Melanocytes'))
+
+
 #find peaks accessible in tumor cells and prximal tubules
-if (cancer.type=='BRCA') {
-   walk(c('BRCA', 'BRCA_Basal'), c('Luminal mature', 'Luminal progenitor'), function(c, n) {
-    open.peaks <- AccessiblePeaks(obj, idents = c(glue::glue("{c}__Tumor"), n))
-    enriched.m <- findEnrichedMotifs(cancer=c, open.peaks)
-    fwrite(enriched.m, glue::glue('Motifs_enriched_in_{c}_cancer_vs_{n}.tsv'), row.names = F, sep='\t')
-    depleted.m <- findDepletedMotifs(cancer=c, open.peaks)
-    fwrite(depleted.m, glue::glue('Motifs_depleted_in_{c}_cancer_vs_{n}.tsv'), row.names = F, sep='\t')
-    
-  })
+if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal' ) {
+  normal <- cancer.normal.pairs %>% filter(Cancer==cancer.type) %>% pull(Normal)
+  open.peaks <- AccessiblePeaks(obj, idents = c(glue::glue("{cancer.type}__Tumor"), normal))
+  enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
+  fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+  depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
+  fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+
   
 } else {
     normal <- cancer.normal.pairs %>% filter(Cancer==cancer.type) %>% pull(Normal)
