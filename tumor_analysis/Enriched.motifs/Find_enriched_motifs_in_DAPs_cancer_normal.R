@@ -43,6 +43,7 @@ findEnrichedMotifs <- function(cancer, open.peaks) {
 
 findDepletedMotifs <- function(cancer, open.peaks) {
   peaks.to.test <- dap.relaxed %>% filter(p_val_adj < 0.05 & Disease==cancer & avg_log2FC < 0) %>% pull(peak)
+  print(length(peaks.to.test))
   # match the overall GC content in the peak set
   meta.feature <- GetAssayData(obj, assay = "pancan", slot = "meta.features")
   peaks.matched <- MatchRegionStats(
@@ -135,12 +136,14 @@ if (cancer.type %in% c('ccRCC', 'PDAC', 'CRC')) {
 
 table(Idents(obj))
 if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
-  obj$Cancer <- case_when(obj$Piece_ID %in% c("HT268B1-Th1H3", "HT029B1-S1PC", "HT035B1-S1PA",
+  obj$Cancer2 <- case_when(obj$Piece_ID %in% c("HT268B1-Th1H3", "HT029B1-S1PC", "HT035B1-S1PA",
                                               "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
                                               "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
                           TRUE ~ 'BRCA')
-  obj$Cancer_cell_type <- case_when(obj$cell_type.harmonized.cancer=='Tumor' ~ paste(cancer.type, 'Tumor', sep='__'),
-                                    TRUE ~ obj$cell_type.harmonized.cancer)
+  #table(obj$Cancer2)
+  obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.harmonized.cancer=='Tumor' ~ paste(Cancer2, 'Tumor', sep='__'),
+                                    TRUE ~ cell_type.harmonized.cancer))
+  #table(obj$Cancer_cell_type)
   Idents(obj) <- 'Cancer_cell_type'
 }
 
@@ -158,8 +161,8 @@ if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal' ) {
   open.peaks <- AccessiblePeaks(obj, idents = c(glue::glue("{cancer.type}__Tumor"), normal))
   enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
   fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
-  depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
-  fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+  #depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
+  #fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
 
   
 } else {
@@ -167,8 +170,8 @@ if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal' ) {
     open.peaks <- AccessiblePeaks(obj, idents = c("Tumor", normal))
     enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
     fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
-    depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
-    fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
+    #depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
+    #fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
     
 }
 
