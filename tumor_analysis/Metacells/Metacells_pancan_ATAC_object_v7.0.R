@@ -110,6 +110,7 @@ DefaultAssay(obj) <- 'pancan'
 genes.oi <- SelectFractionGenes(obj,
                                 fraction=frac, # fraction of cells that a gene needs to be expressed in order to be included
                                 group.by = c("Piece_cell_type.normal"))
+print(length(genes.oi))
 obj <- SetupForWGCNA(
   obj,
   gene_list=genes.oi,
