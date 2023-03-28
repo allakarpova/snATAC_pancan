@@ -1,6 +1,5 @@
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
-suppressMessages(library(GenomeInfoDb))
 suppressMessages(library(ggplot2))
 suppressMessages(library(RColorBrewer))
 
@@ -8,13 +7,6 @@ suppressMessages(library(tidyverse))
 set.seed(1234)
 
 suppressMessages(library(data.table))
-suppressMessages(library(JASPAR2020))
-suppressMessages(library(TFBSTools))
-suppressMessages(library(ChIPseeker))
-suppressMessages(library(TxDb.Hsapiens.UCSC.hg38.knownGene))
-library("BSgenome.Hsapiens.UCSC.hg38")
-library(motifmatchr)
-
 plan("multicore", workers =4)
 options(future.globals.maxSize = 50 * 1024^3)
 suppressMessages(library(optparse))
@@ -41,18 +33,19 @@ SelectFractionGenes <- function(
   
   # binarize counts matrix in chunks to save memory
   expr_mat <- GetAssayData(seurat_obj, slot='counts')
-  n_chunks <- ceiling(ncol(expr_mat) / 5000)
-  
-  if(n_chunks == 1){
-    chunks <- factor(rep(1), levels=1)
-  } else{
-    chunks <- cut(1:nrow(expr_mat), n_chunks)
-  }
-  expr_mat <- do.call(rbind, lapply(levels(chunks), function(x){
-    cur <- expr_mat[chunks == x,]
-    cur[cur > 0] <- 1
-    cur
-  }))
+  expr_mat <- expr_mat > 0
+  # n_chunks <- ceiling(ncol(expr_mat) / 5000)
+  # 
+  # if(n_chunks == 1){
+  #   chunks <- factor(rep(1), levels=1)
+  # } else{
+  #   chunks <- cut(1:nrow(expr_mat), n_chunks)
+  # }
+  # expr_mat <- do.call(rbind, lapply(levels(chunks), function(x){
+  #   cur <- expr_mat[chunks == x,]
+  #   cur[cur > 0] <- 1
+  #   cur
+  # }))
   
   group_gene_list <- list()
   if(!is.null(group.by)){
@@ -126,7 +119,6 @@ atac.obj <- MetacellsByGroups(
   k = 25, # nearest-neighbors parameter
   ident.group = 'Piece_cell_type.normal' # set the Idents of the metacell seurat object
 )
-
 
 meta.atac.obj <- obj@misc$metacells$wgcna_metacell_obj
 
