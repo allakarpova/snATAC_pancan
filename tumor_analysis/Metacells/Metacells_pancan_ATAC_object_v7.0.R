@@ -110,16 +110,17 @@ DefaultAssay(obj) <- 'pancan'
 genes.oi <- SelectFractionGenes(obj,
                                 fraction=frac, # fraction of cells that a gene needs to be expressed in order to be included
                                 group.by = c("Piece_cell_type.normal"))
-atac.obj <- SetupForWGCNA(
+obj <- SetupForWGCNA(
   obj,
   gene_list=genes.oi,
   gene_select = "custom", # the gene selection approach
   wgcna_name = 'metacells' # the name of the scWGCNA experiment
 )
 
-atac.obj <- MetacellsByGroups(
-  reduction = 'umap',
+obj <- MetacellsByGroups(
   seurat_obj = obj,
+  mode = "sum",
+  reduction = 'umap.200PC',
   assay = 'pancan',
   group.by = c("Piece_cell_type.normal"), # specify the columns in seurat_obj@meta.data to group by
   k = 25, # nearest-neighbors parameter
