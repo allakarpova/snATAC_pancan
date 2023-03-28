@@ -80,13 +80,19 @@ option_list = list(
               type="character",
               default="./", 
               help="output folder path",
-              metavar="character")
+              metavar="character"),
+  make_option(c("-f", "--fraction"),
+              type="double",
+              default=0.01, 
+              help="fraction cutoff",
+              metavar="double")
   
 );
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser)
 
+frac <- opt$fraction
 out_path <- opt$output
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
@@ -102,7 +108,7 @@ obj <- AddMetaData(obj, atac.meta)
 
 DefaultAssay(obj) <- 'pancan'
 genes.oi <- SelectFractionGenes(obj,
-                                fraction=0.01, # fraction of cells that a gene needs to be expressed in order to be included
+                                fraction=frac, # fraction of cells that a gene needs to be expressed in order to be included
                                 group.by = c("Piece_cell_type.normal"))
 atac.obj <- SetupForWGCNA(
   obj,
