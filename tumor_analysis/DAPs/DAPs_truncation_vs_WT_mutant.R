@@ -98,7 +98,7 @@ da_peaks$cell_t2=cell_t2
 da_peaks$Driver=driver
 da_peaks$peak=rownames(da_peaks)
 
-fwrite(da_peaks, glue::glue("{driver}_Mut_vs_WT.Pooled.pct.0.1.fCh.0.20230329.tsv"),
+fwrite(da_peaks, glue::glue("{driver}_Mut_vs_WT.Pooled.pct.0.01.fCh.0.1.20230329.tsv"),
             sep="\t",row.names=FALSE)
 
 
