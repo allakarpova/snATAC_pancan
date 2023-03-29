@@ -86,9 +86,9 @@ da_peaks <- FindMarkers(
   ident.1 = cell_t1,
   ident.2 = cell_t2,
   only.pos = FALSE,
-  min.pct = 0.1,
+  min.pct = 0.01,
   min.diff.pct=0,
-  logfc.threshold=0,
+  logfc.threshold=0.1,
   test.use = 'LR',
   latent.vars = c('peak_RF_pancan','Cancer.for.test')
 )
