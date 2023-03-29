@@ -49,21 +49,21 @@ exclude <-  c('CE507-C1A2', 'CE354E1-S1', 'CE357E1-S1', 'CE336E1-S1', 'CE332E1-N
 
 # add driver annotation to the object
 genomic.data <- read_excel('/diskmnt/Projects/snATAC_primary/Pancan_ATAC_bulk_data_freeze.v2.0/Pancan_ATAC_driver_mutation_metatable_v7_20230221.xlsx', 
-                           sheet='Driver_mutation_mutant_WT')
+                           sheet='Driver_mutation_metatable')
 genomic.data <- genomic.data[,-1]
 driver.piece.anno  <- genomic.data %>% dplyr::select('Piece_ID', all_of(driver))
 obj@meta.data <- obj@meta.data  %>% cbind(driver.piece.anno[match(obj@meta.data$Piece_ID,driver.piece.anno$Piece_ID), -1])
 
-cells.wt <- atac.meta %>% 
+cells.wt <- obj@meta.data %>% 
   filter(cell_type.normal == 'Tumor') %>%
   filter(!(Piece_ID %in% exclude)) %>%
-  filter(.[driver]=='WT') %>% 
+  filter(.data[[driver]] == 'WT') %>% 
   rownames
 
-cells.trunc <- atac.meta %>% 
+cells.trunc <- obj@meta.data %>% 
   filter(cell_type.normal == 'Tumor') %>%
   filter(!(Piece_ID %in% exclude)) %>%
-  filter(grepl('Nonsen|Shift', .[[driver]])) %>% 
+  dplyr::filter(grepl('Nonsen|Shift', .data[[driver]])) %>% 
   rownames
 
 obj$Cancer.for.test <- case_when(obj$Cancer.new == 'PDAC_Basal' ~ 'PDAC',
