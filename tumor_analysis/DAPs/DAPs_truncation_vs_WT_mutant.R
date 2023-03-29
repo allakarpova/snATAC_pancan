@@ -11,7 +11,7 @@ plan("multicore", workers =4)
 options(future.globals.maxSize = 50 * 1024^3)
 suppressMessages(library(optparse))
 suppressMessages(library(googlesheets4))
-
+library(readxl)
 
 ###options###
 ######################
