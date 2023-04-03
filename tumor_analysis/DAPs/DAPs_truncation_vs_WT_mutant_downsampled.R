@@ -85,6 +85,7 @@ cell_t2 <- 'WT'
 Idents(obj) <- 'Test.column'
 
 obj <- subset(obj, downsample = 10000)
+print(table(obj$Test.column))
 
 
 da_peaks <- FindMarkers(
