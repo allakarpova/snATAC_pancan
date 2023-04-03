@@ -84,6 +84,9 @@ cell_t1 <- 'Truncation'
 cell_t2 <- 'WT'
 Idents(obj) <- 'Test.column'
 
+obj <- subset(obj, downsample = 10000)
+
+
 da_peaks <- FindMarkers(
   object = obj,
   ident.1 = cell_t1,
