@@ -29,7 +29,7 @@ findEnrichedMotifs <- function(cancer, open.peaks) {
   peaks.matched <- MatchRegionStats(
     meta.feature = meta.feature[open.peaks, ],
     query.feature = meta.feature[peaks.to.test, ],
-    n = 5000
+    n = length(peaks.to.test) + 500
   )
   
   enriched.motifs <- FindMotifs(
@@ -49,7 +49,7 @@ findDepletedMotifs <- function(cancer, open.peaks) {
   peaks.matched <- MatchRegionStats(
     meta.feature = meta.feature[open.peaks, ],
     query.feature = meta.feature[peaks.to.test, ],
-    n = length(peaks.to.test)
+    n = length(peaks.to.test) + 500
   )
   
   enriched.motifs <- FindMotifs(
