@@ -129,24 +129,25 @@ if (cancer.type %in% c('ccRCC', 'PDAC', 'CRC')) {
                                     TRUE ~ obj$cell_type.normal)
   
   table(obj$cell_type.normal)
-  Idents(obj) <- 'cell_type.normal'
-} else {
-  Idents(obj) <- 'cell_type.harmonized.cancer'
-}
-
-table(Idents(obj))
-if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
+  
+  obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.normal=='Tumor' ~ paste(Cancer, 'Tumor', sep='__'),
+                                                                       TRUE ~ cell_type.normal))
+} else if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal') {
   obj$Cancer2 <- case_when(obj$Piece_ID %in% c("HT268B1-Th1H3", "HT029B1-S1PC", "HT035B1-S1PA",
-                                              "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
-                                              "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
-                          TRUE ~ 'BRCA')
+                                               "HT1408-06","HT141B1-S1H1", "HT206B1-S1H4", "HT271B1-S1H3",
+                                               "HT378B1-S1H1", "HT378B1-S1H2", "HT384B1-S1H1", "HT517B1-S1H1") ~ 'BRCA_Basal',
+                           TRUE ~ 'BRCA')
   #table(obj$Cancer2)
   obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.harmonized.cancer=='Tumor' ~ paste(Cancer2, 'Tumor', sep='__'),
-                                    TRUE ~ cell_type.harmonized.cancer))
-  #table(obj$Cancer_cell_type)
-  Idents(obj) <- 'Cancer_cell_type'
+                                                                       TRUE ~ cell_type.harmonized.cancer))
+  
+  
+} else {
+  obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.harmonized.cancer=='Tumor' ~ paste(Cancer, 'Tumor', sep='__'),
+                                                                       TRUE ~ cell_type.harmonized.cancer))
 }
 
+Idents(obj) <- 'Cancer_cell_type'
 table(Idents(obj))
 
 cancer.normal.pairs <- data.frame(Cancer = c('BRCA', 'BRCA_Basal', 'PDAC', 'ccRCC', "CRC", 'UCEC', 'CESC', 'GBM', 'MM', 'OV', 'HNSCC', 'SKCM'),
@@ -169,6 +170,7 @@ if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal' ) {
     normal <- cancer.normal.pairs %>% filter(Cancer==cancer.type) %>% pull(Normal)
     open.peaks <- AccessiblePeaks(obj, idents = c("Tumor", normal))
     enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
+    enriched.m %>%
     fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
     depleted.m <- findDepletedMotifs(cancer=cancer.type, open.peaks)
     fwrite(depleted.m, glue::glue('Motifs_depleted_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
