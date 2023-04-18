@@ -168,7 +168,7 @@ if (cancer.type=='BRCA' | cancer.type=='BRCA_Basal' ) {
   
 } else {
     normal <- cancer.normal.pairs %>% filter(Cancer==cancer.type) %>% pull(Normal)
-    open.peaks <- AccessiblePeaks(obj, idents = c("Tumor", normal))
+    open.peaks <- AccessiblePeaks(obj, idents = c(glue::glue("{cancer.type}__Tumor"), normal))
     enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
     enriched.m %>%
     fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_cancer_vs_{normal}.tsv'), row.names = F, sep='\t')
