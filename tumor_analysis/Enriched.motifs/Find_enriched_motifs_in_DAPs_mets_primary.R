@@ -121,7 +121,7 @@ obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.h
 Idents(obj) <- 'cell_type.harmonized.cancer'
 table(Idents(obj))
 
-open.peaks <- AccessiblePeaks(obj, idents = glue::glue("{cancer.type}__Tumor"))
+open.peaks <- AccessiblePeaks(obj, idents = "Tumor")
 tryCatch( {
   enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
   fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_mets_vs_primary.tsv'), row.names = F, sep='\t')
