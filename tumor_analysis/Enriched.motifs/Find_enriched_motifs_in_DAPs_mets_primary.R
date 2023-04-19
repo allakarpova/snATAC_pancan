@@ -114,14 +114,14 @@ atac.meta <- fread('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v7.
 obj <- AddMetaData(obj, atac.meta)
 
 
-obj@meta.data <- obj@meta.data %>% mutate(Cancer_stage_cell_type=case_when(cell_type.harmonized.cancer=='Tumor' ~ paste(Cancer,Sample_type, 'Tumor', sep='__'),
+obj@meta.data <- obj@meta.data %>% mutate(Cancer_cell_type=case_when(cell_type.harmonized.cancer=='Tumor' ~ paste(Cancer, 'Tumor', sep='__'),
                                                                        TRUE ~ cell_type.harmonized.cancer))
 
 
 Idents(obj) <- 'cell_type.harmonized.cancer'
 table(Idents(obj))
 
-open.peaks <- AccessiblePeaks(obj, idents = 'Tumor')
+open.peaks <- AccessiblePeaks(obj, idents = glue::glue("{cancer.type}__Tumor"))
 tryCatch( {
   enriched.m <- findEnrichedMotifs(cancer=cancer.type, open.peaks)
   fwrite(enriched.m, glue::glue('Motifs_enriched_in_{cancer.type}_mets_vs_primary.tsv'), row.names = F, sep='\t')
