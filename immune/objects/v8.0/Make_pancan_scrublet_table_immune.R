@@ -51,10 +51,10 @@ regular.scrublet <- regular.sample %>% map(function(x){
            Doublet_final = predicted_doublet_atac)
   return(toret)
 }) %>% rbindlist() %>% data.frame()
-regular.scrublet
+head(regular.scrublet)
 
 regular.scrublet.rna <- regular.sample.rna %>% map(function(x){
-  #print(x)
+  print(x)
   toret <- fread(data.path[x], header = TRUE, data.table = F) 
   #print((toret))
   toret$Barcodes <- paste(cancer.piece[x], toret$Barcodes, sep ='_')
@@ -67,7 +67,7 @@ regular.scrublet.rna <- regular.sample.rna %>% map(function(x){
            Doublet_final = predicted_doublet_rna)
   return(toret)
 }) %>% rbindlist() %>% data.frame()
-regular.scrublet
+head(regular.scrublet.rna)
 
 combo.scrublet <- combo.sample %>% map(function(x){
   #print(x)
