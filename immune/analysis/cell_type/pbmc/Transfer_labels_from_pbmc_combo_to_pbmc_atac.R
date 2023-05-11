@@ -1,4 +1,4 @@
-suppressMessages(library(SeuratDisk))
+#suppressMessages(library(SeuratDisk))
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
 suppressMessages(library(GenomeInfoDb))
