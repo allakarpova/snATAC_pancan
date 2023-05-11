@@ -82,17 +82,32 @@ pbmc <- AddMetaData(
 )
 
 # set the cell identities to the cell type predictions
-Idents(pbmc) <- "predicted.id"
-pbmc$cell_type <- pbmc$predicted.id
-p1 <- DimPlot(pbmc, label = TRUE, repel = TRUE, reduction = "atac.umap")
-p2 <- DimPlot(pbmc, label = TRUE, repel = TRUE, reduction = "wnn.umap")
-
-pdf(paste0(add_filename, '_processed_', data.type, '_cell_types.pdf'), width = 13, height = 5)
-p1 + p2
-dev.off()
+tryCatch({
+  Idents(pbmc) <- "predicted.id"
+  pbmc$cell_type <- pbmc$predicted.id
+  p1 <- DimPlot(pbmc, label = TRUE, repel = TRUE, reduction = "atac.umap")
+  p2 <- DimPlot(pbmc, label = TRUE, repel = TRUE, reduction = "wnn.umap")
+  pdf(paste0(add_filename, '_processed_cell_types.pdf'), width = 13, height = 5)
+  p1 + p2
+  dev.off()
+  },
+ error = function(e){
+  message(e)
+})
+tryCatch({
+  Idents(pbmc) <- "predicted.id"
+  pbmc$cell_type <- pbmc$predicted.id
+  p1 <- DimPlot(pbmc, label = TRUE, repel = TRUE, reduction = "umap")
+  pdf(paste0(add_filename, '_processed_cell_types.pdf'), width = 7, height = 5)
+  p1
+  dev.off()
+},
+error = function(e){
+  message(e)
+})
 
 
 
 #saveRDS(pbmc, 'PBMC_granulocyte_sorted_10k_processed_multiomic_cell_typed.rds')
-fwrite(pbmc@meta.data, paste0(add_filename,'_processed_',data.type,'_cellTyped.meta.data'), sep = '\t', row.names = T)
+fwrite(pbmc@meta.data, paste0(add_filename,'_processed_cellTyped.meta.data'), sep = '\t', row.names = T)
 
