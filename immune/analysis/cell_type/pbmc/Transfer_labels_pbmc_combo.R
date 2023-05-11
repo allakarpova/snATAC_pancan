@@ -66,14 +66,14 @@ transfer_anchors <- FindTransferAnchors(
   normalization.method = 'SCT',
   reference.reduction = 'spca',
   recompute.residuals = FALSE,
-  dims = 1:50
+  dims = 1:30
 )
 
 predictions <- TransferData(
   anchorset = transfer_anchors, 
   refdata = reference$celltype.l2,
   weight.reduction = pbmc[['pca']],
-  dims = 1:50
+  dims = 1:30
 )
 
 pbmc <- AddMetaData(
