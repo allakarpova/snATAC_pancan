@@ -29,7 +29,7 @@ names(cancer.piece) <- samples$Sample
 
 regular.sample <- samples %>% subset (`Data Type` == 'snATAC' | `Data Type` == 'scATAC') %>% pull (Sample)
 combo.sample <- samples %>% subset (`Data Type` == '10x_SC_Multi_ATAC_SEQ') %>% pull (Sample)
-regular.sample.rna <- samples %>% subset (`Data Type` == 'snRNA' | `Data type` =='10x_SC_Multi_GEX') %>% pull (Sample)
+regular.sample.rna <- samples %>% subset (`Data Type` == 'snRNA' | `Data Type` =='10x_SC_Multi_GEX') %>% pull (Sample)
 
 print('combo samples:')
 print(combo.sample)
