@@ -83,13 +83,13 @@ combo.scrublet <- combo.sample %>% map(function(x){
 total.scrublet.atac <- rbind(regular.scrublet[colnames(combo.scrublet)], combo.scrublet)
 
 fwrite(total.scrublet.atac, 
-       paste0('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/snATAC/scrublet/All_',(length(regular.sample) + length(combo.sample)), '_samples_metadata_immune_data_freeze_v8.0.tsv'), 
+       paste0('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/snATAC/scrublet/All_ATAC_',(length(regular.sample) + length(combo.sample)), '_samples_metadata_immune_data_freeze_v8.0.tsv'), 
        sep ='\t', row.names = FALSE)
 
 total.scrublet.rna <- rbind(regular.scrublet.rna[colnames(combo.scrublet)], combo.scrublet)
 
 fwrite(total.scrublet.rna, 
-       paste0('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/snATAC/scrublet/All_',(length(regular.sample.rna) + length(combo.sample)), '_samples_metadata_immune_data_freeze_v8.0.tsv'), 
+       paste0('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/snATAC/scrublet/All_RNA_',(length(regular.sample.rna) + length(combo.sample)), '_samples_metadata_immune_data_freeze_v8.0.tsv'), 
        sep ='\t', row.names = FALSE)
 
 
