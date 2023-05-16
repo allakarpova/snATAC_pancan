@@ -110,6 +110,7 @@ samples$Keep <- samples$`Include in snRNA analysis` %>% unlist()
 #samples$Sample = paste(samples$`Disease Type`, samples$`Sample ID`, sep = '_')
 samples <- samples %>% dplyr::filter(Keep == 'TRUE')
 samples <- samples %>% dplyr::filter(`Disease Type` == cancer.type)
+samples <- samples %>% mutate(Sample = paste(`Disease Type`, `snRNAseq cellranger ID`, sep='_'))
 samples <- samples %>% dplyr::select(Sample,Piece_ID_RNA, `Data Type RNA`, `Seurat Object folder`)
 
 samples.id <- samples$Sample %>% as.character()
