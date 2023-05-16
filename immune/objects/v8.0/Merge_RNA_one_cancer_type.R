@@ -107,10 +107,9 @@ options(future.globals.maxSize = 100 * 1024^3) # for 100 Gb RAM
 gs4_deauth()
 samples <- read_sheet("https://docs.google.com/spreadsheets/d/1lfPnSIweII4cUC5wWVfBIFjKNdwWUI_CUThE2M7NzOs/edit?usp=sharing", sheet = '04_matched snRNA individual rds', trim_ws = T)
 samples$Keep <- samples$`Include in snRNA analysis` %>% unlist()
-#samples$Sample = paste(samples$`Disease Type`, samples$`Sample ID`, sep = '_')
+samples$Sample = paste(samples$`Disease Type`, samples$`snRNAseq cellranger ID`, sep = '_')
 samples <- samples %>% dplyr::filter(Keep == 'TRUE')
 samples <- samples %>% dplyr::filter(`Disease Type` == cancer.type)
-samples <- samples %>% mutate(Sample = paste(`Disease Type`, `snRNAseq cellranger ID`, sep='_'))
 samples <- samples %>% dplyr::select(Sample,Piece_ID_RNA, `Data Type RNA`, `Seurat Object folder`)
 
 samples.id <- samples$Sample %>% as.character()
