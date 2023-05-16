@@ -204,7 +204,7 @@ option_list = list(
               metavar="character"),
   make_option(c("--scrublet.table"),
               type="character",
-              default='/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v5.0/snATAC/scrublet/All_164_samples_metadata_immune_data_freeze_v5.0.tsv',
+              default='/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/snATAC/scrublet/All_ATAC_233_samples_metadata_immune_data_freeze_v8.0.tsv',
               help="path to scrublet metadata",
               metavar="character")
   
