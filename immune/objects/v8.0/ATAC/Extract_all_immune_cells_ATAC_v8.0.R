@@ -220,20 +220,10 @@ option_list = list(
               default="boop", 
               help="add unique string identifier for your data",
               metavar="character"),
-  make_option(c("-m","--macs2_path"),
-              type="character",
-              default=NULL,
-              help = "path to installed MACS2",
-              metavar="character"),
   make_option(c("-c","--cell_type_column"),
               type="character",
               default='cell_type',
               help = "column in the metadata with most recent cell types",
-              metavar="character"),
-  make_option(c("-s","--chrom_size"),
-              type="character",
-              default='./hg38.chrom.sizes.txt',
-              help = "path to hg38.chrom.sizes.txt",
               metavar="character"),
   make_option(c("-t","--metadata.file"),
               type="character",
@@ -257,8 +247,6 @@ input.path <- opt$input.object
 out_path <- opt$output
 add_filename <- opt$extra
 cell_column <- opt$cell_type_column
-macs2_path <- opt$macs2_path
-chrom.size <- opt$chrom_size
 meta.path <- opt$metadata.file
 assay.towork <- opt$assay
 annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
@@ -281,7 +269,8 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
     print(length(p))
     return(p)
   })
-  paths
+  paths <- unlist(paths)
+  print(paths)
   
   my.metadata <- fread(meta.path, data.table = F) %>% 
     data.frame(row.names = 1, check.rows = F, check.names = F)
