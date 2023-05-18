@@ -308,11 +308,15 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   combined.peaks <- UnifyPeaks(object.list = atac, mode = "reduce")
   peakwidths <- width(combined.peaks)
   combined.peaks <- combined.peaks[peakwidths  < 10000 & peakwidths > 20]
-  combined.peaks
-  combined.peaks = combined.peaks
   combined.peaks <- keepStandardChromosomes(combined.peaks, pruning.mode = "coarse")
   combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = blacklist_hg38_unified, invert = TRUE)
+  
+  saveRDS(access.peaks, 'Accessible.peaks.rds')
+  saveRDS(combined.peaks, 'Unified.regions.rds')
+  
   combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = StringToGRanges(access.peaks)) #include only peaks that are accessible in immune cells
+  print('N peaks before sampling:\n')
+  print(length(combined.peaks))
   #peaks.use <- combined.peaks
   peaks.use=sample(combined.peaks, size = 100000, replace = FALSE)
   
