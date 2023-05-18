@@ -373,13 +373,13 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
 ####################################
 ##### Integration with seurat #######
 ####################################
-
+cat ('Integrating\n')
 panc.my$Data.source <- ifelse(panc.my$Cancer == 'PBMC', '10x', 'DingLab')
 panc.my$Batches <- case_when(panc.my$Cancer %in% c('PBMC') ~ paste(panc.my$Cancer, panc.my$data.type, sep = '__'),
                              panc.my$Cancer %in% c('MM') ~ panc.my$Cancer,
                              TRUE ~ panc.my$Chemistry)
 
-
+table(panc.my$Batches)
 atac.split <- SplitObject(panc.my, split.by = 'Batches')
 
 atac.split <- map(atac.split, function(obj) {
