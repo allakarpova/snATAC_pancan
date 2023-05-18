@@ -293,6 +293,15 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   })
   cat('done\n')
   
+  cat('Find accessible peaks')
+  registerDoParallel(cores=12)
+  #matrix.counts=vector(mode = "list", length = length(samples.id))
+  access.peaks <- foreach (obj = atac, .combine=c) %dopar% {
+    AccessiblePeaks(obj, min.cells = 5000)
+  }
+  stopImplicitCluster()
+  
+  
   cat ('Reducing peaks\n')
   combined.peaks <- UnifyPeaks(object.list = atac, mode = "reduce")
   peakwidths <- width(combined.peaks)
@@ -301,9 +310,22 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   combined.peaks = combined.peaks
   combined.peaks <- keepStandardChromosomes(combined.peaks, pruning.mode = "coarse")
   combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = blacklist_hg38_unified, invert = TRUE)
+  combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = StringToGRanges(unlist(access.peaks))) #include only peaks that are accessible in immune cells
   #peaks.use <- combined.peaks
   peaks.use=sample(combined.peaks, size = 100000, replace = FALSE)
   
+   registerDoParallel(cores=12)
+  cat ('creating matrix counts\n')
+  #matrix.counts=vector(mode = "list", length = length(samples.id))
+  matrix.counts <- foreach (obj = atac, .combine=c) %dopar% {
+    FeatureMatrix(
+      fragments = Fragments(obj[[assay.towork]]),
+      features = peaks.use,
+      sep = c("-","-"),
+      cells = colnames(obj)
+    ) 
+  }
+  stopImplicitCluster()
   
   registerDoParallel(cores=12)
   cat ('creating matrix counts\n')
@@ -375,11 +397,12 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
 ####################################
 cat ('Integrating\n')
 panc.my$Data.source <- ifelse(panc.my$Cancer == 'PBMC', '10x', 'DingLab')
-panc.my$Batches <- case_when(panc.my$Cancer %in% c('PBMC') ~ paste(panc.my$Cancer, panc.my$data.type, sep = '__'),
+panc.my@meta.data$Batches <- case_when(panc.my$Cancer %in% c('PBMC') ~ paste(panc.my$Cancer, panc.my$Chemistry, sep = '__'),
                              panc.my$Cancer %in% c('MM') ~ panc.my$Cancer,
                              TRUE ~ panc.my$Chemistry)
 
 table(panc.my$Batches)
+table(panc.my$Data.source)
 atac.split <- SplitObject(panc.my, split.by = 'Batches')
 
 atac.split <- map(atac.split, function(obj) {
@@ -451,8 +474,6 @@ p2 <- DimPlot(integrated, group.by = "Cancer", cols = 'Spectral')
 p1 <- DimPlot(panc.my, group.by = "Cancer", cols = 'Spectral')
 (p1 + ggtitle("Merged")) | (p2 + ggtitle("Integrated"))
 ggsave(paste0(add_filename, '_Cancer.pdf'), width = 12, height = 4.5)
-
-
 
 
 
