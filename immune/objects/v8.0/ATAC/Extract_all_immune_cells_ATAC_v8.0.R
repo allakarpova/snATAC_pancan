@@ -191,7 +191,7 @@ runAllNormalization <- function(obj, dims) {
       reduction = 'lsi',
       dims = 2:dims ) %>% 
     FindClusters(
-      algorithm = 4,
+      algorithm = 2,
       resolution = 1,
       verbose = FALSE
     ) %>% 
@@ -258,7 +258,8 @@ setwd(out_path)
 
 if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', add_filename, '.rds'))) {
   
-  
+  if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_', add_filename, '.rds'))) {
+    
   cancers <- c('BRCA', 'ccRCC', 'GBM', 'CRC', 'HNSCC', 'MM', 'CESC', 'OV', 'UCEC', "PDAC", "SKCM", 'PBMC')
   cat('creating object on old peaks \n')
   paths <- map(cancers, function(c) {
@@ -342,7 +343,10 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   gc()
   
   saveRDS(panc.my, paste0('PanImmune_merged_object_100K_random_peaks_', add_filename, '.rds'))
-  
+  } 
+  else {
+    panc.my <- readRDS(paste0('PanImmune_merged_object_100K_random_peaks_', add_filename, '.rds'))
+  }
   cat ('Normalizing 100k random peak object\n')
   panc.my <- runAllNormalization (panc.my, dims = 30)
   ################
