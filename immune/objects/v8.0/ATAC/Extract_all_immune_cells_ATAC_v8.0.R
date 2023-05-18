@@ -293,15 +293,17 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   })
   cat('done\n')
   
-  cat('Find accessible peaks')
+  cat('Find accessible peaks\n')
   registerDoParallel(cores=12)
   #matrix.counts=vector(mode = "list", length = length(samples.id))
   access.peaks <- foreach (obj = atac, .combine=c) %dopar% {
-    AccessiblePeaks(obj, min.cells = 5000)
+    AccessiblePeaks(obj, min.cells = 1000)
   }
   stopImplicitCluster()
   
+  access.peaks <- unlist(access.peaks)
   
+  print(length(access.peaks))
   cat ('Reducing peaks\n')
   combined.peaks <- UnifyPeaks(object.list = atac, mode = "reduce")
   peakwidths <- width(combined.peaks)
@@ -310,7 +312,7 @@ if(!file.exists(paste0('PanImmune_merged_object_100K_random_peaks_normalized_', 
   combined.peaks = combined.peaks
   combined.peaks <- keepStandardChromosomes(combined.peaks, pruning.mode = "coarse")
   combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = blacklist_hg38_unified, invert = TRUE)
-  combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = StringToGRanges(unlist(access.peaks))) #include only peaks that are accessible in immune cells
+  combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = StringToGRanges(access.peaks)) #include only peaks that are accessible in immune cells
   #peaks.use <- combined.peaks
   peaks.use=sample(combined.peaks, size = 100000, replace = FALSE)
   
