@@ -422,7 +422,7 @@ integrated  <-  integrated %>%
     dims = 2:50
   ) %>% 
   FindClusters( 
-    algorithm = 4,
+    algorithm = 2,
     resolution = 2,
     verbose = FALSE
   )
