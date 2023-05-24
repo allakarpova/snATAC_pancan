@@ -321,7 +321,7 @@ panc.my <- readRDS(input.path)
 
 my.metadata <- fread(meta.path, data.table = F) %>% 
   data.frame(row.names = 1, check.rows = F, check.names = F)
-
+panc.my <- AddMetaData(panc.my, my.metadata)
 panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
 print(table(panc.my$to_remove))
 print(dim(panc.my))
