@@ -203,7 +203,68 @@ runAllNormalization <- function(obj, dims) {
             reduction = 'lsi')
   return(obj)
 }
-############################################
+
+doIntegration <- function (int.sub.f, k.w = 100) {
+  int.sub.f$Data.source <- ifelse(int.sub.f$Cancer == 'PBMC', '10x', 'DingLab')
+  int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
+                                 int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
+                                 TRUE ~ int.sub.f$Chemistry)
+  
+  print(table(int.sub.f$Batches))
+  
+  atac.split <- SplitObject(int.sub.f, split.by = 'Batches')
+  
+  atac.split <- map(atac.split, function(obj) {
+    obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
+      RunTFIDF() %>%
+      RunSVD(reduction.key = 'LSI_',
+             reduction.name = 'lsi',
+             irlba.work = 400)
+    return(obj)
+  })
+  
+  #######integration############
+  plan("multiprocess", workers = 10)
+  options(future.globals.maxSize = 100 * 1024^3)
+  
+  integration.anchors <- FindIntegrationAnchors(
+    object.list = atac.split,
+    anchor.features = rownames(int.sub.f),
+    reduction = "rlsi",
+    dims = 2:50
+  )
+  
+  # integrate LSI embeddings
+  integrated <- IntegrateEmbeddings(
+    anchorset = integration.anchors,
+    reductions = int.sub.f[["lsi"]],
+    new.reduction.name = "integrated_lsi",
+    dims.to.integrate = 1:50, 
+    k.weight = k.w
+  )
+  
+  # create a new UMAP using the integrated embeddings
+  integrated <- RunUMAP(integrated, 
+                        reduction = "integrated_lsi", 
+                        dims = 2:50)
+  
+  integrated  <-  integrated %>% 
+    FindNeighbors(
+      reduction = 'integrated_lsi',
+      dims = 2:40
+    ) %>% 
+    FindClusters( 
+      algorithm = 4,
+      method='igraph',
+      resolution = 1,
+      verbose = FALSE
+    )
+  
+  #Annotation(integrated) <- annotations.f
+  return(integrated)
+}
+
+######################################
 
 ###options###
 ######################
@@ -232,6 +293,11 @@ option_list = list(
               type="character",
               default=NULL,
               help = "path to installed MACS2",
+              metavar="character"),
+  make_option(c("-c","--cell_type_column"),
+              type="character",
+              default='cell_type',
+              help = "column in the metadata with most recent cell types",
               metavar="character")
   
 );
@@ -247,6 +313,7 @@ out_path <- opt$output
 add_filename <- opt$extra
 meta.path <- opt$metadata.file
 macs2_path <- opt$macs2_path
+cell_column <- opt$cell_type_column
 
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
@@ -256,8 +323,11 @@ panc.my <- readRDS(input.path)
 my.metadata <- fread(meta.path, data.table = F) %>% 
   data.frame(row.names = 1, check.rows = F, check.names = F)
 
-panc.my <- AddMetaData(panc.my, my.metadata)
-panc.my <- subset(panc.my, cell_type_v8_atac=='Doublet', invert= TRUE)
+panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
+print(table(panc.my$to_remove))
+print(dim(panc.my))
+panc.my <- subset(x = panc.my, subset = to_remove, invert = TRUE)
+print(dim(panc.my))
 
 annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
 
@@ -334,60 +404,9 @@ saveRDS(panc.my, paste0('PanImmune_merged_object_new_peaks_', add_filename, '.rd
 ##### Integration with seurat #######
 ####################################
 
-panc.my$Data.source <- ifelse(panc.my$Cancer == 'PBMC', '10x', 'DingLab')
-panc.my$Batches <- case_when(panc.my$Cancer %in% c('PBMC') ~ paste(panc.my$Cancer, panc.my$data.type, sep = '__'),
-                             panc.my$Cancer %in% c('MM') ~ panc.my$Cancer,
-                             TRUE ~ panc.my$Chemistry)
-
-
-atac.split <- SplitObject(panc.my, split.by = 'Batches')
-
-atac.split <- map(atac.split, function(obj) {
-  obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
-    RunTFIDF() %>%
-    RunSVD(reduction.key = 'LSI_',
-           reduction.name = 'lsi',
-           irlba.work = 400)
-  return(obj)
-})
-
-#######integration############
-plan("multiprocess", workers = 10)
-options(future.globals.maxSize = 100 * 1024^3)
-
-integration.anchors <- FindIntegrationAnchors(
-  object.list = atac.split,
-  anchor.features = rownames(panc.my),
-  reduction = "rlsi",
-  dims = 2:50
-)
-
-# integrate LSI embeddings
-integrated <- IntegrateEmbeddings(
-  anchorset = integration.anchors,
-  reductions = panc.my[["lsi"]],
-  new.reduction.name = "integrated_lsi",
-  dims.to.integrate = 1:50
-)
-
-
-# create a new UMAP using the integrated embeddings
-integrated <- RunUMAP(integrated, 
-                      reduction = "integrated_lsi", 
-                      dims = 2:50)
-
-integrated  <-  integrated %>% 
-  FindNeighbors(
-    reduction = 'integrated_lsi',
-    dims = 2:30
-  ) %>% 
-  FindClusters( 
-    algorithm = 4,
-    method = 'igraph',
-    resolution = 2,
-    verbose = FALSE
-  )
-
+integrated <- doIntegration(panc.my, 
+                            #annotations.f = annotations, 
+                            k.w = 100)
 
 print(integrated@reductions)
 saveRDS(integrated, paste0('PanImmune_seurat_integrated_object_new_peaks_', add_filename, '_chemistry_data.source.rds'))
@@ -403,16 +422,15 @@ p1 <- DimPlot(panc.my, group.by = "Chemistry")
 ggsave(paste0(add_filename, '_Chemistry.pdf'), width = 13, height = 4.5)
 #saveRDS(integrated, paste0(add_filename, '_Chemistry.rds'))
 
-p2 <- DimPlot(integrated, group.by = "cell_type.harmonized.cancer")
-p1 <- DimPlot(panc.my, group.by = "cell_type.harmonized.cancer")
+p2 <- DimPlot(integrated, group.by = cell_column)
+p1 <- DimPlot(panc.my, group.by = cell_column)
 (p1 + ggtitle("Merged") + NoLegend()) | (p2 + ggtitle("Integrated"))
-ggsave(paste0(add_filename, '_cell_type.harm.cancer.pdf'), width = 15, height = 4.5)
+ggsave(paste0(add_filename, '_',cell_column,'.pdf'), width = 15, height = 4.5)
 
 p2 <- DimPlot(integrated, group.by = "Cancer", cols = 'Spectral')
 p1 <- DimPlot(panc.my, group.by = "Cancer", cols = 'Spectral')
 (p1 + ggtitle("Merged")) | (p2 + ggtitle("Integrated"))
 ggsave(paste0(add_filename, '_Cancer.pdf'), width = 12, height = 4.5)
-
 
 saveRDS(integrated, paste0('PanImmune_seurat_integrated_object_new_peaks_', add_filename, '_chemistry_data.source.rds'))
 
