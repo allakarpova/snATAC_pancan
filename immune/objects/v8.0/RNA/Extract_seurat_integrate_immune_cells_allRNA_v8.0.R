@@ -147,18 +147,18 @@ if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rd
     cat('subsetting\n')
     
     obj.my <- subset(x = obj, subset = (is_immune))
-    print(unique(obj.my$Case_ID))
-    if(c('HT029B1') %in% obj.my$Case_ID) {
+    print(unique(obj.my$Case_ID_RNA))
+    if(c('HT029B1') %in% obj.my$Case_ID_RNA) {
       cat('removing HT029B1 \n')
-      obj.my <- subset(x = obj.my, subset = Case_ID %in% c('HT029B1'), invert = TRUE)
+      obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('HT029B1'), invert = TRUE)
     }
-    if(c('MMY34600') %in% obj.my$Case_ID) {
+    if(c('MMY34600') %in% obj.my$Case_ID_RNA) {
       cat('removing MMY34600 \n')
-      obj.my <- subset(x = obj.my, subset = Case_ID %in% c( 'MMY34600'), invert = TRUE)
+      obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c( 'MMY34600'), invert = TRUE)
     }
-    if(c( 'C3N-01816') %in% obj.my$Case_ID) {
+    if(c( 'C3N-01816') %in% obj.my$Case_ID_RNA) {
       cat('removing C3N-01816\n')
-      obj.my <- subset(x = obj.my, subset = Case_ID %in% c('C3N-01816'), invert = TRUE)
+      obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('C3N-01816'), invert = TRUE)
     }
     # if (c('VF031V1-Tm1Y1') %in% obj.my$Piece_ID) {
     #   cat('removing VF031V1-Tm1Y1\n')
