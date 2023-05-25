@@ -1,5 +1,5 @@
 ## Alla Karpova
-### merge regular RNA data for immune cells and integrate with seurat
+### merge regular RNA data for immune cells and integrate with seuratv8.0 data freeze
 
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
@@ -55,11 +55,11 @@ select <- dplyr::select
 
 
 option_list = list(
-  # make_option(c("-i", "--input.folder"),
-  #             type="character",
-  #             default=NULL,
-  #             help="path to folder with cancer level merged rds objects",
-  #             metavar="character"),
+  make_option(c("-i", "--input.folder"),
+              type="character",
+              default=NULL,
+              help="path to folder with cancer level merged rds objects",
+              metavar="character"),
   make_option(c("-o", "--output"),
               type="character",
               default="./", 
@@ -87,7 +87,7 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
 # read in initial arguments
-#input.path <- opt$input.folder
+input.path <- opt$input.folder
 out_path <- opt$output
 add_filename <- opt$extra
 meta.path <- opt$metadata.file
@@ -110,17 +110,16 @@ samples <- samples %>% dplyr::filter(`Cellranger version` == 'v2.0')
 #samples <- samples %>% dplyr::filter( `Data Type` != '10x_SC_Multi_ATAC_SEQ')
 #samples <- samples %>% dplyr::select(Sample,Piece_ID, `Data Type`, `Data folder`)
 
-cancers <- samples %>% dplyr::filter( `Data Type` != '10x_SC_Multi_ATAC_SEQ') %>% 
-  pull(`Disease Type`) %>% unique()
-
-print(cancers)
-merged.obj <- read_sheet("https://docs.google.com/spreadsheets/d/1lfPnSIweII4cUC5wWVfBIFjKNdwWUI_CUThE2M7NzOs/edit?usp=sharing", trim_ws = T, sheet = "matched snRNA merged objects")
-merged.obj.path <- merged.obj$`Merged object RDS`
-names(merged.obj.path) <- merged.obj$`Disease Type`
-
-merged.obj.path <- merged.obj.path[names(merged.obj.path) %in% cancers]
-
-print(merged.obj.path)
+cancers <- c('BRCA', 'ccRCC', 'GBM', 'CRC', 'HNSCC', 'MM', 'CESC', 'OV', 'UCEC', "PDAC", "SKCM", 'PBMC')
+paths <- map(cancers, function(c) {
+  p <- list.files(path = input.path, 
+                  full.names = T, 
+                  pattern = paste0(c,'.*rds'), all.files = F, recursive = T)
+  print(length(p))
+  return(p)
+})
+paths <- unlist(paths)
+print(paths)
 
 if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rds'))) {
   
@@ -133,8 +132,8 @@ if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rd
   
   
   cat('opening cancer object...\n')
-  rna <- map(merged.obj.path, function(p) {
-    print(names(merged.obj.path[merged.obj.path==p]))
+  rna <- map(paths, function(p) {
+    print(p)
     obj=readRDS(p)
     DefaultAssay(obj) <- 'RNA'
     obj<- DietSeurat(obj, assay = 'RNA', counts = TRUE, data = TRUE)
