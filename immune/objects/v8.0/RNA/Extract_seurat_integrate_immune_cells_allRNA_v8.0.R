@@ -145,8 +145,10 @@ if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rd
     stopifnot(!is.na(ct))
     
     cat('subsetting\n')
+    obj$is_immune <- grepl('Plasma|B-cells|T-cell|DC|Macro|Mast|Microglia|NK|Treg|Immune|Gran|Mono|MAIT', as.character(unlist(obj[[cell_column]])))
+    cat('subsetting\n')
+    obj.my <- subset(x = obj, subset = is_immune)
     
-    obj.my <- subset(x = obj, subset = (is_immune))
     print(unique(obj.my$Case_ID_RNA))
     if(c('HT029B1') %in% obj.my$Case_ID_RNA) {
       cat('removing HT029B1 \n')
