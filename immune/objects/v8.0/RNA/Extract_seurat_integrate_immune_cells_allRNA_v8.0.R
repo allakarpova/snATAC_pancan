@@ -147,7 +147,7 @@ if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rd
     
     cat('subsetting\n')
     
-    obj.my <- subset(x = obj, subset = (is_immune & data.type == 'snATAC'))
+    obj.my <- subset(x = obj, subset = (is_immune))
     print(unique(obj.my$Case_ID))
     if(c('HT029B1') %in% obj.my$Case_ID) {
       cat('removing HT029B1 \n')
