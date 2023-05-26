@@ -197,7 +197,7 @@ all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all
                              all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                              TRUE ~ all.rna$Chemistry)
 
-table(panc.my$Batches)
+table(all.rna$Batches)
 cat ('Integrate regular RNA and combo RNA by batches \n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 
