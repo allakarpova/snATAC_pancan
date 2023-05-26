@@ -193,10 +193,11 @@ if(!file.exists(paste0('PanImmune_merged_allRNA_normalized_', add_filename, '.rd
 
 
 all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
-all.rna$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
+all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
                              all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                              TRUE ~ all.rna$Chemistry)
 
+table(panc.my$Batches)
 cat ('Integrate regular RNA and combo RNA by batches \n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 
