@@ -293,6 +293,11 @@ option_list = list(
               default=NULL,
               help = "path to installed MACS2",
               metavar="character"),
+  make_option(c("-s","--chrom_size"),
+              type="character",
+              default='./hg38.chrom.sizes.txt',
+              help = "path to hg38.chrom.sizes.txt",
+              metavar="character"),
   make_option(c("-c","--cell_type_column"),
               type="character",
               default='cell_type',
@@ -313,7 +318,9 @@ add_filename <- opt$extra
 meta.path <- opt$metadata.file
 macs2_path <- opt$macs2_path
 cell_column <- opt$cell_type_column
-
+chrom.size <- opt$chrom_size
+  
+  
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
@@ -321,6 +328,7 @@ panc.my <- readRDS(input.path)
 
 my.metadata <- fread(meta.path, data.table = F) %>% 
   data.frame(row.names = 1, check.rows = F, check.names = F)
+
 panc.my <- AddMetaData(panc.my, my.metadata)
 panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
 print(table(panc.my$to_remove))
