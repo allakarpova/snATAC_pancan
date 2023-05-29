@@ -205,7 +205,7 @@ runAllNormalization <- function(obj, dims) {
 
 doIntegration <- function (int.sub.f, k.w = 100) {
   int.sub.f$Data.source <- ifelse(int.sub.f$Cancer == 'PBMC', '10x', 'DingLab')
-  int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
+  int.sub.f@meta.data$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
                                  int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
                                  TRUE ~ int.sub.f$Chemistry)
   
@@ -324,6 +324,9 @@ chrom.size <- opt$chrom_size
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
+if (!file.exists(paste0('PanImmune_merged_object_new_peaks_', add_filename, '.rds'))) {
+  
+
 panc.my <- readRDS(input.path)
 
 my.metadata <- fread(meta.path, data.table = F) %>% 
@@ -406,7 +409,9 @@ panc.my <- panc.my %>%
 # save
 saveRDS(panc.my, paste0('PanImmune_merged_object_new_peaks_', add_filename, '.rds'))
 
-
+} else {
+  panc.my <- readRDS(paste0('PanImmune_merged_object_new_peaks_', add_filename, '.rds'))
+}
 ####################################
 ##### Integration with seurat #######
 ####################################
