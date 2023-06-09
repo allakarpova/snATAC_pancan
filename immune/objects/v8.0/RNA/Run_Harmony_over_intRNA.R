@@ -119,11 +119,11 @@ ggsave(glue::glue('Dimplot_{add_filename}_Cancer.pdf'), plot = p2, width = 5.5, 
 p2 <- DimPlot(obj, group.by = "seurat_clusters", label = TRUE)
 ggsave(glue::glue('Dimplot_{add_filename}_seurat_clusters.pdf'), plot = p2, width = 6, height = 4.5)
 
-p2 <- DimPlot(obj, group.by = "data.type", cols = 'Paired', label = TRUE)
-ggsave(glue::glue('Dimplot_{add_filename}_data.type.pdf'), plot = p2, width = 5.5, height = 4.5)
+p2 <- DimPlot(obj, group.by = "data.type.rna", cols = 'Paired', label = TRUE)
+ggsave(glue::glue('Dimplot_{add_filename}_data.type.rna.pdf'), plot = p2, width = 5.5, height = 4.5)
 
-p2 <- DimPlot(obj, group.by = "Piece_ID", label = TRUE)
-ggsave(glue::glue('Dimplot_{add_filename}_Piece_ID.pdf'), plot = p2, width = 12, height = 7)
+p2 <- DimPlot(obj, group.by = "Piece_ID_RNA", label = TRUE)
+ggsave(glue::glue('Dimplot_{add_filename}_Piece_ID_RNA.pdf'), plot = p2, width = 12, height = 7)
 
 p2 <- DimPlot(obj, group.by =ct, label = TRUE)
 ggsave(glue::glue('Dimplot_{add_filename}_{ct}.pdf'), plot = p2, width = 12, height = 7)
