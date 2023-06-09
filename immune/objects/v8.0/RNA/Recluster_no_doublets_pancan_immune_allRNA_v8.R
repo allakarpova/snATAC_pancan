@@ -112,8 +112,9 @@ if (!is.null(meta.path)) {
 all.rna@meta.data$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell_column]])))
 DefaultAssay(all.rna) <- 'RNA'
 all.rna <- all.rna %>%  DietSeurat(assay = 'RNA', counts = TRUE, data = TRUE)
+dim(all.rna)
 all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
-
+dim(all.rna)
 
 all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
 all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
