@@ -168,7 +168,7 @@ pdf(paste0("Dimplot_Piece_ID_integrated_object_regularRNA_multiome_",add_filenam
 print(dimplot)
 dev.off()
 
-dimplot=DimPlot(object = int, label = F, group.by = "data.type")
+dimplot=DimPlot(object = int, label = F, group.by = "data.type.rna")
 pdf(paste0("Dimplot_data.type_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=14, useDingbats = F)
 print(dimplot)
 dev.off()
