@@ -116,7 +116,7 @@ all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
 
 
 all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
-all.rna$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
+all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
                              all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                              TRUE ~ all.rna$Chemistry)
 
