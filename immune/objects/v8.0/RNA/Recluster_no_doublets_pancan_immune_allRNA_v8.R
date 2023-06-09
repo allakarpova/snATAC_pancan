@@ -109,7 +109,7 @@ if (!is.null(meta.path)) {
     data.frame(row.names = 1, check.rows = F, check.names = F) %>% select(all_of(cell_column))
   all.rna <- AddMetaData(all.rna, metadata = my.metadata)
 }
-all.rna$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell_column]])))
+all.rna@meta.data$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell_column]])))
 DefaultAssay(all.rna) <- 'RNA'
 all.rna <- all.rna %>%  DietSeurat(assay = 'RNA', counts = TRUE, data = TRUE)
 all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
