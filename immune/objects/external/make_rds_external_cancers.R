@@ -162,6 +162,9 @@ samples.needed <- intersect(samples.found, samples.included)
 frag.files <- list.files(path = input, pattern = '*fragments.tsv.gz$', full.names = T)
 frag.files <- frag.files[samples.found %in% samples.included]
 
+print(frag.files)
+print(samples.needed)
+
 #chromsize <- fread('/diskmnt/Projects/snATAC_primary/02_atac_rds_signca/v3.0/hg19.chrom.sizes.txt')
 chromsize38 <- fread('/diskmnt/Projects/snATAC_primary/02_atac_rds_signca/v3.0/hg38.chrom.sizes.txt')
 
