@@ -19,7 +19,7 @@ suppressMessages(library(optparse))
 #suppressMessages(library(BSgenome.Hsapiens.UCSC.hg19))
 #suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
 
-#suppressMessages(library(googlesheets4))
+suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(doParallel))
 
