@@ -10,14 +10,14 @@ set.seed(1234)
 suppressMessages(library(dplyr))
 suppressMessages(library(data.table))
 
-suppressMessages(library(EnsDb.Hsapiens.v75))
+#suppressMessages(library(EnsDb.Hsapiens.v75))
 suppressMessages(library(EnsDb.Hsapiens.v86))
 
 suppressMessages(library(GenomicRanges))
 suppressMessages(library(future))
 suppressMessages(library(optparse))
-suppressMessages(library(BSgenome.Hsapiens.UCSC.hg19))
-suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
+#suppressMessages(library(BSgenome.Hsapiens.UCSC.hg19))
+#suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
 
 #suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
