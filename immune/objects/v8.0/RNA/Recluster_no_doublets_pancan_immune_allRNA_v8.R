@@ -142,7 +142,7 @@ if(opt$int_batch=='weird') {
   all.rna@meta.data$Batches <- paste(all.rna$Cancer, all.rna$Chemistry, sep = '__')
 }
 
-
+print(table(all.rna$Batches))
 
 cat ('Integrate regular RNA and combo RNA by batches \n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
