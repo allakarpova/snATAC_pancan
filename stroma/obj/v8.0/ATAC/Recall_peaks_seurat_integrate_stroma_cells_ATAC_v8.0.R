@@ -129,10 +129,10 @@ call_peaks <- function(panc.my.f,add_filename.f, macs2_path.f) {
   } 
   peaks <- CallPeaks(
     object = panc.my.f,
-    group.by = "seurat_clusters",
-    macs2.path=macs2_path.f, 
-    combine.peaks = F, # important!!!
-    format = "BEDPE"
+    #group.by = "seurat_clusters", # the clusters on accessible peaks were flacky, so I call peaks on all cells collectively
+    macs2.path=macs2_path.f 
+    #combine.peaks = F, # important!!!
+    #format = "BEDPE"
   )
   # remove peaks on nonstandard chromosomes and in genomic blacklist regions
   peaks <- peaks[!sapply(peaks, is.null)]
