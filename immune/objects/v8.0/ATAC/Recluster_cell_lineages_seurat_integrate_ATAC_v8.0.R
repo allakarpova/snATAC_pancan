@@ -175,7 +175,7 @@ int$cell_lin <- case_when(grepl('NK|CD|Treg|Tfh|MAIT|ILC|dnT|gdT|T-cell', int$ce
                           TRUE ~ int$cell_type_v8_atac)
 #print(head(int@meta.data, n = 5))
 
-conditions <- c( 'B-cell_Plasma','T-cells_NK', 'Myeloid')
+conditions <- c( 'T-cells_NK', 'Myeloid','B-cell_Plasma')
 
 conditions %>% walk (function(column) {
   print(column)
