@@ -139,7 +139,7 @@ if(opt$int_batch=='weird') {
                                          all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                                          TRUE ~ all.rna$Chemistry)
 } else if(opt$int_batch=='cancer_chemistry') {
-  all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('GBM') ~ all.rna$Chemistry,
+  all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('GBM') ~ all.rna$Cancer,
                                          TRUE ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'))
 }
 
