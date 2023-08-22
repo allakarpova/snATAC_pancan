@@ -327,7 +327,7 @@ if (!file.exists(paste0('PanStroma_merged_object_new_peaks_', add_filename, '.rd
   
   panc.my <- readRDS(input.path)
   
-  if(!is.null(metadata.file)) {
+  if(!is.null(meta.path)) {
     my.metadata <- fread(meta.path, data.table = F) %>% 
       data.frame(row.names = 1, check.rows = F, check.names = F)
     
