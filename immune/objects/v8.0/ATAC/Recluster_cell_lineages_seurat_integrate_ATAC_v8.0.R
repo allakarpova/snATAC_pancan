@@ -60,11 +60,11 @@ runAllNormalization <- function(obj, dims) {
 doIntegration <- function (int.sub.f,  k.w = 100, k.filter = 200) {
   int.sub.f$Data.source <- ifelse(int.sub.f$Cancer == 'PBMC', '10x', 'DingLab')
   if(conditions=='B-cell_Plasma') {
-    int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ 'PBMC',
+    int.sub.f@meta.data$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ 'PBMC',
                                    int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
                                    TRUE ~ int.sub.f$Chemistry)
   }  else {
-    int.sub.f$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
+    int.sub.f@meta.data$Batches <- case_when(int.sub.f$Cancer %in% c('PBMC') ~ paste(int.sub.f$Cancer, int.sub.f$data.type, sep = '__'),
                                    int.sub.f$Cancer %in% c('MM') ~ int.sub.f$Cancer,
                                    TRUE ~ int.sub.f$Chemistry)
   }
