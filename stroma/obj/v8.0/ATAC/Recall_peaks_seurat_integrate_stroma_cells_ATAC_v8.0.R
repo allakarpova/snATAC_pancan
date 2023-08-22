@@ -1,4 +1,4 @@
-# subset stroma cells from the ATAC object and make object with 100K random peaks
+# subset obvious doublets with stroma cells from the stroma ATAC object and recall peaks with MACS2
 ###libraries
 ##################
 library(future)
@@ -28,10 +28,13 @@ suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(doParallel))
 #suppressMessages(library(harmony))
-#library(SeuratWrappers)
+
 
 ################################
 
+#####################################
+####### FUNCTIONS ##################
+####################################
 #####################################
 ####### FUNCTIONS ##################
 ####################################
@@ -176,7 +179,6 @@ call_recenter_filter_peaks <- function(panc.my.f,add_filename.f, macs2_path.f ) 
 }
 
 
-
 runAllNormalization <- function(obj, dims) {
   #### run normalization to get initial clusters ###
   ########
@@ -191,7 +193,8 @@ runAllNormalization <- function(obj, dims) {
       reduction = 'lsi',
       dims = 2:dims ) %>% 
     FindClusters(
-      algorithm = 2,
+      algorithm = 4,
+      method = 'igraph',
       resolution = 1,
       verbose = FALSE
     ) %>% 
@@ -199,7 +202,66 @@ runAllNormalization <- function(obj, dims) {
             reduction = 'lsi')
   return(obj)
 }
-############################################
+
+doIntegration <- function (int.sub.f, k.w = 100) {
+  
+  int.sub.f@meta.data$Batches <- int.sub.f$Chemistry
+  
+  print(table(int.sub.f$Batches))
+  
+  atac.split <- SplitObject(int.sub.f, split.by = 'Batches')
+  
+  atac.split <- map(atac.split, function(obj) {
+    obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
+      RunTFIDF() %>%
+      RunSVD(reduction.key = 'LSI_',
+             reduction.name = 'lsi',
+             irlba.work = 400)
+    return(obj)
+  })
+  
+  #######integration############
+  plan("multiprocess", workers = 10)
+  options(future.globals.maxSize = 100 * 1024^3)
+  
+  integration.anchors <- FindIntegrationAnchors(
+    object.list = atac.split,
+    anchor.features = rownames(int.sub.f),
+    reduction = "rlsi",
+    dims = 2:50
+  )
+  
+  # integrate LSI embeddings
+  integrated <- IntegrateEmbeddings(
+    anchorset = integration.anchors,
+    reductions = int.sub.f[["lsi"]],
+    new.reduction.name = "integrated_lsi",
+    dims.to.integrate = 1:50, 
+    k.weight = k.w
+  )
+  
+  # create a new UMAP using the integrated embeddings
+  integrated <- RunUMAP(integrated, 
+                        reduction = "integrated_lsi", 
+                        dims = 2:50)
+  
+  integrated  <-  integrated %>% 
+    FindNeighbors(
+      reduction = 'integrated_lsi',
+      dims = 2:40
+    ) %>% 
+    FindClusters( 
+      algorithm = 4,
+      method='igraph',
+      resolution = 1,
+      verbose = FALSE
+    )
+  
+  #Annotation(integrated) <- annotations.f
+  return(integrated)
+}
+
+######################################
 
 ###options###
 ######################
@@ -216,23 +278,28 @@ option_list = list(
               metavar="character"),
   make_option(c("-e", "--extra"),
               type="character",
-              default="boop", 
+              default="./", 
               help="add unique string identifier for your data",
-              metavar="character"),
-  make_option(c("-c","--cell_type_column"),
-              type="character",
-              default='cell_type',
-              help = "column in the metadata with most recent cell types",
               metavar="character"),
   make_option(c("-t","--metadata.file"),
               type="character",
               default=NULL,
               help = "path to metadats file with cell types, make cell barcodes in the 1st column",
               metavar="character"),
-  make_option(c("-a","--assay"),
+  make_option(c("-m","--macs2_path"),
               type="character",
-              default='pancan',
-              help = "X500peaksMACS2 or peaksinters or pancan",
+              default=NULL,
+              help = "path to installed MACS2",
+              metavar="character"),
+  make_option(c("-s","--chrom_size"),
+              type="character",
+              default='./hg38.chrom.sizes.txt',
+              help = "path to hg38.chrom.sizes.txt",
+              metavar="character"),
+  make_option(c("-c","--cell_type_column"),
+              type="character",
+              default='cell_type',
+              help = "column in the metadata with most recent cell types",
               metavar="character")
   
 );
@@ -241,144 +308,43 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser)
 ###################################
 
+
 # read in initial arguments
 input.path <- opt$input.object
 out_path <- opt$output
 add_filename <- opt$extra
-cell_column <- opt$cell_type_column
 meta.path <- opt$metadata.file
-assay.towork <- opt$assay
-annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
+macs2_path <- opt$macs2_path
+cell_column <- opt$cell_type_column
+chrom.size <- opt$chrom_size
 
 
-#out_path <- '/diskmnt/Projects/snATAC_analysis/immune/obj/v1.0'
-#add_filename <- '100_sample_obj.v1.0_old_macs2'
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
-if(!file.exists(paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))) {
+if (!file.exists(paste0('PanStroma_merged_object_new_peaks_', add_filename, '.rds'))) {
   
-  if(!file.exists(paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))) {
-    
-    cancers <- c('BRCA', 'ccRCC', 'GBM', 'CRC', 'HNSCC', 'CESC', 'OV', 'UCEC', "PDAC", "SKCM") # MM doesnt have any stroma cells
-    cat('creating object on old peaks \n')
-    paths <- map(cancers, function(c) {
-      p <- list.files(path = input.path, 
-                      full.names = T, 
-                      pattern = paste0(c,'.*rds'), all.files = F, recursive = T)
-      print(length(p))
-      return(p)
-    })
-    paths <- unlist(paths)
-    print(paths)
-    
-    my.metadata <- fread(meta.path, data.table = F) %>% 
-      data.frame(row.names = 1, check.rows = F, check.names = F)
-    
-    cat('opening object...\n')
-    atac <- map(paths, function(p) {
-      obj=readRDS(p)
-      DefaultAssay(obj) <- assay.towork
-      if (!file.exists(Fragments(obj)[[1]]@path)) stop("Urgh, this sample object can't locate fragments file")
-      obj<- DietSeurat(obj, assay = assay.towork)
-      obj <- AddMetaData(obj, my.metadata)
-      ct <- obj@meta.data %>% pull(cell_column) %>% unique %>% sort
-      print(ct)
-      stopifnot(!is.na(ct))
-      obj$is_immune <- grepl('Endoth|Pericy|Fibro|vSMC|Lymphatic', as.character(unlist(obj[[cell_column]])))
-      cat('subsetting\n')
-      obj.my <- subset(x = obj, subset = is_immune)
-      print(dim(obj.my))
-      return(obj.my)
-    })
-    cat('done\n')
-    
-    cat('Find accessible peaks\n')
-    registerDoParallel(cores=12)
-    #matrix.counts=vector(mode = "list", length = length(samples.id))
-    access.peaks <- foreach (obj = atac, .combine=c) %dopar% {
-      AccessiblePeaks(obj, min.cells = 1000)
-    }
-    stopImplicitCluster()
-    
-    access.peaks <- unlist(access.peaks)
-    
-    print(length(access.peaks))
-    cat ('Reducing peaks\n')
-    combined.peaks <- UnifyPeaks(object.list = atac, mode = "reduce")
-    peakwidths <- width(combined.peaks)
-    combined.peaks <- combined.peaks[peakwidths  < 10000 & peakwidths > 20]
-    combined.peaks <- keepStandardChromosomes(combined.peaks, pruning.mode = "coarse")
-    combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = blacklist_hg38_unified, invert = TRUE)
-    
-    saveRDS(access.peaks, 'Accessible.peaks.rds')
-    saveRDS(combined.peaks, 'Unified.regions.rds')
-    
-    combined.peaks <- subsetByOverlaps(x = combined.peaks, ranges = StringToGRanges(access.peaks)) #include only peaks that are accessible in immune cells
-    print('N peaks before sampling:\n')
-    print(length(combined.peaks))
-    peaks.use <- combined.peaks
-    #peaks.use=sample(combined.peaks, size = 100000, replace = FALSE)
-    
-    registerDoParallel(cores=12)
-    cat ('creating matrix counts\n')
-    #matrix.counts=vector(mode = "list", length = length(samples.id))
-    matrix.counts <- foreach (obj = atac, .combine=c) %dopar% {
-      FeatureMatrix(
-        fragments = Fragments(obj[[assay.towork]]),
-        features = peaks.use,
-        sep = c("-","-"),
-        cells = colnames(obj)
-      ) 
-    }
-    stopImplicitCluster()
-    
-    registerDoParallel(cores=12)
-    cat ('creating matrix counts\n')
-    #matrix.counts=vector(mode = "list", length = length(samples.id))
-    matrix.counts <- foreach (obj = atac, .combine=c) %dopar% {
-      FeatureMatrix(
-        fragments = Fragments(obj[[assay.towork]]),
-        features = peaks.use,
-        sep = c("-","-"),
-        cells = colnames(obj)
-      ) 
-    }
-    stopImplicitCluster()
-    
-    registerDoParallel(cores=12)
-    cat ('creating peaksinters and removing useless assays\n')
-    atac <- foreach (obj = atac, co = matrix.counts, .combine=c) %dopar% {
-      obj[['peaksinters']] <- CreateChromatinAssay(counts = co,
-                                                   fragments=Fragments(obj[[assay.towork]]), 
-                                                   min.cells = -1, min.features = -1)
-      #obj$dataset=samples.id[i]
-      DefaultAssay(obj)<-'peaksinters'
-      ###remove another assay
-      obj[[assay.towork]]<-NULL
-      return(obj)
-    }
-    stopImplicitCluster()
-    
-    
-    cat ('Merging on 100k random peaks\n')
-    panc.my <- merge(x = atac[[1]], y = atac[-1])
-    cat ('done\n')
-    DefaultAssay(panc.my) <- 'peaksinters'
-    
-    #remove individual objects
-    rm(atac, matrix.counts)
-    gc()
-    
-    saveRDS(panc.my, paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))
-  } 
-  else {
-    panc.my <- readRDS(paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))
-  }
-  cat ('Normalizing 100k random peak object\n')
-  panc.my <- runAllNormalization (panc.my, dims = 30)
-  ################
   
+  panc.my <- readRDS(input.path)
+  
+  my.metadata <- fread(meta.path, data.table = F) %>% 
+    data.frame(row.names = 1, check.rows = F, check.names = F)
+  
+  panc.my <- AddMetaData(panc.my, my.metadata)
+  panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
+  print(table(panc.my$to_remove))
+  print(dim(panc.my))
+  panc.my <- subset(x = panc.my, subset = to_remove, invert = TRUE)
+  print(dim(panc.my))
+  
+  annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
+  
+  #call peaks
+  cat ('Recalling peaks on clusters \n')
+  recentered_final <- call_recenter_filter_peaks(panc.my,add_filename, macs2_path )
+  fwrite(recentered_final,paste0('recentered_final.filtered',add_filename,'.tsv'),sep='\t')
+  
+  recentered_p=StringToGRanges(recentered_final$new_peak)
   frag <- Fragments(panc.my@assays[['peaksinters']])
   
   #this will remove fragment objects with just 1 or 0 cells because they fail FeatureMatrix function
@@ -393,73 +359,70 @@ if(!file.exists(paste0('PanStroma_merged_object_Accessible_peaks_normalized_', a
     panc.my <- subset(panc.my, subset = Sample %in% samples.to.keep)
   }
   
-  saveRDS(panc.my, paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))
+  #create cromatin assay
+  peak.number <- length(unique(recentered_final$new_peak))
+  n.peaks <- round(peak.number/30)
+  
+  matrix.counts <- FeatureMatrix(
+    fragments = frag.filtered,
+    features = recentered_p,
+    process_n = n.peaks,
+    sep = c("-","-"),
+    cells = colnames(panc.my)
+  )
+  
+  panc.my[['ATAC_stroma']] <- CreateChromatinAssay(counts = matrix.counts,
+                                                   fragments=frag.filtered,
+                                                   annotation = annotations)
+  
+  
+  DefaultAssay(panc.my)<-'ATAC_stroma'
+  panc.my <- DietSeurat(panc.my, assays = 'ATAC_stroma')
+  
+  peak.counts <- colSums(GetAssayData(object = panc.my, assay = 'ATAC_stroma', slot = "counts"))
+  total_fragments_cell <- panc.my$passed_filters
+  frip <- peak.counts / total_fragments_cell
+  panc.my <- AddMetaData(object = panc.my, metadata = frip, col.name = 'pct_read_in_peaks_ATAC_stroma')
+  panc.my <- AddMetaData(object = panc.my, metadata = peak.counts, col.name = 'peak_region_fragments_ATAC_stroma')
+  
+  
+  #### remove excessive fragment files, artifact after peak calling on cluster level
+  cat('removing excessive fragment files\n')
+  all.fragment.obj <- Fragments(panc.my)
+  all.fragment.obj.cell.count <- map_chr(all.fragment.obj, function(x) length(x@cells))
+  all.fragment.obj.upd <- all.fragment.obj[all.fragment.obj.cell.count > 0]
+  Fragments(panc.my) <- NULL
+  Fragments(panc.my) <- all.fragment.obj.upd
+  
+  #normalize
+  panc.my <- panc.my %>% 
+    RunTFIDF() %>%
+    FindTopFeatures(min.cutoff = 20) %>% 
+    RunSVD(
+      reduction.key = 'LSI_',
+      reduction.name = 'lsi',
+      irlba.work = 400 )  %>%
+    RunUMAP(reduction = "lsi", dims = 2:50)
+  
+  # save
+  saveRDS(panc.my, paste0('PanStroma_merged_object_new_peaks_', add_filename, '.rds'))
+  
 } else {
-  panc.my <- readRDS(paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))
+  panc.my <- readRDS(paste0('PanStroma_merged_object_new_peaks_', add_filename, '.rds'))
 }
-
 ####################################
 ##### Integration with seurat #######
 ####################################
-cat ('Integrating\n')
 
-panc.my@meta.data$Batches <- panc.my$Chemistry
-
-table(panc.my$Batches)
-atac.split <- SplitObject(panc.my, split.by = 'Batches')
-
-atac.split <- map(atac.split, function(obj) {
-  obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
-    RunTFIDF() %>%
-    RunSVD(reduction.key = 'LSI_',
-           reduction.name = 'lsi',
-           irlba.work = 400)
-  return(obj)
-})
-
-#######integration############
-plan("multiprocess", workers = 10)
-options(future.globals.maxSize = 100 * 1024^3)
-
-integration.anchors <- FindIntegrationAnchors(
-  object.list = atac.split,
-  anchor.features = rownames(panc.my),
-  reduction = "rlsi",
-  dims = 2:50
-)
-
-# integrate LSI embeddings
-integrated <- IntegrateEmbeddings(
-  anchorset = integration.anchors,
-  reductions = panc.my[["lsi"]],
-  new.reduction.name = "integrated_lsi",
-  dims.to.integrate = 1:50
-)
-
-
-# create a new UMAP using the integrated embeddings
-integrated <- RunUMAP(integrated, 
-                      reduction = "integrated_lsi", 
-                      dims = 2:50)
-
-integrated  <-  integrated %>% 
-  FindNeighbors(
-    reduction = 'integrated_lsi',
-    dims = 2:30
-  ) %>% 
-  FindClusters( 
-    algorithm = 4,
-    method = 'igraph',
-    resolution = 1,
-    verbose = FALSE
-  )
-
+integrated <- doIntegration(panc.my, 
+                            #annotations.f = annotations, 
+                            k.w = 100)
 
 print(integrated@reductions)
-saveRDS(integrated, paste0('PanStroma_seurat_integrated_object_Accessible_peaks_', add_filename, '_chemistry.rds'))
+saveRDS(integrated, paste0('PanStroma_seurat_integrated_object_new_peaks_', add_filename, '_chemistry.rds'))
 
 fwrite(cbind(Embeddings(integrated, reduction='umap'), integrated@meta.data), 
-       paste0('PanStroma_seurat_integrated_object_Accessible_peaks_', add_filename, '_chemistry_matadata.tsv'),
+       paste0('PanStroma_seurat_integrated_object_new_peaks_', add_filename, '_chemistry_matadata.tsv'),
        sep='\t', row.names = T)
 
 
@@ -469,15 +432,24 @@ p1 <- DimPlot(panc.my, group.by = "Chemistry")
 ggsave(paste0(add_filename, '_Chemistry.pdf'), width = 13, height = 4.5)
 #saveRDS(integrated, paste0(add_filename, '_Chemistry.rds'))
 
-p2 <- DimPlot(integrated, group.by = "cell_type.harmonized.cancer")
-p1 <- DimPlot(panc.my, group.by = "cell_type.harmonized.cancer")
+p2 <- DimPlot(integrated, group.by = cell_column)
+p1 <- DimPlot(panc.my, group.by = cell_column)
 (p1 + ggtitle("Merged") + NoLegend()) | (p2 + ggtitle("Integrated"))
-ggsave(paste0(add_filename, '_cell_type.harm.cancer.pdf'), width = 15, height = 4.5)
+ggsave(paste0(add_filename, '_',cell_column,'.pdf'), width = 15, height = 4.5)
 
 p2 <- DimPlot(integrated, group.by = "Cancer", cols = 'Spectral')
 p1 <- DimPlot(panc.my, group.by = "Cancer", cols = 'Spectral')
 (p1 + ggtitle("Merged")) | (p2 + ggtitle("Integrated"))
 ggsave(paste0(add_filename, '_Cancer.pdf'), width = 12, height = 4.5)
+
+saveRDS(integrated, paste0('PanStroma_seurat_integrated_object_new_peaks_', add_filename, '_chemistr.rds'))
+
+fwrite(cbind(Embeddings(integrated, reduction='umap'), integrated@meta.data), 
+       paste0('PanStroma_seurat_integrated_object_new_peaks_', add_filename, '_chemistry_matadata.tsv'),
+       sep='\t', row.names = T)
+
+
+
 
 
 
