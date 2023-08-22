@@ -144,7 +144,7 @@ if(opt$int_batch=='weird') {
 
 print(table(all.rna$Batches))
 
-cat ('Integrate regular RNA and combo RNA by batches \n')
+cat ('Run SCT on batches\n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 
 all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
@@ -160,12 +160,15 @@ all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
   return(x)
 })
 
+message('Selecting integration features')
 features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3000)
 all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
+message('Run PCA on integration features')
 all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
-
+message('Run FindIntegrationAnchors')
 rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
                                       anchor.features = features, dims = 1:30, reduction = "rpca", k.anchor = 20)
+message('Run IntegrateData')
 int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:30)
 int <- RunPCA(int, verbose = FALSE)
 int <- RunUMAP(int, reduction = "pca", dims = 1:30)
