@@ -139,7 +139,8 @@ if(opt$int_batch=='weird') {
                                          all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                                          TRUE ~ all.rna$Chemistry)
 } else if(opt$int_batch=='cancer_chemistry') {
-  all.rna@meta.data$Batches <- paste(all.rna$Cancer, all.rna$Chemistry, sep = '__')
+  all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('GBM') ~ all.rna$Chemistry,
+                                         TRUE ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'))
 }
 
 print(table(all.rna$Batches))
@@ -155,13 +156,15 @@ all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
     assay = 'RNA',
     vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
     conserve.memory = T,
+    verbose = F,
     return.only.var.genes = T
   )
   return(x)
 })
 
 message('Selecting integration features')
-features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3000)
+features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3000, )
+
 all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
 message('Run PCA on integration features')
 all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
@@ -176,6 +179,7 @@ int <- FindNeighbors(int, reduction = "pca", dims = 1:30)
 int <- FindClusters(int, resolution = 2)
 
 int <- PrepSCTFindMarkers(int)
+VariableFeatures(int) <- features
 
 cat('saving the object...\n')
 saveRDS(int,   paste0("PanImmune_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".rds"))
