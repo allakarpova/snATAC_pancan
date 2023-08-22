@@ -1,5 +1,5 @@
 ## Alla Karpova
-### merge regular RNA data for immune cells and integrate with seurat
+### merge regular RNA data for immune cells and integrate with seurat using different batches groupings
 
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
@@ -79,6 +79,11 @@ option_list = list(
               type="character",
               default='cell_type.harmonized',
               help = "cell_type_column",
+              metavar="character"),
+  make_option(c("--int_batch"),
+              type="character",
+              default="chemistry",
+              help = "optione include 'weird','sample', 'cancer','chemistry', 'cancer_chemistry'",
               metavar="character")
   
 );
@@ -117,9 +122,27 @@ all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
 dim(all.rna)
 
 all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
-all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
-                             all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
-                             TRUE ~ all.rna$Chemistry)
+if(opt$int_batch=='weird') {
+  wierd.gbm <- c('C3N-02783', 'C3L-02705', 'C3N-01334', 'C3N-01798', 'C3L-03968')
+  all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.gbm ~  paste(all.rna$Cancer, 'weird', sep = '__'),
+                                         all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
+                                         all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
+                                         TRUE ~ all.rna$Chemistry)
+  
+} else if(opt$int_batch=='sample') {
+  all.rna@meta.data$Batches <- all.rna@meta.data$Piece_ID_RNA
+  
+} else if(opt$int_batch=='cancer') {
+  all.rna@meta.data$Batches <- paste(all.rna$Cancer, all.rna$Chemistry, sep = '__')
+} else if(opt$int_batch=='chemistry') {
+  all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
+                                         all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
+                                         TRUE ~ all.rna$Chemistry)
+} else if(opt$int_batch=='cancer_chemistry') {
+  all.rna@meta.data$Batches <- paste(all.rna$Cancer, all.rna$Chemistry, sep = '__')
+}
+
+
 
 cat ('Integrate regular RNA and combo RNA by batches \n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
@@ -149,42 +172,38 @@ int <- RunUMAP(int, reduction = "pca", dims = 1:30)
 int <- FindNeighbors(int, reduction = "pca", dims = 1:30)
 int <- FindClusters(int, resolution = 2)
 
-tb <- table(int$seurat_clusters, int$cell_type.harmonized.cancer)
-cluster.match.celltype <- apply(tb, 1, function(x) {
-  colnames(tb)[which.max (x)]
-})
-int$cell_type.immune <- cluster.match.celltype[as.character(int$seurat_clusters)]
+int <- PrepSCTFindMarkers(int)
 
 cat('saving the object...\n')
-saveRDS(int,   paste0("PanImmune_integrated_object_regularRNA_multiome_",add_filename,".rds"))
+saveRDS(int,   paste0("PanImmune_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".rds"))
 
 dimplot=DimPlot(object = int, label = TRUE) + NoLegend()
-pdf(paste0("Dimplot_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
+pdf(paste0("Dimplot_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
 print(dimplot)
 dev.off()
 
 dimplot=DimPlot(object = int, label = F, group.by = "Piece_ID")
-pdf(paste0("Dimplot_Piece_ID_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=25, useDingbats = F)
+pdf(paste0("Dimplot_Piece_ID_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=25, useDingbats = F)
 print(dimplot)
 dev.off()
 
 dimplot=DimPlot(object = int, label = F, group.by = "data.type.rna")
-pdf(paste0("Dimplot_data.type_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=14, useDingbats = F)
+pdf(paste0("Dimplot_data.type_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=14, useDingbats = F)
 print(dimplot)
 dev.off()
 
 dimplot=DimPlot(object = int, label = TRUE, group.by = "cell_type.harmonized.cancer")
-pdf(paste0("Dimplot_cell_type.harmonized.cancer_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
+pdf(paste0("Dimplot_cell_type.harmonized.cancer_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
 print(dimplot)
 dev.off()
 
 dimplot=DimPlot(object = int, label = TRUE, group.by = cell_column)
-pdf(paste0("Dimplot_",cell_column,"_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
+pdf(paste0("Dimplot_",cell_column,"_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
 print(dimplot)
 dev.off()
 
 dimplot=DimPlot(object = int, label = TRUE, group.by = "Cancer")
-pdf(paste0("Dimplot_Cancer_integrated_object_regularRNA_multiome_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
+pdf(paste0("Dimplot_Cancer_integrated_allRNA_by_",opt$int_batch,"_",add_filename,".pdf"),height=12,width=15, useDingbats = F)
 print(dimplot)
 dev.off()
 
