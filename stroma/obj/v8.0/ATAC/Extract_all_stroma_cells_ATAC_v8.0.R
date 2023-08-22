@@ -256,9 +256,9 @@ annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
-if(!file.exists(paste0('PanStroma_merged_object_100K_random_peaks_normalized_', add_filename, '.rds'))) {
+if(!file.exists(paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))) {
   
-  if(!file.exists(paste0('PanStroma_merged_object_100K_random_peaks_', add_filename, '.rds'))) {
+  if(!file.exists(paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))) {
     
     cancers <- c('BRCA', 'ccRCC', 'GBM', 'CRC', 'HNSCC', 'CESC', 'OV', 'UCEC', "PDAC", "SKCM") # MM doesnt have any stroma cells
     cat('creating object on old peaks \n')
@@ -370,10 +370,10 @@ if(!file.exists(paste0('PanStroma_merged_object_100K_random_peaks_normalized_', 
     rm(atac, matrix.counts)
     gc()
     
-    saveRDS(panc.my, paste0('PanStroma_merged_object_100K_random_peaks_', add_filename, '.rds'))
+    saveRDS(panc.my, paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))
   } 
   else {
-    panc.my <- readRDS(paste0('PanStroma_merged_object_100K_random_peaks_', add_filename, '.rds'))
+    panc.my <- readRDS(paste0('PanStroma_merged_object_Accessible_peaks_', add_filename, '.rds'))
   }
   cat ('Normalizing 100k random peak object\n')
   panc.my <- runAllNormalization (panc.my, dims = 30)
@@ -393,9 +393,9 @@ if(!file.exists(paste0('PanStroma_merged_object_100K_random_peaks_normalized_', 
     panc.my <- subset(panc.my, subset = Sample %in% samples.to.keep)
   }
   
-  saveRDS(panc.my, paste0('PanStroma_merged_object_100K_random_peaks_normalized_', add_filename, '.rds'))
+  saveRDS(panc.my, paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))
 } else {
-  panc.my <- readRDS(paste0('PanStroma_merged_object_100K_random_peaks_normalized_', add_filename, '.rds'))
+  panc.my <- readRDS(paste0('PanStroma_merged_object_Accessible_peaks_normalized_', add_filename, '.rds'))
 }
 
 ####################################
@@ -456,10 +456,10 @@ integrated  <-  integrated %>%
 
 
 print(integrated@reductions)
-saveRDS(integrated, paste0('PanStroma_seurat_integrated_object_100K_random_peaks_', add_filename, '_chemistry_data.source.rds'))
+saveRDS(integrated, paste0('PanStroma_seurat_integrated_object_Accessible_peaks_', add_filename, '_chemistry_data.source.rds'))
 
 fwrite(cbind(Embeddings(integrated, reduction='umap'), integrated@meta.data), 
-       paste0('PanStroma_seurat_integrated_object_100K_random_', add_filename, '_chemistry_data.source_matadata.tsv'),
+       paste0('PanStroma_seurat_integrated_object_Accessible_peaks_', add_filename, '_chemistry_data.source_matadata.tsv'),
        sep='\t', row.names = T)
 
 
