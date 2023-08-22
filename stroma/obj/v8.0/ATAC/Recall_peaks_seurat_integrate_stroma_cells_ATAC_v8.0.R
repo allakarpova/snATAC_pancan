@@ -298,7 +298,7 @@ option_list = list(
               metavar="character"),
   make_option(c("-c","--cell_type_column"),
               type="character",
-              default='cell_type',
+              default='cell_type.harmonized.cancer',
               help = "column in the metadata with most recent cell types",
               metavar="character")
   
@@ -327,15 +327,17 @@ if (!file.exists(paste0('PanStroma_merged_object_new_peaks_', add_filename, '.rd
   
   panc.my <- readRDS(input.path)
   
-  my.metadata <- fread(meta.path, data.table = F) %>% 
-    data.frame(row.names = 1, check.rows = F, check.names = F)
-  
-  panc.my <- AddMetaData(panc.my, my.metadata)
-  panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
-  print(table(panc.my$to_remove))
-  print(dim(panc.my))
-  panc.my <- subset(x = panc.my, subset = to_remove, invert = TRUE)
-  print(dim(panc.my))
+  if(!is.null(metadata.file)) {
+    my.metadata <- fread(meta.path, data.table = F) %>% 
+      data.frame(row.names = 1, check.rows = F, check.names = F)
+    
+    panc.my <- AddMetaData(panc.my, my.metadata)
+    panc.my$to_remove <- grepl('oublet', as.character(unlist(panc.my[[cell_column]])))
+    print(table(panc.my$to_remove))
+    print(dim(panc.my))
+    panc.my <- subset(x = panc.my, subset = to_remove, invert = TRUE)
+    print(dim(panc.my))
+  }
   
   annotations <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
   
