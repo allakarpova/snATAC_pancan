@@ -179,7 +179,7 @@ all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features =
 message('Run PCA on integration features')
 all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
 message('Run FindIntegrationAnchors')
-if(do.reference) {
+if(opt$do.reference) {
   rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = multiome.batches.n,
                                         anchor.features = features, dims = 1:50, reduction = "rpca")
   
