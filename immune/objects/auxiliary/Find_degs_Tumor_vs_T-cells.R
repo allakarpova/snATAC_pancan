@@ -104,7 +104,7 @@ total.degs <- map(cancers, function(c) {
   stopifnot(!is.na(ct))
   
   
-  Idents(obj) <- 'cell_type.harmonized.cancer'
+  Idents(obj) <- cell_column
   degs <- FindMarkers(obj, ident.1 = 'Tumor', ident.2 = 'T-cells', max.cells.per.ident = 5000, only.pos =TRUE) %>%
     mutate(gene = rownames(.),
            Cancer = c)
