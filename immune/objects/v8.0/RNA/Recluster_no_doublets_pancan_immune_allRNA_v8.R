@@ -181,6 +181,7 @@ all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
 message('Run FindIntegrationAnchors')
 if(opt$do.reference) {
   rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = multiome.batches.n,
+                                        normalization.method = "SCT",
                                         anchor.features = features, dims = 1:50, reduction = "rpca")
   
 } else {
