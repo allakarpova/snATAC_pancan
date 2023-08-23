@@ -83,8 +83,13 @@ option_list = list(
   make_option(c("--int_batch"),
               type="character",
               default="chemistry",
-              help = "optione include 'weird','sample', 'cancer','chemistry', 'cancer_chemistry'",
-              metavar="character")
+              help = "options include 'weird','sample', 'cancer','chemistry', 'cancer_chemistry'",
+              metavar="character"),
+  make_option(c("--do.reference"),
+              type="logical",
+              default=FALSE,
+              help = "Do reference integartion against multiome samples or not",
+              metavar="logical")
   
 );
 
@@ -148,6 +153,11 @@ print(table(all.rna$Batches))
 cat ('Run SCT on batches\n')
 all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 
+batches <- names(all.rna.list)
+multiome.batches.n <- which(grepl('Multiome', batches))
+print(multiome.batches.n)
+print(grep('Multiome', batches))
+
 all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
   DefaultAssay(x) <- 'RNA'
   x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
@@ -169,10 +179,17 @@ all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features =
 message('Run PCA on integration features')
 all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
 message('Run FindIntegrationAnchors')
-rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
-                                      anchor.features = features, dims = 1:30, reduction = "rpca", k.anchor = 20)
+if(do.reference) {
+  rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = multiome.batches.n,
+                                        anchor.features = features, dims = 1:50, reduction = "rpca")
+  
+} else {
+  rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
+                                        anchor.features = features, dims = 1:50, reduction = "rpca")
+  
+}
 message('Run IntegrateData')
-int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:30)
+int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
 int <- RunPCA(int, verbose = FALSE)
 int <- RunUMAP(int, reduction = "pca", dims = 1:30)
 int <- FindNeighbors(int, reduction = "pca", dims = 1:30)
