@@ -89,6 +89,11 @@ option_list = list(
               type="logical",
               default=FALSE,
               help = "Do reference integartion against multiome samples or not",
+              metavar="logical"),
+  make_option(c("--remove.tumor.genes"),
+              type="logical",
+              default=FALSE,
+              help = "Remove cancer cell genes from integration features",
               metavar="logical")
   
 );
@@ -174,6 +179,26 @@ all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
 
 message('Selecting integration features')
 features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3000, )
+
+if(opt$remove.tumor.genes) {
+  tumor.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/obj/v8.0/auxiliary/DEGs_tumor_T-cells/Degs_tumor_vs_Tcells_all.cancers.tsv', data.table = F) 
+  suspicious <- tumor.genes %>% 
+    filter(pct.2 > 0.3 & p_val_adj < 1.0e-20) %>% 
+    group_by(Cancer) %>% 
+    top_n(n = 500, wt = avg_log2FC) %>% pull(gene)
+  trash.genes <- tumor.genes %>% filter(gene %in% suspicious) %>% arrange(gene) %>% 
+    group_by(gene) %>% 
+    mutate(median.pct.2 = median(pct.2),
+           qrt.pct.2 = quantile(pct.2, probs = 0.25),
+           min.pct.2 = min(pct.2),
+           max.pct.2 = max(pct.2)) %>% 
+    filter(min.pct.2 < 0.1) %>% 
+    pull(gene) %>% unique 
+  
+  length(suspicious)
+  length(trash.genes)
+  features <- setdiff(features, trash.genes)
+}
 
 all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
 message('Run PCA on integration features')
