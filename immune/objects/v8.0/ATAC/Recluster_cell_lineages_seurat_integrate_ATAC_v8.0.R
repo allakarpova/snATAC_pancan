@@ -196,10 +196,7 @@ conditions %>% walk (function(column) {
   
   
   if (!file.exists(paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))) {
-    integrated <- doIntegration(int.sub, 
-                                
-                                k.w = ifelse(conditions=='B-cell_Plasma', 28, 100),
-                                k.filter = ifelse(conditions=='B-cell_Plasma', 50, 200))
+    integrated <- doIntegration(int.sub)
     
     saveRDS(integrated, paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
   } else {
