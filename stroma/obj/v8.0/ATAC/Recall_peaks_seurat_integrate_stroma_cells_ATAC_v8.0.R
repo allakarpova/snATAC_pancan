@@ -135,16 +135,14 @@ call_peaks <- function(panc.my.f,add_filename.f, macs2_path.f) {
     #format = "BEDPE"
   )
   # remove peaks on nonstandard chromosomes and in genomic blacklist regions
-  peaks <- peaks[!sapply(peaks, is.null)]
-  peaks <- lapply(peaks, keepStandardChromosomes, pruning.mode = "coarse")
-  peaks <- lapply(peaks, subsetByOverlaps, ranges = blacklist_hg38_unified, invert = TRUE)
-  all_peaks <- lapply(peaks, as.data.table)
-  all_peaks <- lapply(all_peaks, function(x) {
-    total.score.per.mil <- sum(x$neg_log10qvalue_summit)/1000000 # this is scaling factor for MACS2 score
-    x$score.norm <- x$neg_log10qvalue_summit / total.score.per.mil
-    return(x)
-  })
-  all_peaks <- rbindlist(all_peaks)
+  peaks <- keepStandardChromosomes (peaks, pruning.mode = "coarse")
+  peaks <- subsetByOverlaps (peaks, ranges = blacklist_hg38_unified, invert = TRUE)
+  all_peaks <- as.data.table(peaks)
+  
+  total.score.per.mil <- sum(all_peaks$neg_log10qvalue_summit)/1000000 # this is scaling factor for MACS2 score
+  all_peaks$score.norm <- all_peaks$neg_log10qvalue_summit / total.score.per.mil
+
+  #all_peaks <- rbindlist(all_peaks)
   return(all_peaks)
 }
 
