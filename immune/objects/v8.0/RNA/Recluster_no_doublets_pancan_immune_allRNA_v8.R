@@ -160,8 +160,6 @@ all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 
 batches <- names(all.rna.list)
 multiome.batches.n <- which(grepl('Multiome', batches))
-print(multiome.batches.n)
-print(grep('Multiome', batches))
 
 all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
   DefaultAssay(x) <- 'RNA'
