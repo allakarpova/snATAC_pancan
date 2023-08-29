@@ -209,10 +209,10 @@ conditions %>% walk (function(column) {
   ggsave(paste0(column, '_Chemistry.pdf'), width = 13, height = 4.5)
   #saveRDS(integrated, paste0(add_filename, '_Chemistry.rds'))
   
-  p2 <- DimPlot(integrated, group.by = 'cell_type_v5_atac', label = TRUE)
-  p1 <- DimPlot(int.sub, group.by = 'cell_type_v5_atac', label = TRUE)
+  p2 <- DimPlot(integrated, group.by = 'cell_type_v8_atac', label = TRUE)
+  p1 <- DimPlot(int.sub, group.by = 'cell_type_v8_atac', label = TRUE)
   (p1 + ggtitle("Merged") + NoLegend()) | (p2 + ggtitle("Integrated"))
-  ggsave(glue::glue('{column}_cell_type_v5_atac.pdf'), width = 15, height = 4.5)
+  ggsave(glue::glue('{column}_cell_type_v8_atac.pdf'), width = 15, height = 4.5)
   
   p2 <- DimPlot(integrated, group.by = "Cancer", cols = 'Spectral', label = TRUE)
   p1 <- DimPlot(int.sub, group.by = "Cancer", cols = 'Spectral', label = TRUE)
