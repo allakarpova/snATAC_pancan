@@ -198,6 +198,13 @@ conditions %>% walk (function(column) {
   if (!file.exists(paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))) {
     integrated <- doIntegration(int.sub)
     
+    #### remove excessive fragment files, artifact after peak calling on cluster level
+    all.fragment.obj <- Fragments(int.sub)
+    all.fragment.obj.cell.count <- map_chr(all.fragment.obj, function(x) length(x@cells))
+    all.fragment.obj.upd <- all.fragment.obj[all.fragment.obj.cell.count > 0]
+    Fragments(int.sub) <- NULL
+    Fragments(int.sub) <- all.fragment.obj.upd
+    
     saveRDS(integrated, paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
   } else {
     integrated <- readRDS(paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
