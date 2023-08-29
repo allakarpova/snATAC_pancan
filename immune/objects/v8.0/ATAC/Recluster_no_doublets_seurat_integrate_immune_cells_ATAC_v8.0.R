@@ -26,7 +26,7 @@ suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(doParallel))
 #suppressMessages(library(harmony))
-library(SeuratWrappers)
+#library(SeuratWrappers)
 
 
 ################################
