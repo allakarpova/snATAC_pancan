@@ -179,7 +179,7 @@ conditions <- c( 'T-cells_NK', 'Myeloid','B-cell_Plasma')
 
 conditions %>% walk (function(column) {
   print(column)
-  if(!file.exists(paste0(column, '_object_same_peaks_normalized_MERGED_', add_filename, '.rds'))) {
+  if(!file.exists(paste0(column, '_object_new_peaks_normalized_MERGED_', add_filename, '.rds'))) {
     int.sub <- subset(x = int, subset = cell_lin == column)
     
     #normalize original object
@@ -189,13 +189,13 @@ conditions %>% walk (function(column) {
       RunTFIDF() %>%
       RunSVD() %>%
       RunUMAP(reduction = "lsi", dims = 2:50)
-    saveRDS(int.sub,  paste0(column, '_object_same_peaks_normalized_MERGED_', add_filename, '.rds'))
+    saveRDS(int.sub,  paste0(column, '_object_new_peaks_normalized_MERGED_', add_filename, '.rds'))
   } else {
-    int.sub <- readRDS(paste0(column, '_object_same_peaks_normalized_MERGED_', add_filename, '.rds'))
+    int.sub <- readRDS(paste0(column, '_object_new_peaks_normalized_MERGED_', add_filename, '.rds'))
   }
   
   
-  if (!file.exists(paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))) {
+  if (!file.exists(paste0(column, '_object_new_peaks_normalized_INTEGRATED_', add_filename, '.rds'))) {
     integrated <- doIntegration(int.sub)
     
     #### remove excessive fragment files, artifact after peak calling on cluster level
@@ -205,9 +205,9 @@ conditions %>% walk (function(column) {
     Fragments(int.sub) <- NULL
     Fragments(int.sub) <- all.fragment.obj.upd
     
-    saveRDS(integrated, paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
+    saveRDS(integrated, paste0(column, '_object_new_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
   } else {
-    integrated <- readRDS(paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
+    integrated <- readRDS(paste0(column, '_object_new_peaks_normalized_INTEGRATED_', add_filename, '.rds'))
   }
   
   p2 <- DimPlot(integrated, group.by = "Chemistry", label = TRUE)
@@ -242,7 +242,7 @@ conditions %>% walk (function(column) {
   ggsave(paste0(column, '_Batches.pdf'), width = 12, height = 4.5)
   
   
-  fwrite(integrated@meta.data, paste0(column, '_object_same_peaks_normalized_INTEGRATED_', add_filename, '_metadata.tsv'),
+  fwrite(integrated@meta.data, paste0(column, '_object_new_peaks_normalized_INTEGRATED_', add_filename, '_metadata.tsv'),
          sep='\t', row.names = T)
   
 })
