@@ -3,7 +3,7 @@
 
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
-suppressMessages(library(GenomeInfoDb))
+
 suppressMessages(library(ggplot2))
 suppressMessages(library(RColorBrewer))
 
@@ -13,11 +13,10 @@ set.seed(1234)
 suppressMessages(library(dplyr))
 suppressMessages(library(data.table))
 
-suppressMessages(library(EnsDb.Hsapiens.v86))
-suppressMessages(library(GenomicRanges))
+
 suppressMessages(library(future))
 suppressMessages(library(optparse))
-suppressMessages(library(BSgenome.Hsapiens.UCSC.hg38))
+
 
 suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
@@ -216,9 +215,9 @@ if(opt$do.reference) {
 message('Run IntegrateData')
 int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
 int <- RunPCA(int, verbose = FALSE)
-int <- RunUMAP(int, reduction = "pca", dims = 1:30)
-int <- FindNeighbors(int, reduction = "pca", dims = 1:30)
-int <- FindClusters(int, resolution = 2)
+int <- RunUMAP(int, reduction = "pca", dims = 1:40)
+int <- FindNeighbors(int, reduction = "pca", dims = 1:40)
+int <- FindClusters(int, resolution = 1)
 
 int <- PrepSCTFindMarkers(int)
 VariableFeatures(int) <- features
