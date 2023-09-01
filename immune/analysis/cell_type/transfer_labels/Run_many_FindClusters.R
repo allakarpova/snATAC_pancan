@@ -48,7 +48,7 @@ setwd(out_path)
 
 panc<- readRDS(input.path)
 
-for (resol in c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2)) {
+for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
   panc <- FindClusters(panc, resolution = resol, algorithm = 4, method = "igraph")
   print(head(panc@meta.data))
 }
@@ -57,7 +57,7 @@ cluster.tb <- panc@meta.data %>% select(dplyr::contains('res.'))
 fwrite(cluster.tb, paste0('Clusters_res0.1_to_2_alg4_', add_filename, '.txt'), sep='\t', row.names = TRUE)
 
 
-for (resol in c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2)) {
+for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
   panc <- FindClusters(panc, resolution = resol, algorithm = 1)
   print(head(panc@meta.data))
 }
@@ -65,7 +65,7 @@ for (resol in c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2)) {
 cluster.tb <- panc@meta.data %>% select(dplyr::contains('res.'))
 fwrite(cluster.tb, paste0('Clusters_res0.1_to_2_alg1_', add_filename, '.txt'), sep='\t', row.names = TRUE)
 
-for (resol in c(seq(0.1, 0.5, 0.1), 0.7, 1, 1.2, 1.5, 1.7, 2)) {
+for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
   panc <- FindClusters(panc, resolution = resol, algorithm = 3)
   print(head(panc@meta.data))
 }
