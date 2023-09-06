@@ -82,7 +82,7 @@ option_list = list(
   make_option(c("--int_batch"),
               type="character",
               default="chemistry",
-              help = "options include 'weird','sample', 'cancer','chemistry', 'cancer_chemistry'",
+              help = "options include 'weird_Brca_Ov','sample', 'cancer','chemistry', 'cancer_chemistry'",
               metavar="character"),
   make_option(c("--do.reference"),
               type="logical",
@@ -138,7 +138,7 @@ if(opt$int_batch=='weird.gbm') {
                                          all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
                                          TRUE ~ all.rna$Chemistry)
   
-} else if(opt$int_batch=='weird.brca.ov') {
+} else if(opt$int_batch=='weird_Brca_Ov') {
   wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
   wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
   all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.brca ~  paste(all.rna$Cancer, 'weird', sep = '__'),
