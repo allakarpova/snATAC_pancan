@@ -130,7 +130,7 @@ dim(all.rna)
 all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
 dim(all.rna)
 
-all.rna$Data.source <- ifelse(all.rna$Cancer == 'PBMC', '10x', 'DingLab')
+print(opt$int_batch)
 if(opt$int_batch=='weird.gbm') {
   wierd.gbm <- c('C3N-02783', 'C3L-02705', 'C3N-01334', 'C3N-01798', 'C3L-03968')
   all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.gbm ~  paste(all.rna$Cancer, 'weird', sep = '__'),
@@ -140,7 +140,7 @@ if(opt$int_batch=='weird.gbm') {
   
 } else if(opt$int_batch=='weird.brca.ov') {
   wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
-  wierd.ov <- c('VF031V1-Tm1Y1')
+  wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
   all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.brca ~  paste(all.rna$Cancer, 'weird', sep = '__'),
                                          all.rna$Piece_ID_RNA %in% wierd.ov ~  paste(all.rna$Cancer, 'weird', sep = '__'),
                                          all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
