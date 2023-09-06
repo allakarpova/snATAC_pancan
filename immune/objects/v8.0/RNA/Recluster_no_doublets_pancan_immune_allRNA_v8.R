@@ -178,20 +178,25 @@ message('Selecting integration features')
 features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3500)
 print(length(features))
 if(opt$remove.tumor.genes) {
-  tumor.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/obj/v8.0/auxiliary/DEGs_tumor_T-cells/Degs_tumor_vs_Tcells_all.cancers.tsv', data.table = F) 
-  suspicious <- tumor.genes %>% 
-    filter(pct.2 > 0.3 & p_val_adj < 1.0e-20 & avg_log2FC > 1) %>% 
-    group_by(Cancer) %>% 
-    top_n(n = 500, wt = avg_log2FC) %>% pull(gene)
-  trash.genes <- tumor.genes %>% filter(gene %in% suspicious) %>% arrange(gene) %>% 
-    group_by(gene) %>% 
-    mutate(median.pct.2 = median(pct.2),
-           qrt.pct.2 = quantile(pct.2, probs = 0.25),
-           min.pct.2 = min(pct.2),
-           max.pct.2 = max(pct.2)) %>% 
-    filter(min.pct.2 < 0.1) %>% 
-    pull(gene) %>% unique 
+  # tumor.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/obj/v8.0/auxiliary/DEGs_tumor_T-cells/Degs_tumor_vs_Tcells_all.cancers.tsv', data.table = F) 
+  # suspicious <- tumor.genes %>% 
+  #   filter(pct.2 > 0.3 & p_val_adj < 1.0e-20 & avg_log2FC > 1) %>% 
+  #   group_by(Cancer) %>% 
+  #   top_n(n = 500, wt = avg_log2FC) %>% pull(gene)
+  # trash.genes <- tumor.genes %>% filter(gene %in% suspicious) %>% arrange(gene) %>% 
+  #   group_by(gene) %>% 
+  #   mutate(median.pct.2 = median(pct.2),
+  #          qrt.pct.2 = quantile(pct.2, probs = 0.25),
+  #          min.pct.2 = min(pct.2),
+  #          max.pct.2 = max(pct.2)) %>% 
+  #   filter(min.pct.2 < 0.1) %>% 
+  #   pull(gene) %>% unique 
 
+  tumor.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/obj/v8.0/auxiliary/DEGs_tumor_T-cells/Pval_aver_immune_cell_pct_vs_tumor_pct.tsv', data.table = F, header = TRUE)
+  
+  trash.genes <- tumor.genes %>% 
+    filter(p.vals<0.1, pct.tumor.fake>0, Cancer.rank < 6) %>% pull(features.plot) %>% unique()
+  
   print(length(intersect(features, trash.genes)))
   print(length(setdiff(features, trash.genes)))
   features <- setdiff(features, trash.genes)
