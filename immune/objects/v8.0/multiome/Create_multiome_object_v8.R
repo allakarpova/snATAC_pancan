@@ -143,7 +143,7 @@ ggsave(glue::glue("Dimplot_{add_filename}_Cancer.pdf"), height=8,width=11)
 
 
 DimPlot(r.obj, reduction = "wnn.umap", group.by = "Piece_ID", label = TRUE, label.size = 2.5, repel = TRUE)
-ggsave(glue::glue("Dimplot_{add_filename}_Piece_ID.pdf"), height=8,width=11)
+ggsave(glue::glue("Dimplot_{add_filename}_Piece_ID.pdf"), height=8,width=20)
 
 
 
