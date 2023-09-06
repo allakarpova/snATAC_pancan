@@ -45,7 +45,7 @@ normalize_multiome <- function(obj,dims = 50) {
   
   obj <- FindMultiModalNeighbors(obj, 
                                  reduction.list = list("pca", "lsi"), 
-                                 dims.list = list(1:dims, 2:dims))
+                                 dims.list = list(1:30, 2:dims))
   obj <- RunUMAP(obj, nn.name = "weighted.nn", 
                  reduction.name = "wnn.umap", 
                  reduction.key = "wnnUMAP_")
@@ -137,13 +137,13 @@ pdf(glue::glue("Dimplot_{add_filename}_seurat_clusters.pdf"),height=8,width=24)
 p1 + p2 + p3 & NoLegend() & theme(plot.title = element_text(hjust = 0.5))
 dev.off()
 
-DimPlot(r.obj, reduction = "wnn.umap", group.by = "Piece_ID", label = TRUE, label.size = 2.5, repel = TRUE)
-ggsave(glue::glue("Dimplot_{add_filename}_Piece_ID.pdf"), height=8,width=11)
 
 DimPlot(r.obj, reduction = "wnn.umap", group.by = "Cancer", label = TRUE, label.size = 2.5, repel = TRUE, cols = colors$Cancer)
 ggsave(glue::glue("Dimplot_{add_filename}_Cancer.pdf"), height=8,width=11)
 
 
+DimPlot(r.obj, reduction = "wnn.umap", group.by = "Piece_ID", label = TRUE, label.size = 2.5, repel = TRUE)
+ggsave(glue::glue("Dimplot_{add_filename}_Piece_ID.pdf"), height=8,width=11)
 
 
 
