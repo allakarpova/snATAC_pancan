@@ -16,7 +16,7 @@ suppressMessages(library(googlesheets4))
 ### FUNCTIONS #####
 
 integrate_rna <- function(obj) {
-  if(opt$int_batch=='weird.brca.ov') {
+  if(opt$int_batch=='weird_Brca_Ov') {
     wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
     obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
@@ -183,7 +183,7 @@ option_list = list(
   make_option(c("--int_batch"),
               type="character",
               default="chemistry",
-              help = "options include 'weird.brca.ov','sample', 'cancer','ov'",
+              help = "options include 'weird_Brca_Ov','sample', 'cancer','ov'",
               metavar="character"),
   make_option(c("--do.reference"),
               type="logical",
