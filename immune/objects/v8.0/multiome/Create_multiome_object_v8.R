@@ -227,9 +227,15 @@ r.obj <- subset(r.obj, cells = combo.cells)
 
 r.obj[['ATAC_immune']] <- a.obj[['ATAC_immune']]
 
-cat('normalizing all \n')
-r.obj <- normalize_multiome(r.obj)
-cat('done \n')
+if(opt$do.integration) {
+  cat('normalize_multiome_with_integration \n')
+  r.obj <- normalize_multiome_with_integration(r.obj)
+} else {
+  cat('normalizing all \n')
+  r.obj <- normalize_multiome(r.obj)
+  cat('done \n')
+}
+
 
 saveRDS(r.obj, glue::glue("PanImmune_merged_RNA_ATAC_{add_filename}.rds"))
 #} else {
