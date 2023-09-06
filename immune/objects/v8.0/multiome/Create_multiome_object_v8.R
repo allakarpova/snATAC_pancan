@@ -35,6 +35,8 @@ integrate_rna <- function(obj) {
                                        TRUE ~ 'All_other')
   } 
   
+  print(table(obj$Batches))
+  
   cat ('Run SCT on batches\n')
   all.rna.list <- SplitObject(obj, split.by = 'Batches')
   
