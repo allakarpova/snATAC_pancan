@@ -15,7 +15,74 @@ suppressMessages(library(googlesheets4))
 ######################
 ### FUNCTIONS #####
 
-normalize_multiome <- function(obj,dims = 50) {
+integrate_rna <- function(obj) {
+  if(opt$int_batch=='weird.brca.ov') {
+    wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
+    wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
+    obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                        TRUE ~ 'All_other')
+  }  else if(opt$int_batch=='sample') {
+    obj@meta.data$Batches <- obj@meta.data$Piece_ID_RNA
+    
+  } else if(opt$int_batch=='cancer') {
+    obj@meta.data$Batches <- obj$Cancer
+  } else if (opt$int_batch=='ov') {
+    wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
+    wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
+    obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Cancer == 'OV' ~  obj$Cancer,
+                                       TRUE ~ 'All_other')
+  } 
+  
+  cat ('Run SCT on batches\n')
+  all.rna.list <- SplitObject(obj, split.by = 'Batches')
+  
+  batches <- names(all.rna.list)
+  reference.batches.n <- which(grepl('All_other', batches))
+  
+  all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
+    DefaultAssay(x) <- 'RNA'
+    x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
+    x <- CellCycleScoring(x, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes, set.ident = F)
+    x <- x %>% SCTransform(
+      assay = 'RNA',
+      vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
+      conserve.memory = T,
+      verbose = F,
+      return.only.var.genes = T
+    )
+    return(x)
+  })
+  
+  message('Selecting integration features')
+  features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3500)
+  print(length(features))
+  
+  all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
+  message('Run PCA on integration features')
+  all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
+  message('Run FindIntegrationAnchors')
+  if(opt$do.reference) {
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = reference.batches.n,
+                                          normalization.method = "SCT",
+                                          anchor.features = features, dims = 1:50, reduction = "rpca")
+    
+  } else {
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
+                                          anchor.features = features, dims = 1:50, reduction = "rpca")
+    
+  }
+  message('Run IntegrateData')
+  int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
+  int <- RunPCA(int, verbose = FALSE)
+  int <- RunUMAP(int, reduction = "pca", dims = 1:50, reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
+  
+  return(int)
+  
+}
+
+normalize_rna <- function(obj, dims=50) {
   DefaultAssay(obj) <- "RNA"
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
   s.genes <- cc.genes$s.genes
@@ -32,6 +99,9 @@ normalize_multiome <- function(obj,dims = 50) {
       verbose = FALSE) %>% 
     RunPCA(assay = 'SCT', do.print = FALSE) %>%
     RunUMAP(dims = 1:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
+  return(obj)
+}
+normalize_atac <- function(obj, dims=50) {
   DefaultAssay(obj) <- "ATAC_immune"
   
   obj <- obj %>% 
@@ -42,7 +112,26 @@ normalize_multiome <- function(obj,dims = 50) {
       reduction.name = 'lsi',
       irlba.work = 400) %>%
     RunUMAP(dims = 2:dims,reduction = 'lsi', reduction.name = "atac.umap", reduction.key = "atacUMAP_")
+  return(obj)
+}
+
+normalize_multiome <- function(obj,dims = 50) {
+  obj <- normalize_rna(obj)
+  obj <- normalize_atac(obj)
+  obj <- FindMultiModalNeighbors(obj, 
+                                 reduction.list = list("pca", "lsi"), 
+                                 dims.list = list(1:30, 2:dims))
+  obj <- RunUMAP(obj, nn.name = "weighted.nn", 
+                 reduction.name = "wnn.umap", 
+                 reduction.key = "wnnUMAP_")
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, verbose = T)
   
+  return(obj)
+}
+
+normalize_multiome_with_integration <- function(obj,dims = 50) {
+  obj <- integrate_rna(obj)
+  obj <- normalize_atac(obj)
   obj <- FindMultiModalNeighbors(obj, 
                                  reduction.list = list("pca", "lsi"), 
                                  dims.list = list(1:30, 2:dims))
@@ -85,7 +174,22 @@ option_list = list(
   make_option(c("--metadata.atac"),
               type="character",
               default=NULL, 
-              help="path to atac metadata")
+              help="path to atac metadata"),
+  make_option(c("--do.integration"),
+              type="character",
+              default=FALSE,
+              help = "Do RNA integartion or not",
+              metavar="logical") ,
+  make_option(c("--int_batch"),
+              type="character",
+              default="chemistry",
+              help = "options include 'weird.brca.ov','sample', 'cancer','ov'",
+              metavar="character"),
+  make_option(c("--do.reference"),
+              type="logical",
+              default=FALSE,
+              help = "Do reference integartion against all_other samples or not (int_batch must be weird.brca.ov or ov",
+              metavar="logical") 
   
 );
 
