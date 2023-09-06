@@ -139,7 +139,7 @@ if(opt$int_batch=='weird.gbm') {
                                          TRUE ~ all.rna$Chemistry)
   
 } else if(opt$int_batch=='weird.brca.ov') {
-  wierd.brca <- c('HT206B1-S1H4')
+  wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
   wierd.ov <- c('VF031V1-Tm1Y1')
   all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.brca ~  paste(all.rna$Cancer, 'weird', sep = '__'),
                                          all.rna$Piece_ID_RNA %in% wierd.ov ~  paste(all.rna$Cancer, 'weird', sep = '__'),
@@ -150,7 +150,7 @@ if(opt$int_batch=='weird.gbm') {
   all.rna@meta.data$Batches <- all.rna@meta.data$Piece_ID_RNA
   
 } else if(opt$int_batch=='cancer') {
-  all.rna@meta.data$Batches <- paste(all.rna$Cancer, all.rna$Chemistry, sep = '__')
+  all.rna@meta.data$Batches <- all.rna$Cancer
 } else if(opt$int_batch=='chemistry') {
   all.rna@meta.data$Batches <- case_when(all.rna$Cancer %in% c('PBMC') ~ paste(all.rna$Cancer, all.rna$Chemistry, sep = '__'),
                                          all.rna$Cancer %in% c('MM') ~ all.rna$Cancer,
