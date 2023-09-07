@@ -85,20 +85,25 @@ pdf(glue::glue('SEplot.pdf'), width=7, height = 6)
 SEplot(ent.res)
 dev.off()
 
-colnames(clusters.all) %>% walk(function(column) {
+registerDoParallel(cores=25)
+foreach(column=clusters.all) %dopar% {
   
-  rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
+  #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
   meta <- rna.obj@meta.data %>% 
+    bind_cols((clusters.all %>% select(all_of(column)))) %>%
     select(Piece_ID_RNA, ct) %>% 
     rename(Patient=Piece_ID_RNA)
   print(head(meta))
+  
   rogue.res <- rogue(expr, labels = meta$ct, samples = meta$Patient, platform = "UMI", span = 0.6)
   print(head(rogue.res))
   
-  fwrite(rogue.res, glue('ROGUE_{column}_{add_filename}.tsv'), sep='\t')
-  saveRDS(rogue.res, glue('ROGUE_{column}_{add_filename}.rds'))
+  fwrite(rogue.res, glue('ROGUE_{column}_{add_filename}.tsv'), sep='\t', row.names = T)
+  #saveRDS(rogue.res, glue('ROGUE_{column}_{add_filename}.rds'))
   
   rogue.boxplot(rogue.res)
   ggsave(glue::glue('Boxplot_{column}.pdf'), width=18, height = 5)
-})
+}
+stopImplicitCluster()
+  
 
