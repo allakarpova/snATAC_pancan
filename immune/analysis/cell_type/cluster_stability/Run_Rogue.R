@@ -64,6 +64,9 @@ add_filename <- opt$extra
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
+select <- dplyr::select
+filter <- dplyr::filter
+
 cat('opening object \n')
 rna.obj <- readRDS(input.path)
 clusters.all <- fread(opt$cluster.file) %>%
