@@ -98,8 +98,7 @@ colnames(clusters.all) %>% walk(function(column) {
   fwrite(rogue.res, glue('ROGUE_{column}_{add_filename}.tsv'), sep='\t')
   saveRDS(rogue.res, glue('ROGUE_{column}_{add_filename}.rds'))
   
-  pdf(glue::glue('Boxplot_{column}.pdf'), width=18, height = 5)
   rogue.boxplot(rogue.res)
-  dev.off()
+  ggsave(glue::glue('Boxplot_{column}.pdf'), width=18, height = 5)
 })
 
