@@ -46,7 +46,12 @@ option_list = list(
               type="character",
               default=NULL,
               help = "path to file with clusters at different resolutions",
-              metavar="character")
+              metavar="character"),
+  make_option(c("--core"),
+              type="integer",
+              default=8,
+              help = "how many cores to use for parallel",
+              metavar="number")
   
 );
 
@@ -85,7 +90,7 @@ expr <- GetAssayData(rna.obj, assay = 'RNA', slot = 'counts')
 # SEplot(ent.res)
 # dev.off()
 
-registerDoParallel(cores=8)
+registerDoParallel(cores=opt$core)
 foreach(column=colnames(clusters.all)) %dopar% {
   
   #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
