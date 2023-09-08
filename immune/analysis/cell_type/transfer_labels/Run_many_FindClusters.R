@@ -26,7 +26,12 @@ option_list = list(
               type="character",
               default="./", 
               help="add unique string identifier for your data",
-              metavar="character")
+              metavar="character"),
+  make_option(c("--multiome"),
+              type="logical",
+              default=FALSE,
+              help = "is it a multiome object or not?",
+              metavar="logical")
   
   
 );
@@ -49,7 +54,12 @@ setwd(out_path)
 panc<- readRDS(input.path)
 
 for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
-  panc <- FindClusters(panc, resolution = resol, algorithm = 4, method = "igraph")
+  if(opt$multiome) {
+    panc <- FindClusters(panc, resolution = resol,graph.name = "wsnn", algorithm = 4, method = "igraph")
+  } else {
+    panc <- FindClusters(panc, resolution = resol, algorithm = 4, method = "igraph")
+  }
+  
   print(head(panc@meta.data))
 }
 
@@ -58,7 +68,12 @@ fwrite(cluster.tb, paste0('Clusters_res0.1_to_2_alg4_', add_filename, '.txt'), s
 
 
 for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
-  panc <- FindClusters(panc, resolution = resol, algorithm = 1)
+  if(opt$multiome) {
+    panc <- FindClusters(panc, resolution = resol,graph.name = "wsnn", algorithm = 1)
+  } else {
+    panc <- FindClusters(panc, resolution = resol, algorithm = 1)
+  }
+  
   print(head(panc@meta.data))
 }
 
@@ -66,7 +81,12 @@ cluster.tb <- panc@meta.data %>% select(dplyr::contains('res.'))
 fwrite(cluster.tb, paste0('Clusters_res0.1_to_2_alg1_', add_filename, '.txt'), sep='\t', row.names = TRUE)
 
 for (resol in c(0.1, 0.3, 0.5, 0.7, seq(1, 1.8, 0.1), 2)) {
-  panc <- FindClusters(panc, resolution = resol, algorithm = 3)
+  if(opt$multiome) {
+    panc <- FindClusters(panc, resolution = resol,graph.name = "wsnn", algorithm = 3)
+  } else {
+    panc <- FindClusters(panc, resolution = resol, algorithm = 3)
+  }
+  
   print(head(panc@meta.data))
 }
 cluster.tb <- panc@meta.data %>% select(dplyr::contains('res.'))
