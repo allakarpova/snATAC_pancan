@@ -70,7 +70,7 @@ filter <- dplyr::filter
 cat('opening object \n')
 rna.obj <- readRDS(input.path)
 clusters.all <- fread(opt$cluster.file) %>%
-  data.frame(row.names = 1) %>% 
+  column_to_rownames(var='V1') %>% 
   select(starts_with('integrated_snn_res'))
 
 expr <- GetAssayData(rna.obj, assay = 'RNA', slot = 'counts')
@@ -85,7 +85,7 @@ expr <- GetAssayData(rna.obj, assay = 'RNA', slot = 'counts')
 # SEplot(ent.res)
 # dev.off()
 
-registerDoParallel(cores=25)
+registerDoParallel(cores=8)
 foreach(column=colnames(clusters.all)) %dopar% {
   
   #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
