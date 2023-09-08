@@ -76,17 +76,17 @@ clusters.all <- fread(opt$cluster.file) %>%
 expr <- GetAssayData(rna.obj, assay = 'RNA', slot = 'counts')
 
 
-ent.res <- SE_fun(expr)
-head(ent.res)
-
-fwrite(ent.res, glue('Entropy_from_ROGUE_{add_filename}.tsv'), sep='\t')
-
-pdf(glue::glue('SEplot.pdf'), width=7, height = 6)
-SEplot(ent.res)
-dev.off()
+# ent.res <- SE_fun(expr)
+# head(ent.res)
+# 
+# fwrite(ent.res, glue('Entropy_from_ROGUE_{add_filename}.tsv'), sep='\t')
+# 
+# pdf(glue::glue('SEplot.pdf'), width=7, height = 6)
+# SEplot(ent.res)
+# dev.off()
 
 registerDoParallel(cores=25)
-foreach(column=clusters.all) %dopar% {
+foreach(column=colnames(clusters.all)) %dopar% {
   
   #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
   meta <- rna.obj@meta.data %>% 
