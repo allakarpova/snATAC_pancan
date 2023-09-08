@@ -90,7 +90,9 @@ foreach(column=colnames(clusters.all)) %dopar% {
   
   #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
   meta <- rna.obj@meta.data %>% 
-    bind_cols((clusters.all %>% select(all_of(column)))) %>%
+    bind_cols((clusters.all %>% select(all_of(column))))
+  colnames(meta)[ncol(meta)] <- 'ct'
+  meta <- meta %>%
     select(Piece_ID_RNA, ct) %>% 
     rename(Patient=Piece_ID_RNA)
   print(head(meta))
