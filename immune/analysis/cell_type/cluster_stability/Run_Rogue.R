@@ -92,7 +92,7 @@ expr <- GetAssayData(rna.obj, assay = 'RNA', slot = 'counts')
 
 registerDoParallel(cores=opt$core)
 foreach(column=colnames(clusters.all)) %dopar% {
-  
+  print(column)
   #rna.obj <- AddMetaData(rna.obj, clusters.all[[column]], col.name = 'ct')
   meta <- rna.obj@meta.data %>% 
     bind_cols((clusters.all %>% select(all_of(column))))
