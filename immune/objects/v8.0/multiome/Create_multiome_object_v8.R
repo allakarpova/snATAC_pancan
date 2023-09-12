@@ -126,7 +126,7 @@ normalize_multiome <- function(obj,dims = 50) {
   obj <- RunUMAP(obj, nn.name = "weighted.nn", 
                  reduction.name = "wnn.umap", 
                  reduction.key = "wnnUMAP_")
-  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, verbose = T)
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, resolution=1, verbose = T)
   
   return(obj)
 }
@@ -140,7 +140,7 @@ normalize_multiome_with_integration <- function(obj,dims = 50) {
   obj <- RunUMAP(obj, nn.name = "weighted.nn", 
                  reduction.name = "wnn.umap", 
                  reduction.key = "wnnUMAP_")
-  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, verbose = T)
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4,  resolution=1, verbose = T)
   
   return(obj)
 }
