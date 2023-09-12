@@ -250,6 +250,7 @@ if(opt$regress.cc.interferon.genes) {
   interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
     pull(V1)
   features <- unique(c(features, cc.genes$s.genes, cc.genes$g2m.genes, interferon.genes))
+  features <- setdiff(features, c('MLF1IP', 'FAM64A', 'HN1'))
 }
 print(length(features))
 
