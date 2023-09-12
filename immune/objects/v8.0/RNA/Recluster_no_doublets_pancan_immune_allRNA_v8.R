@@ -21,7 +21,7 @@ suppressMessages(library(optparse))
 suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(doParallel))
-
+library("glmGamPoi")
 
 
 runAllNormalization <- function(obj, dims=30) {
@@ -34,6 +34,7 @@ runAllNormalization <- function(obj, dims=30) {
   obj <- obj %>%
     SCTransform(
       assay = 'RNA',
+      method = "glmGamPoi",
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       return.only.var.genes = T
@@ -47,6 +48,25 @@ runAllNormalization <- function(obj, dims=30) {
                       method='igraph',  verbose = FALSE)
   return(obj)
   
+}
+
+InterferonScoring <- function(obj) {
+  interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
+    pull(V1)
+  
+  features <- list('Interferon.response' = rownames(interferon.genes))
+  ctrl <- length(features[[1]])
+  
+  obj <- AddModuleScore(
+    object = obj,
+    features = features,
+    name = 'Interferon.response',
+    ctrl = ctrl)
+  
+  obj@meta.data <- obj@meta.data %>% 
+    rename(Interferon.response=Interferon.response1)
+  
+  return(obj)
 }
 
 filter <- dplyr::filter
@@ -93,8 +113,13 @@ option_list = list(
               type="logical",
               default=FALSE,
               help = "Remove cancer cell genes from integration features",
+              metavar="logical"),
+  make_option(c("--regress.cc.interferon.genes"),
+              type="logical",
+              default=FALSE,
+              help = "Regress interferon and cell cycle genes from integrated assay",
               metavar="logical")
-  
+
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -139,6 +164,7 @@ if(opt$int_batch=='weird.gbm') {
                                          TRUE ~ all.rna$Chemistry)
   
 } else if(opt$int_batch=='weird_Brca_Ov') {
+  message('doing weird_Brca_Ov')
   wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
   wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
   all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.brca ~  paste(all.rna$Cancer, 'weird', sep = '__'),
@@ -168,17 +194,27 @@ all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
 batches <- names(all.rna.list)
 multiome.batches.n <- which(grepl('Multiome', batches))
 
+
 all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
   DefaultAssay(x) <- 'RNA'
   x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
   x <- CellCycleScoring(x, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes, set.ident = F)
+  if(opt$regress.cc.interferon.genes) {
+    x <- InterferonScoring(x)
+    regress.me <- c("percent.mt", "S.Score", "G2M.Score", "Interferon.response")
+  } else {
+    regress.me <- c("percent.mt", "S.Score", "G2M.Score")
+  }
+  
   x <- x %>% SCTransform(
     assay = 'RNA',
-    vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
+    method = "glmGamPoi",
+    vars.to.regress =  regress.me,
     conserve.memory = T,
     verbose = F,
     return.only.var.genes = T
   )
+  DefaultAssay(x) <- 'SCT'
   return(x)
 })
 
@@ -209,6 +245,12 @@ if(opt$remove.tumor.genes) {
   print(length(setdiff(features, trash.genes)))
   features <- setdiff(features, trash.genes)
 }
+
+if(opt$regress.cc.interferon.genes) {
+  interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
+    pull(V1)
+  features <- unique(c(features, cc.genes$s.genes, cc.genes$g2m.genes, interferon.genes))
+}
 print(length(features))
 
 all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
@@ -227,6 +269,7 @@ if(opt$do.reference) {
 }
 message('Run IntegrateData')
 int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
+int <- ScaleData(int, vars.to.regress )
 int <- RunPCA(int, verbose = FALSE)
 int <- RunUMAP(int, reduction = "pca", dims = 1:40)
 int <- FindNeighbors(int, reduction = "pca", dims = 1:40)
