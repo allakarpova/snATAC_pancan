@@ -56,7 +56,7 @@ InterferonScoring <- function(obj) {
   print(interferon.genes)
   features <- list('Interferon.response' = interferon.genes)
   ctrl <- length(features[[1]])
-  DefaultAssay(x) <- 'RNA'
+
   obj <- AddModuleScore(
     object = obj,
     features = features,
