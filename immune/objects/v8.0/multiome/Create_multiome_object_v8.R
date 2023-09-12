@@ -219,8 +219,12 @@ colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_free
 r.obj <- readRDS(input.path.rna)
 a.obj <- readRDS(input.path.atac)
 
-combo.cells <- intersect(colnames(r.obj), colnames(a.obj)) 
- 
+likely.combo.cells <- intersect(colnames(r.obj), colnames(a.obj)) 
+print(length(likely.combo.cells))
+atac.combo.cells <- rownames(filter(a.obj@meta.data, data.type=='10x_SC_Multi_ATAC_SEQ'))
+combo.cells <- intersect(likely.combo.cells, atac.combo.cells)
+print(length(combo.cells))
+
 a.obj <- subset(a.obj, cells = combo.cells)
 r.obj <- subset(r.obj, cells = combo.cells)
 
