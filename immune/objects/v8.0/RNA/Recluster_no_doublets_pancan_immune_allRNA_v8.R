@@ -53,10 +53,10 @@ runAllNormalization <- function(obj, dims=30) {
 InterferonScoring <- function(obj) {
   interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
     pull(V1)
-  
+  print(interferon.genes)
   features <- list('Interferon.response' = rownames(interferon.genes))
   ctrl <- length(features[[1]])
-  
+  DefaultAssay(x) <- 'RNA'
   obj <- AddModuleScore(
     object = obj,
     features = features,
@@ -269,7 +269,14 @@ if(opt$do.reference) {
 }
 message('Run IntegrateData')
 int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
-int <- ScaleData(int, vars.to.regress )
+if(opt$regress.cc.interferon.genes) { 
+  message('Run ScaleData')
+  int <- ScaleData(int, 
+                  vars.to.regress = c("S.Score", "G2M.Score", "Interferon.response"),
+                  do.scale = FALSE,
+                  do.center = TRUE,)
+}
+
 int <- RunPCA(int, verbose = FALSE)
 int <- RunUMAP(int, reduction = "pca", dims = 1:40)
 int <- FindNeighbors(int, reduction = "pca", dims = 1:40)
