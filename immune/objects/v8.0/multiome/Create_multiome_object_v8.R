@@ -9,7 +9,7 @@ plan("multicore", workers =4)
 options(future.globals.maxSize = 50 * 1024^3)
 suppressMessages(library(optparse))
 suppressMessages(library(googlesheets4))
-
+library("glmGamPoi")
 
 
 ######################
@@ -58,6 +58,7 @@ integrate_rna <- function(obj) {
     x <- CellCycleScoring(x, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes, set.ident = F)
     x <- x %>% SCTransform(
       assay = 'RNA',
+      method = "glmGamPoi",
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       verbose = F,
@@ -104,6 +105,7 @@ normalize_rna <- function(obj, dims=50) {
   obj <- obj %>%
     SCTransform(
       assay = 'RNA',
+      method = "glmGamPoi",
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       return.only.var.genes = T,
