@@ -21,8 +21,17 @@ integrate_rna <- function(obj) {
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
     obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
                                        obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       
                                         TRUE ~ 'All_other')
-  }  else if(opt$int_batch=='sample') {
+  }  else if(opt$int_batch=='weird_Brca_Ov_PBMC') {
+    wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
+    wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
+    obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Cancer == 'PBMC' ~  obj$Cancer,
+                                       TRUE ~ 'All_other')
+    
+  } else if(opt$int_batch=='sample') {
     obj@meta.data$Batches <- obj@meta.data$Piece_ID_RNA
     
   } else if(opt$int_batch=='cancer') {
