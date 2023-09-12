@@ -275,7 +275,7 @@ if(opt$regress.cc.interferon.genes) {
   int <- ScaleData(int, 
                   vars.to.regress = c("S.Score", "G2M.Score", "Interferon.response"),
                   do.scale = FALSE,
-                  do.center = TRUE,)
+                  do.center = TRUE)
 }
 
 int <- RunPCA(int, verbose = FALSE)
