@@ -43,7 +43,8 @@ integrate_rna <- function(obj) {
     obj@meta.data$Batches <- obj@meta.data$Piece_ID_RNA
     
   } else if(opt$int_batch=='cancer') {
-    obj@meta.data$Batches <- obj$Cancer
+    obj@meta.data$Batches <- case_when(obj$Cancer=='GBM' ~ 'ccRCC',
+                                      TRUE ~ obj$Cancer)
   } else if (opt$int_batch=='ov') {
     wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
@@ -76,8 +77,9 @@ integrate_rna <- function(obj) {
       vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       verbose = F,
-      return.only.var.genes = T
+      return.only.var.genes = F
     )
+    
     return(x)
   })
   
