@@ -30,7 +30,14 @@ integrate_rna <- function(obj) {
                                        obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
                                        obj$Cancer == 'PBMC' ~  obj$Cancer,
                                        TRUE ~ 'All_other')
-    
+  }  else if(opt$int_batch=='weird_Brca_Ov_crc_PBMC') {
+      wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
+      wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
+      wierd.crc <- c('HT307C1-Th1K1')
+      obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                         obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                         obj$Cancer == 'PBMC' ~  obj$Cancer,
+                                         TRUE ~ 'All_other')
   } else if(opt$int_batch=='sample') {
     obj@meta.data$Batches <- obj@meta.data$Piece_ID_RNA
     
@@ -56,6 +63,12 @@ integrate_rna <- function(obj) {
     DefaultAssay(x) <- 'RNA'
     x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
     x <- CellCycleScoring(x, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes, set.ident = F)
+    if(opt$regress.cc.interferon.genes) {
+      x <- InterferonScoring(x)
+      regress.me <- c("percent.mt", "S.Score", "G2M.Score", "Interferon.response")
+    } else {
+      regress.me <- c("percent.mt", "S.Score", "G2M.Score")
+    }
     x <- x %>% SCTransform(
       assay = 'RNA',
       method = "glmGamPoi",
@@ -69,6 +82,12 @@ integrate_rna <- function(obj) {
   
   message('Selecting integration features')
   features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3500)
+  if(opt$regress.cc.interferon.genes) {
+    interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
+      pull(V1)
+    features <- unique(c(features, cc.genes$s.genes, cc.genes$g2m.genes, interferon.genes))
+    features <- setdiff(features, c('MLF1IP', 'FAM64A', 'HN1'))
+  }
   print(length(features))
   
   all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
@@ -87,6 +106,15 @@ integrate_rna <- function(obj) {
   }
   message('Run IntegrateData')
   int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
+  
+  if(opt$regress.cc.interferon.genes) { 
+    message('Run ScaleData')
+    int <- ScaleData(int, 
+                     vars.to.regress = c("S.Score", "G2M.Score", "Interferon.response"),
+                     do.scale = FALSE,
+                     do.center = TRUE)
+  }
+  
   int <- RunPCA(int, verbose = FALSE)
   int <- RunUMAP(int, reduction = "pca", dims = 1:50, reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
   
@@ -101,6 +129,7 @@ normalize_rna <- function(obj, dims=50) {
   g2m.genes <- cc.genes$g2m.genes
   
   obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
+
   
   obj <- obj %>%
     SCTransform(
@@ -128,16 +157,35 @@ normalize_atac <- function(obj, dims=50) {
   return(obj)
 }
 
+InterferonScoring <- function(obj) {
+  interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
+    pull(V1)
+  print(interferon.genes)
+  features <- list('Interferon.response' = interferon.genes)
+  ctrl <- length(features[[1]])
+  
+  obj <- AddModuleScore(
+    object = obj,
+    features = features,
+    name = 'Interferon.response',
+    ctrl = ctrl)
+  
+  obj@meta.data <- obj@meta.data %>% 
+    rename(Interferon.response=Interferon.response1)
+  
+  return(obj)
+}
+
 normalize_multiome <- function(obj,dims = 50) {
   obj <- normalize_rna(obj)
   obj <- normalize_atac(obj)
   obj <- FindMultiModalNeighbors(obj, 
                                  reduction.list = list("pca", "lsi"), 
-                                 dims.list = list(1:30, 2:dims))
+                                 dims.list = list(1:dims, 2:dims))
   obj <- RunUMAP(obj, nn.name = "weighted.nn", 
                  reduction.name = "wnn.umap", 
                  reduction.key = "wnnUMAP_")
-  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, resolution=1, verbose = T)
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4, resolution=1.2, verbose = T)
   
   return(obj)
 }
@@ -202,7 +250,12 @@ option_list = list(
               type="logical",
               default=FALSE,
               help = "Do reference integartion against all_other samples or not (int_batch must be weird.brca.ov or ov",
-              metavar="logical") 
+              metavar="logical"),
+  make_option(c("--regress.cc.interferon.genes"),
+              type="logical",
+              default=FALSE,
+              help = "Regress interferon and cell cycle genes from integrated assay",
+              metavar="logical")
   
 );
 
