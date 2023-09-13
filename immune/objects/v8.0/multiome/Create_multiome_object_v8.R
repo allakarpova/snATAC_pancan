@@ -33,9 +33,10 @@ integrate_rna <- function(obj) {
   }  else if(opt$int_batch=='weird_Brca_Ov_crc_PBMC') {
       wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
       wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
-      wierd.crc <- c('HT307C1-Th1K1')
+      wierd.crc <- c('HT307C1-Th1K1', 'HT270P1-S1H2')
       obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
                                          obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                         obj$Piece_ID_RNA %in% wierd.crc ~  paste('CRC_PDAC', 'weird', sep = '__'),
                                          obj$Cancer == 'PBMC' ~  obj$Cancer,
                                          TRUE ~ 'All_other')
   } else if(opt$int_batch=='sample') {
