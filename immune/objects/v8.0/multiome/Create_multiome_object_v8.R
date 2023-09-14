@@ -198,11 +198,11 @@ normalize_multiome_with_integration <- function(obj,dims = 50) {
   obj <- normalize_atac(obj)
   obj <- FindMultiModalNeighbors(obj, 
                                  reduction.list = list("pca", "lsi"), 
-                                 dims.list = list(1:30, 2:dims))
+                                 dims.list = list(1:dims, 2:dims))
   obj <- RunUMAP(obj, nn.name = "weighted.nn", 
                  reduction.name = "wnn.umap", 
                  reduction.key = "wnnUMAP_")
-  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4,  resolution=1, verbose = T)
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4,  resolution=1.2, verbose = T)
   
   return(obj)
 }
