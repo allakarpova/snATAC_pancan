@@ -10,7 +10,7 @@ options(future.globals.maxSize = 50 * 1024^3)
 suppressMessages(library(optparse))
 suppressMessages(library(googlesheets4))
 library("glmGamPoi")
-
+library(harmony)
 
 ######################
 ### FUNCTIONS #####
@@ -64,7 +64,7 @@ integrate_rna <- function(obj) {
   all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
     DefaultAssay(x) <- 'RNA'
     x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
-    x <- CellCycleScoring(x, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes, set.ident = F)
+    x <- CellCycleScoring(x, s.features = cc.genes.updated.2019$s.genes, g2m.features = cc.genes.updated.2019$g2m.genes, set.ident = F)
     if(opt$regress.cc.interferon.genes) {
       x <- InterferonScoring(x)
       regress.me <- c("percent.mt", "S.Score", "G2M.Score", "Interferon.response")
@@ -74,7 +74,7 @@ integrate_rna <- function(obj) {
     x <- x %>% SCTransform(
       assay = 'RNA',
       method = "glmGamPoi",
-      vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
+      vars.to.regress =  c( "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       verbose = F,
       return.only.var.genes = F
@@ -84,14 +84,17 @@ integrate_rna <- function(obj) {
   })
   
   message('Selecting integration features')
-  features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 3500)
+  features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 4500)
+  
   if(opt$regress.cc.interferon.genes) {
     interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
       pull(V1)
-    features <- unique(c(features, cc.genes$s.genes, cc.genes$g2m.genes, interferon.genes))
-    features <- setdiff(features, c('MLF1IP', 'FAM64A', 'HN1'))
+    features <- unique(c(features, cc.genes.updated.2019$s.genes, cc.genes.updated.2019$g2m.genes, interferon.genes))
+    sct.model.genes <- lapply(all.rna.list, function(rna.obj) {
+      rownames(rna.obj@assays$SCT@scale.data)
+    }) %>% unlist() %>% unique
+    features <- intersect(features, sct.model.genes)
   }
-  print(length(features))
   
   all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
   message('Run PCA on integration features')
@@ -113,7 +116,7 @@ integrate_rna <- function(obj) {
   if(opt$regress.cc.interferon.genes) { 
     message('Run ScaleData')
     int <- ScaleData(int, 
-                     vars.to.regress = c("S.Score", "G2M.Score", "Interferon.response"),
+                     vars.to.regress = c("percent.mt", "S.Score", "G2M.Score", "Interferon.response"),
                      do.scale = FALSE,
                      do.center = TRUE)
   }
@@ -125,20 +128,45 @@ integrate_rna <- function(obj) {
   
 }
 
-normalize_rna <- function(obj, dims=50) {
+normalize_rna_harmony <- function(obj, dims=30, column = 'Piece_ID_RNA') {
   DefaultAssay(obj) <- "RNA"
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
-  s.genes <- cc.genes$s.genes
-  g2m.genes <- cc.genes$g2m.genes
-  
+  s.genes <- cc.genes.updated.2019$s.genes
+  g2m.genes <- cc.genes.updated.2019$g2m.genes
   obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
-
-  
   obj <- obj %>%
     SCTransform(
       assay = 'RNA',
       method = "glmGamPoi",
-      vars.to.regress =  c("nCount_RNA", "percent.mt", "S.Score", "G2M.Score"),
+      vars.to.regress =  c("percent.mt", "S.Score", "G2M.Score"),
+      conserve.memory = T,
+      return.only.var.genes = T,
+      verbose = FALSE)
+  
+  obj <- obj %>%
+    RunPCA(assay = 'SCT', do.print = FALSE) %>%
+    RunHarmony(column, reduction = 'pca', assay.use = 'SCT') %>%
+    RunUMAP(reduction = "harmony", dims = 1:dims, reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
+  
+  obj <- NormalizeData(obj, assay = 'RNA')
+  
+  return(obj)
+  
+}
+
+normalize_rna <- function(obj, dims=50) {
+  DefaultAssay(obj) <- "RNA"
+  obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
+  s.genes <- cc.genes.updated.2019$s.genes
+  g2m.genes <- cc.genes.updated.2019$g2m.genes
+  
+  obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
+
+  obj <- obj %>%
+    SCTransform(
+      assay = 'RNA',
+      method = "glmGamPoi",
+      vars.to.regress =  c( "percent.mt", "S.Score", "G2M.Score"),
       conserve.memory = T,
       return.only.var.genes = T,
       verbose = FALSE) %>% 
@@ -146,6 +174,7 @@ normalize_rna <- function(obj, dims=50) {
     RunUMAP(dims = 1:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
   return(obj)
 }
+
 normalize_atac <- function(obj, dims=50) {
   DefaultAssay(obj) <- "ATAC_immune"
   
@@ -207,6 +236,19 @@ normalize_multiome_with_integration <- function(obj,dims = 50) {
   return(obj)
 }
 
+normalize_multiome_with_harmony <- function(obj,dims = 50, harm.column = 'Piece_ID_RNA') {
+  obj <- normalize_rna_harmony(obj, dims=dims, column=harm.column)
+  obj <- normalize_atac(obj)
+  obj <- FindMultiModalNeighbors(obj, 
+                                 reduction.list = list("harmony", "lsi"), 
+                                 dims.list = list(1:dims, 2:dims))
+  obj <- RunUMAP(obj, nn.name = "weighted.nn", 
+                 reduction.name = "wnn.umap", 
+                 reduction.key = "wnnUMAP_")
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4,  resolution=1.2, verbose = T)
+  
+  return(obj)
+}
 
 ###options###
 ######################
@@ -244,6 +286,7 @@ option_list = list(
               default=FALSE,
               help = "Do RNA integartion or not",
               metavar="logical") ,
+  
   make_option(c("--int_batch"),
               type="character",
               default="chemistry",
@@ -254,6 +297,16 @@ option_list = list(
               default=FALSE,
               help = "Do reference integartion against all_other samples or not (int_batch must be weird.brca.ov or ov",
               metavar="logical"),
+  make_option(c("--do.harmony"),
+              type="character",
+              default=FALSE,
+              help = "Do RNA harmony or not",
+              metavar="logical") ,
+  make_option(c("--harmony_column"),
+              type="character",
+              default="Piece_ID_RNA",
+              help = "options include 'Piece_ID_RNA','Cancer'",
+              metavar="character"),
   make_option(c("--regress.cc.interferon.genes"),
               type="logical",
               default=FALSE,
@@ -301,6 +354,9 @@ r.obj[['ATAC_immune']] <- a.obj[['ATAC_immune']]
 if(opt$do.integration) {
   cat('normalize_multiome_with_integration \n')
   r.obj <- normalize_multiome_with_integration(r.obj)
+} else if (opt$do.harmony) {
+  cat('normalize_multiome_with_harmony \n')
+  r.obj <- normalize_multiome_with_harmony(r.obj, dims= 50, harm.column = opt$harmony_column)
 } else {
   cat('normalizing all \n')
   r.obj <- normalize_multiome(r.obj)
