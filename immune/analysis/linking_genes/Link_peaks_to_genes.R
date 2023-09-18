@@ -46,7 +46,7 @@ out.obj <- str_split(out.obj, '[/]')[[1]][str_count(out.obj, '/')+1]
 
 cat('opening object \n')
 obj <- readRDS(input_path)
-DefaultAssay(obj) <- "pancan"
+DefaultAssay(obj) <- "ATAC_immune"
 cat('done \n')
 
 min.cells.num <- 0.00005*ncol(obj)
