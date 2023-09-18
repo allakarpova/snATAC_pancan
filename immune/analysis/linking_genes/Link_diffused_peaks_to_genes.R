@@ -80,9 +80,9 @@ options(future.globals.maxSize = 300 * 1024^3) # for 500 Gb RAM
 print(length(bins))
 pro_n <-  round(length(bins)/30)
 
-exlude.samples <- obj@meta.data %>% group_by(Sample) %>% tally() %>% filter(n<=1) %>% pull(Sample)
+exlude.samples <- obj@meta.data %>% group_by(Piece_ID_RNA) %>% tally() %>% filter(n<=1) %>% pull(Sample)
 #now exclude these samples from the object
-obj <- subset(obj, subset = Sample %in% exlude.samples, invert=TRUE)
+obj <- subset(obj, subset = Piece_ID_RNA %in% exlude.samples, invert=TRUE)
 
 matrix.counts <- FeatureMatrix(
   fragments = frag.filtered,
