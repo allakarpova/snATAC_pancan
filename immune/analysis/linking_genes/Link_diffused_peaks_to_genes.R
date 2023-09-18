@@ -80,7 +80,7 @@ options(future.globals.maxSize = 300 * 1024^3) # for 500 Gb RAM
 print(length(bins))
 pro_n <-  round(length(bins)/30)
 
-exlude.samples <- obj@meta.data %>% group_by(Piece_ID_RNA) %>% tally() %>% filter(n<=1) %>% pull(Sample)
+exlude.samples <- obj@meta.data %>% group_by(Piece_ID_RNA) %>% tally() %>% filter(n<=1) %>% pull(Piece_ID_RNA)
 #now exclude these samples from the object
 obj <- subset(obj, subset = Piece_ID_RNA %in% exlude.samples, invert=TRUE)
 
