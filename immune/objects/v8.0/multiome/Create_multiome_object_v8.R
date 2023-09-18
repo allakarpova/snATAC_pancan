@@ -15,14 +15,14 @@ library(harmony)
 ######################
 ### FUNCTIONS #####
 
-integrate_rna <- function(obj) {
+assign_batches <- function(obj) {
   if(opt$int_batch=='weird_Brca_Ov') {
     wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
     obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
                                        obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
                                        
-                                        TRUE ~ 'All_other')
+                                       TRUE ~ 'All_other')
   }  else if(opt$int_batch=='weird_Brca_Ov_PBMC') {
     wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
@@ -31,20 +31,20 @@ integrate_rna <- function(obj) {
                                        obj$Cancer == 'PBMC' ~  obj$Cancer,
                                        TRUE ~ 'All_other')
   }  else if(opt$int_batch=='weird_Brca_Ov_crc_PBMC') {
-      wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
-      wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
-      wierd.crc <- c('HT307C1-Th1K1', 'HT270P1-S1H2')
-      obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
-                                         obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
-                                         obj$Piece_ID_RNA %in% wierd.crc ~  paste('CRC_PDAC', 'weird', sep = '__'),
-                                         obj$Cancer == 'PBMC' ~  obj$Cancer,
-                                         TRUE ~ 'All_other')
+    wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
+    wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
+    wierd.crc <- c('HT307C1-Th1K1', 'HT270P1-S1H2')
+    obj@meta.data$Batches <- case_when(obj$Piece_ID_RNA %in% wierd.brca ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Piece_ID_RNA %in% wierd.ov ~  paste(obj$Cancer, 'weird', sep = '__'),
+                                       obj$Piece_ID_RNA %in% wierd.crc ~  paste('CRC_PDAC', 'weird', sep = '__'),
+                                       obj$Cancer == 'PBMC' ~  obj$Cancer,
+                                       TRUE ~ 'All_other')
   } else if(opt$int_batch=='sample') {
     obj@meta.data$Batches <- obj@meta.data$Piece_ID_RNA
     
   } else if(opt$int_batch=='cancer') {
     obj@meta.data$Batches <- case_when(obj$Cancer=='GBM' ~ 'ccRCC',
-                                      TRUE ~ obj$Cancer)
+                                       TRUE ~ obj$Cancer)
   } else if (opt$int_batch=='ov') {
     wierd.brca <- c('HT206B1-S1H4', 'HT378B1-S1H2')
     wierd.ov <- c('VF031V1-Tm1Y1', 'VF027V1-S1Y1', 'VF034V1-T1Y1')
@@ -52,7 +52,12 @@ integrate_rna <- function(obj) {
                                        obj$Cancer == 'OV' ~  obj$Cancer,
                                        TRUE ~ 'All_other')
   } 
+  return(obj)
+}
+
+integrate_rna <- function(obj) {
   
+  obj <- assign_batches(obj)
   print(table(obj$Batches))
   
   cat ('Run SCT on batches\n')
@@ -127,6 +132,58 @@ integrate_rna <- function(obj) {
   return(int)
   
 }
+
+integrate_atac <- function (int.sub.f,  k.w = 100, k.filter = 200) {
+  
+  int.sub.f <- assign_batches(int.sub.f)
+  
+  print(table(int.sub.f$Batches))
+  
+  atac.split <- SplitObject(int.sub.f, split.by = 'Batches')
+  
+  atac.split <- map(atac.split, function(obj) {
+    obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
+      RunTFIDF() %>%
+      RunSVD(reduction.key = 'LSI_',
+             reduction.name = 'lsi',
+             irlba.work = 400)
+    return(obj)
+  })
+  
+  #######integration############
+  plan("multiprocess", workers = 10)
+  options(future.globals.maxSize = 100 * 1024^3)
+  
+  cat('FindIntegrationAnchors\n')
+  integration.anchors <- FindIntegrationAnchors(
+    object.list = atac.split,
+    anchor.features = rownames(int.sub.f),
+    reduction = "rlsi",
+    k.filter=k.filter,
+    dims = 2:50
+  )
+  
+  # integrate LSI embeddings
+  cat('IntegrateEmbeddings\n')
+  integrated <- IntegrateEmbeddings(
+    anchorset = integration.anchors,
+    reductions = int.sub.f[["lsi"]],
+    new.reduction.name = "integrated_lsi",
+    dims.to.integrate = 1:50, 
+    k.weight = k.w
+  )
+  
+  # create a new UMAP using the integrated embeddings
+  integrated <- RunUMAP(integrated, 
+                        reduction = "integrated_lsi", 
+                        dims = 2:50, 
+                        reduction.name = "atac.umap", reduction.key = "atacUMAP_")
+  
+  
+  #Annotation(integrated) <- annotations.f
+  return(integrated)
+}
+
 
 normalize_rna_harmony <- function(obj, dims=30, column = 'Piece_ID_RNA') {
   DefaultAssay(obj) <- "RNA"
@@ -236,6 +293,20 @@ normalize_multiome_with_integration <- function(obj,dims = 50) {
   return(obj)
 }
 
+normalize_multiome_with_integration2 <- function(obj,dims = 50) {
+  obj <- integrate_rna(obj)
+  obj <- integrate_atac(obj)
+  obj <- FindMultiModalNeighbors(obj, 
+                                 reduction.list = list("pca", "integrated_lsi"), 
+                                 dims.list = list(1:dims, 2:dims))
+  obj <- RunUMAP(obj, nn.name = "weighted.nn", 
+                 reduction.name = "wnn.umap", 
+                 reduction.key = "wnnUMAP_")
+  obj <- FindClusters(obj, graph.name = "wsnn", algorithm = 4,  resolution=1.2, verbose = T)
+  
+  return(obj)
+}
+
 normalize_multiome_with_harmony <- function(obj,dims = 50, harm.column = 'Piece_ID_RNA') {
   obj <- normalize_rna_harmony(obj, dims=dims, column=harm.column)
   obj <- normalize_atac(obj)
@@ -286,7 +357,11 @@ option_list = list(
               default=FALSE,
               help = "Do RNA integartion or not",
               metavar="logical") ,
-  
+  make_option(c("--do.atac.integration"),
+              type="character",
+              default=FALSE,
+              help = "Do ATAC integartion or not",
+              metavar="logical") ,
   make_option(c("--int_batch"),
               type="character",
               default="chemistry",
@@ -348,12 +423,15 @@ print(length(combo.cells))
 a.obj <- subset(a.obj, cells = combo.cells)
 r.obj <- subset(r.obj, cells = combo.cells)
 
-
 r.obj[['ATAC_immune']] <- a.obj[['ATAC_immune']]
 
 if(opt$do.integration) {
   cat('normalize_multiome_with_integration \n')
-  r.obj <- normalize_multiome_with_integration(r.obj)
+  if(opt$do.atac.integration) {
+    r.obj <- normalize_multiome_with_integration2(r.obj)
+  } else {
+    r.obj <- normalize_multiome_with_integration(r.obj)
+  }
 } else if (opt$do.harmony) {
   cat('normalize_multiome_with_harmony \n')
   r.obj <- normalize_multiome_with_harmony(r.obj, dims= 50, harm.column = opt$harmony_column)
