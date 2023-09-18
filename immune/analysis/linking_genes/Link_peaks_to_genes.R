@@ -65,6 +65,6 @@ obj <- LinkPeaks(
   expression.assay = "SCT"
 )
 
-
+toreturn <- Links(obj)
 print(out.obj)
-saveRDS(obj, paste0('out/', out.obj))
+saveRDS(toreturn, paste0('out/', out.obj))
