@@ -39,7 +39,7 @@ dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
 dir.create('out')
-dir.create('plots')
+
 
 out.obj <- str_replace(input_path, pattern = 'rds', replacement = 'diffuse.links.only.rds')
 out.obj <- str_split(out.obj, '[/]')[[1]][str_count(out.obj, '/')+1]
