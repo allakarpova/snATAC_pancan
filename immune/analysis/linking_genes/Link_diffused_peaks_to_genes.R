@@ -61,7 +61,7 @@ chr.size.vector <- as.numeric(chr.size$chr_length)
 names(chr.size.vector) <- chr.size$seqnames
 bins <- GenomicRanges::tileGenome(seqlengths = chr.size.vector, tilewidth = 100000, cut.last.tile.in.chrom = TRUE)
 
-frag <- Fragments(obj@assays$pancan)
+frag <- Fragments(obj@assays$ATAC_immune)
 #this will remove fragment objects with just 1 or 0 cells because they fail FeatureMatrix function
 frag.filtered <- frag[do.call( 'c', lapply(frag, function(x) length(x@cells) > 1))]
 
@@ -72,7 +72,7 @@ print(min.cells.num)
 
 # remove pancan assay
 DefaultAssay(obj)<-'SCT'
-obj[['pancan']] <- NULL
+obj[['ATAC_immune']] <- NULL
 
 plan("multicore", workers = 30)
 options(future.globals.maxSize = 300 * 1024^3) # for 500 Gb RAM

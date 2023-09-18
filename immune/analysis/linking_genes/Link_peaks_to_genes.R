@@ -58,7 +58,7 @@ obj <- RegionStats(obj, genome = BSgenome.Hsapiens.UCSC.hg38)
 # link peaks to genes
 obj <- LinkPeaks(
   object = obj,
-  peak.assay = "pancan",
+  peak.assay = "ATAC_immune",
   distance = 5e+05,
   n_sample = 1000,
   #min.cells = min.cells.num,
