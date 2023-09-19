@@ -128,7 +128,8 @@ integrate_rna <- function(obj) {
   
   int <- RunPCA(int, verbose = FALSE)
   int <- RunUMAP(int, reduction = "pca", dims = 1:50, reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
-  
+  int <- PrepSCTFindMarkers(int)
+  int <- NormalizeData(int, assay = 'RNA')
   return(int)
   
 }
@@ -143,7 +144,7 @@ integrate_atac <- function (int.sub.f,  k.w = 100, k.filter = 200) {
   atac.split <- SplitObject(int.sub.f, split.by = 'Batches')
   
   atac.split <- map(atac.split, function(obj) {
-    obj <- FindTopFeatures(obj, min.cutoff = 500) %>%
+    obj <- FindTopFeatures(obj, min.cutoff = 50) %>%
       RunTFIDF() %>%
       RunSVD(reduction.key = 'LSI_',
              reduction.name = 'lsi',
