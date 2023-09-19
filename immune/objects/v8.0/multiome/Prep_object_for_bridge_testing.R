@@ -221,6 +221,7 @@ for.test <- rownames(r.obj@meta.data[!(rownames(r.obj@meta.data) %in% for.multi)
 print(length(for.multi))
 print(length(for.test))
 
+DefaultAssay(r.obj) <- 'RNA'
 r.obj <- DietSeurat(r.obj, assays = c('RNA', 'ATAC_immune'))
 r.obj.multi <- subset(r.obj, cells = for.multi)
 
