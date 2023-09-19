@@ -80,7 +80,7 @@ if(!is.null(meta.path)) {
 
 
 library(future)
-plan("multicore", workers = 10)
+plan("multicore", workers = 2)
 options(future.globals.maxSize = 100 * 1024 ^ 3)
 
 
