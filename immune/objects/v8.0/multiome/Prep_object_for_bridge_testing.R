@@ -252,12 +252,18 @@ a.obj.test <- r.obj.test
 a.obj.test[['RNA']] <- NULL
 r.obj.test[['ATAC_immune']] <- NULL
 
+rm(r.obj)
+gc()
 r.obj.multi <- normalize_multiome_with_integration(r.obj.multi)
 saveRDS(r.obj.multi, glue::glue("PanImmune_int_RNA_ATAC_{add_filename}.rds"))
 
+rm(r.obj.multi)
+gc()
 r.obj.test <- normalize_rna(r.obj.test)
 saveRDS(r.obj.test, glue::glue("PanImmune_merged_RNA_{add_filename}.rds"))
 
+rm(r.obj.test)
+gc()
 a.obj.test <- normalize_atac(a.obj.test)
 saveRDS(a.obj.test, glue::glue("PanImmune_merged_ATAC_{add_filename}.rds"))
 
