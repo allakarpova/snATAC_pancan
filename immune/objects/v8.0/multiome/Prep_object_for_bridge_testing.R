@@ -216,7 +216,7 @@ r.obj <- readRDS(input.path)
 
 for.multi <- r.obj@meta.data %>%  rownames_to_column(var = 'Barcode') %>%
     group_by(seurat_clusters) %>% sample_frac(size = 0.6, replace = FALSE) %>% pull(Barcode)
-for.test <- rownames(r.obj@meta.data[-for.multi,])
+for.test <- rownames(r.obj@meta.data[!(rownames(r.obj@meta.data) %in% for.multi),])
 
 print(length(for.multi))
 print(length(for.test))
