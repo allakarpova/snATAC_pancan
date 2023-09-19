@@ -105,7 +105,7 @@ da_peaks <- FindAllMarkers(
   pseudocount.use = 0.01,
   only.pos = F,
   test.use = 'LR',
-  latent.vars = 'nCount_peaks'
+  latent.vars = 'nCount_ATAC_immune'
 )
 
 da_peaks <- merge(da_peaks, annot.500kb.ensdb[c('SYMBOL', 'peak.position' ,'GENENAME', 'new_peak')], by.x = 0, by.y = 'new_peak', all.x = T)

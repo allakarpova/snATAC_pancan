@@ -90,8 +90,7 @@ da_motif <- FindAllMarkers(
   only.pos = F,
   mean.fxn=rowMeans,
   fc.name="avg_diff",
-  test.use = 'LR',
-  latent.vars = 'nCount_peaks'
+  test.use = 'LR'
 )
 
 fwrite(da_motif, paste0('DAM_findAllMarkers_by_clusters_',add_filename,'.txt'), sep = '\t', row.names = T)
