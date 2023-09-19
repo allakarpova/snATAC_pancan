@@ -70,12 +70,8 @@ integrate_rna <- function(obj) {
     DefaultAssay(x) <- 'RNA'
     x[["percent.mt"]] <- PercentageFeatureSet(x, pattern = "^MT-")
     x <- CellCycleScoring(x, s.features = cc.genes.updated.2019$s.genes, g2m.features = cc.genes.updated.2019$g2m.genes, set.ident = F)
-    if(opt$regress.cc.interferon.genes) {
-      x <- InterferonScoring(x)
-      regress.me <- c("percent.mt", "S.Score", "G2M.Score", "Interferon.response")
-    } else {
-      regress.me <- c("percent.mt", "S.Score", "G2M.Score")
-    }
+    regress.me <- c("percent.mt", "S.Score", "G2M.Score")
+    
     x <- x %>% SCTransform(
       assay = 'RNA',
       method = "glmGamPoi",
@@ -91,40 +87,20 @@ integrate_rna <- function(obj) {
   message('Selecting integration features')
   features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 4500)
   
-  if(opt$regress.cc.interferon.genes) {
-    interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
-      pull(V1)
-    features <- unique(c(features, cc.genes.updated.2019$s.genes, cc.genes.updated.2019$g2m.genes, interferon.genes))
-    sct.model.genes <- lapply(all.rna.list, function(rna.obj) {
-      rownames(rna.obj@assays$SCT@scale.data)
-    }) %>% unlist() %>% unique
-    features <- intersect(features, sct.model.genes)
-  }
+  
   
   all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features = features)
   message('Run PCA on integration features')
   all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
   message('Run FindIntegrationAnchors')
-  if(opt$do.reference) {
-    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = reference.batches.n,
-                                          normalization.method = "SCT",
+  
+  rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
                                           anchor.features = features, dims = 1:50, reduction = "rpca")
     
-  } else {
-    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
-                                          anchor.features = features, dims = 1:50, reduction = "rpca")
-    
-  }
+  
   message('Run IntegrateData')
   int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
   
-  if(opt$regress.cc.interferon.genes) { 
-    message('Run ScaleData')
-    int <- ScaleData(int, 
-                     vars.to.regress = c("percent.mt", "S.Score", "G2M.Score", "Interferon.response"),
-                     do.scale = FALSE,
-                     do.center = TRUE)
-  }
   
   int <- RunPCA(int, verbose = FALSE)
   int <- RunUMAP(int, reduction = "pca", dims = 1:50, reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
