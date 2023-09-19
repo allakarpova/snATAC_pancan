@@ -64,7 +64,7 @@ cat('opening object \n')
 panc <- readRDS(input.path)
 
 library(future)
-plan("multicore", workers = 10)
+plan("multicore", workers = 4)
 options(future.globals.maxSize = 100 * 1024 ^ 3)
 
 if(!is.null(meta.path)) {
