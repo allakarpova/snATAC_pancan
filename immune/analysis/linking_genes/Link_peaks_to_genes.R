@@ -49,6 +49,10 @@ obj <- readRDS(input_path)
 DefaultAssay(obj) <- "ATAC_immune"
 cat('done \n')
 
+annot <- readRDS('/diskmnt/Projects/snATAC_analysis/immune/conda_env_files/Annotations.EnsDb.Hsapiens.v100.rds')
+Annotation(obj) <- annot
+
+
 min.cells.num <- 0.00005*ncol(obj)
 print(min.cells.num)
 

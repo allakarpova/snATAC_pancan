@@ -50,11 +50,11 @@ DefaultAssay(obj) <- "ATAC_immune"
 cat('done \n')
 
 
-annot <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_ATAC_data_freeze/v2.0/snATAC/merged_no_recalling_upd/Annotations.EnsDb.Hsapiens.v86.rds')
+annot <- readRDS('/diskmnt/Projects/snATAC_analysis/immune/conda_env_files/Annotations.EnsDb.Hsapiens.v100.rds')
 Annotation(obj) <- annot
 
 
-chr.size=fread('/diskmnt/Projects/snATAC_primary/02_atac_rds_signca/v3.0/hg38.chrom.sizes.txt', header = FALSE,col.names = c('seqnames','chr_length') ) %>% 
+chr.size=fread('/diskmnt/Projects/snATAC_analysis/immune/conda_env_files/hg38.chrom.sizes.txt', header = FALSE,col.names = c('seqnames','chr_length') ) %>% 
   data.frame()
 chr.size <- chr.size %>% filter(seqnames %in% paste0('chr', 1:22) | seqnames == 'chrX')
 chr.size.vector <- as.numeric(chr.size$chr_length)
