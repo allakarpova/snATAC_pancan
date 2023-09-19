@@ -102,6 +102,7 @@ da_peaks <- FindAllMarkers(
   object = panc,
   logfc.threshold = 0.05,
   min.pct = 0.01,
+  pseudocount.use = 0.01,
   only.pos = F,
   test.use = 'LR',
   latent.vars = 'nCount_peaks'
