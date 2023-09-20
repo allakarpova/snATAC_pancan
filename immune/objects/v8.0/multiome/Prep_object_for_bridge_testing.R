@@ -227,6 +227,7 @@ r.obj.multi <- subset(r.obj, cells = for.multi)
 
 r.obj.test <- subset(r.obj, cells = for.test)
 a.obj.test <- r.obj.test
+DefaultAssay(a.obj.test) <- 'ATAC_immune'
 a.obj.test[['RNA']] <- NULL
 r.obj.test[['ATAC_immune']] <- NULL
 
