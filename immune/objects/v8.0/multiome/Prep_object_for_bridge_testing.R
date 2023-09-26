@@ -94,10 +94,16 @@ integrate_rna <- function(obj) {
   all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
   message('Run FindIntegrationAnchors')
   
-  rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
+  if(opt$do.reference) {
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = batches,
+                                          normalization.method = "SCT",
                                           anchor.features = features, dims = 1:50, reduction = "rpca")
     
-  
+  } else {
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
+                                          anchor.features = features, dims = 1:50, reduction = "rpca")
+    
+  }
   message('Run IntegrateData')
   int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
   
@@ -188,7 +194,12 @@ option_list = list(
               type="character",
               default="chemistry",
               help = "options include 'weird_Brca_Ov','sample', 'cancer','ov'",
-              metavar="character")
+              metavar="character"),
+  make_option(c("--do.reference"),
+              type="logical",
+              default=FALSE,
+              help = "Do reference integartion against all_other samples or not (int_batch must be weird.brca.ov or ov",
+              metavar="logical")
   
   
   
