@@ -64,7 +64,9 @@ integrate_rna <- function(obj) {
   all.rna.list <- SplitObject(obj, split.by = 'Batches')
   
   batches <- names(all.rna.list)
+  print(batches)
   reference.batches.n <- which(grepl('All_other', batches))
+  print(reference.batches.n)
   
   all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
     DefaultAssay(x) <- 'RNA'
