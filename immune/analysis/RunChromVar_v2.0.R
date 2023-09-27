@@ -112,7 +112,7 @@ atac <- atac %>%
   RunUMAP(reduction = "chromvar.pca", dims = 1:40, 
           reduction.name = "chromvar.umap", 
           reduction.key = "chromvarUMAP_")
-atac@assays$chromvar@scale.data <- NULL
+
 
 saveRDS(atac, paste0(add_filename,".chromvar.rds"))
 
