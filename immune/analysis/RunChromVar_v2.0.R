@@ -103,6 +103,17 @@ atac <- RunChromVAR(
   genome = BSgenome.Hsapiens.UCSC.hg38
 )
 
+DefaultAssay(atac) <- 'chromvar'
+atac@assays$chromvar@scale.data <- atac@assays$chromvar@data
+
+atac <- atac %>% 
+  FindVariableFeatures( assay = 'chromvar') %>%
+  RunPCA(assay = 'chromvar', reduction.name = "chromvar.pca") %>%
+  RunUMAP(reduction = "chromvar.pca", dims = 1:40, 
+          reduction.name = "chromvar.umap", 
+          reduction.key = "chromvarUMAP_")
+atac@assays$chromvar@scale.data <- NULL
+
 saveRDS(atac, paste0(add_filename,".chromvar.rds"))
 
 
