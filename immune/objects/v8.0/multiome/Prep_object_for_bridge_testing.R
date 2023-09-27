@@ -95,7 +95,7 @@ integrate_rna <- function(obj) {
   message('Run FindIntegrationAnchors')
   
   if(opt$do.reference) {
-    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = batches,
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = reference.batches.n,
                                           normalization.method = "SCT",
                                           anchor.features = features, dims = 1:50, reduction = "rpca")
     
