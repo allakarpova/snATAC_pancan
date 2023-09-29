@@ -101,12 +101,14 @@ annot.500kb.ensdb[, new_peak:= paste(seqnames, start, end, sep='-')]
 da_peaks <- FindAllMarkers(
   object = panc,
   logfc.threshold = 0.25,
-  min.pct = 0.01,
+  min.pct = 0.05,
   pseudocount.use = 1,
   only.pos = F,
   test.use = 'LR',
   latent.vars = 'nCount_ATAC_immune'
 )
+
+fwrite(da_peaks, paste0('DAP_findAllMarkers_by_clusters_logFC.0.25_',add_filename,'.txt'), sep = '\t', row.names = F)
 
 da_peaks <- merge(da_peaks, annot.500kb.ensdb[c('SYMBOL', 'peak.position' ,'GENENAME', 'new_peak')], by.x = 0, by.y = 'new_peak', all.x = T)
 fwrite(da_peaks, paste0('DAP_findAllMarkers_by_clusters_logFC.0.25_',add_filename,'.txt'), sep = '\t', row.names = F)
