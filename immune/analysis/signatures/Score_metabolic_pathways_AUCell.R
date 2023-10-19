@@ -41,7 +41,7 @@ Run_AUCell <- function(obj, geneset.list, name) {
   
   pdf(glue::glue('{name}_AUCell_featureplots.pdf'), onefile = TRUE)
   #print(DimPlot(obj, group.by = 'cell_type_merged', cols = 'Dark2', label = TRUE))
-  names(geneSets) %>% map(function(f) {
+  names(geneset.list) %>% map(function(f) {
     tryCatch({
       print(suppressWarnings(FeaturePlot(obj, features = f)))
     }, error = function(e) {
