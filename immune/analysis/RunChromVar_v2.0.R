@@ -2,21 +2,11 @@ library(Signac)
 library(Seurat)
 library(GenomeInfoDb)
 library(ggplot2)
-
+library(tidyverse)
 require(magrittr)
-require(readr)
-require(Matrix)
-require(tidyr)
-require(dplyr)
+
 set.seed(1234)
 
-library(plyr)
-library(dplyr)
-library(tibble)
-library(reshape)
-library(plyr)
-
-library(EnsDb.Hsapiens.v86)
 library(BSgenome.Hsapiens.UCSC.hg38)
 
 library(ggplot2)
