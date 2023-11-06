@@ -103,7 +103,7 @@ options(future.globals.maxSize = 50 * 1024^3) # for 250 Gb RAM
 ###### load google sheet and extract samples from there ########
 gs4_deauth()
 samples <- read_sheet("https://docs.google.com/spreadsheets/d/1lfPnSIweII4cUC5wWVfBIFjKNdwWUI_CUThE2M7NzOs/edit?usp=sharing", sheet = 3, trim_ws = T)
-samples$Keep <- samples$`Include in stroma` %>% unlist()
+samples$Keep <- samples$`Include in immune` %>% unlist()
 
 samples <- samples %>% dplyr::filter(Keep == 'TRUE')
 samples <- samples %>% dplyr::filter(`Cellranger version` == 'v2.0')
