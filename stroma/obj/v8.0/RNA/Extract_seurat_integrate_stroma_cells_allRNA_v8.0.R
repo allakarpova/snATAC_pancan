@@ -150,27 +150,27 @@ if(!file.exists(paste0('PanStroma_merged_allRNA_normalized_', add_filename, '.rd
     obj.my <- subset(x = obj, subset = is_stroma)
     
     print(unique(obj.my$Case_ID_RNA))
-    if(c('HT029B1') %in% obj.my$Case_ID_RNA) {
-      cat('removing HT029B1 \n')
-      obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('HT029B1'), invert = TRUE)
-    }
-
-    if(c( 'C3N-01816') %in% obj.my$Case_ID_RNA) {
-      cat('removing C3N-01816\n')
-      obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('C3N-01816'), invert = TRUE)
-    }
-    if(c('CE338E1-S1N1') %in% obj.my$Piece_ID_RNA) {
-      cat('removing CE338E1-S1N1\n')
-      obj.my <- subset(x = obj.my, subset = Piece_ID_RNA %in% c('CE338E1-S1N1'), invert = TRUE)
-    } 
-    if(c('CE342E1-S1N1') %in% obj.my$Piece_ID_RNA) {
-      cat('removing CE342E1-S1N1\n')
-      obj.my <- subset(x = obj.my, subset = Piece_ID_RNA %in% c('CE342E1-S1N1'), invert = TRUE)
-    } 
-    # if (c('VF031V1-Tm1Y1') %in% obj.my$Piece_ID) {
-    #   cat('removing VF031V1-Tm1Y1\n')
-    #   obj.my <- subset(x = obj.my, subset = Piece_ID %in% c('VF031V1-Tm1Y1'), invert = TRUE)
+    # if(c('HT029B1') %in% obj.my$Case_ID_RNA) {
+    #   cat('removing HT029B1 \n')
+    #   obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('HT029B1'), invert = TRUE)
     # }
+    # 
+    # if(c( 'C3N-01816') %in% obj.my$Case_ID_RNA) {
+    #   cat('removing C3N-01816\n')
+    #   obj.my <- subset(x = obj.my, subset = Case_ID_RNA %in% c('C3N-01816'), invert = TRUE)
+    # }
+    # if(c('CE338E1-S1N1') %in% obj.my$Piece_ID_RNA) {
+    #   cat('removing CE338E1-S1N1\n')
+    #   obj.my <- subset(x = obj.my, subset = Piece_ID_RNA %in% c('CE338E1-S1N1'), invert = TRUE)
+    # } 
+    # if(c('CE342E1-S1N1') %in% obj.my$Piece_ID_RNA) {
+    #   cat('removing CE342E1-S1N1\n')
+    #   obj.my <- subset(x = obj.my, subset = Piece_ID_RNA %in% c('CE342E1-S1N1'), invert = TRUE)
+    # } 
+    # # if (c('VF031V1-Tm1Y1') %in% obj.my$Piece_ID) {
+    # #   cat('removing VF031V1-Tm1Y1\n')
+    # #   obj.my <- subset(x = obj.my, subset = Piece_ID %in% c('VF031V1-Tm1Y1'), invert = TRUE)
+    # # }
     
     print(dim(obj.my))
     return(obj.my)
