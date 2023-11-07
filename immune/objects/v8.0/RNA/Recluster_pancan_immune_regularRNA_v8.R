@@ -89,7 +89,7 @@ r.obj <- readRDS(input.path.rna)
 DefaultAssay(r.obj) <- 'RNA'
 r.obj <- DietSeurat(r.obj, counts = TRUE,assays = 'RNA')
 
-meta <- fread(meta.path) %>%
+meta <- fread(meta.rna.path) %>%
   column_to_rownames(var = 'V1') %>%    
   select(all_of(cell_column))
 r.obj <- AddMetaData(r.obj, meta)
