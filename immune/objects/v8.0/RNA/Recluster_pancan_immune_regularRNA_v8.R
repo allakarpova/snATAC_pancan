@@ -111,11 +111,9 @@ colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_free
 DimPlot(r.obj, group.by = "Cancer", label = TRUE, label.size = 2.5, repel = TRUE, cols = colors$Cancer)
 ggsave(glue::glue("Dimplot_{add_filename}_Cancer.pdf"), height=8,width=11)
 
-DimPlot(r.obj, group.by = "Piece_ID_RNA", label = TRUE, label.size = 2.5, repel = TRUE)
-ggsave(glue::glue("Dimplot_{add_filename}_Piece_ID.pdf"), height=8,width=20)
-
 DimPlot(r.obj, group.by = cell_column, label = TRUE, label.size = 2.5, repel = TRUE)
 ggsave(glue::glue("Dimplot_{add_filename}_{cell_column}.pdf"), height=8,width=15)
+
 
 
 
