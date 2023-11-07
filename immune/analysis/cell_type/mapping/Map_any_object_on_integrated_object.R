@@ -66,6 +66,11 @@ set.seed(666)
 query.obj <- readRDS(query.path)
 ref.obj <- readRDS(ref.path)
 
+meta <- fread(meta.path) %>%
+  column_to_rownames(var = 'V1') %>%    
+  select(all_of(cell_column))
+ref.obj <- AddMetaData(ref.obj, meta)
+
 
 DefaultAssay(ref.obj) <- 'integrated'
 ref.obj <- RunUMAP(ref.obj, nn.name = "weighted.nn", 
