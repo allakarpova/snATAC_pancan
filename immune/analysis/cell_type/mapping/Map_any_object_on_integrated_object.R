@@ -72,7 +72,6 @@ ref.obj <- RunUMAP(ref.obj, nn.name = "weighted.nn",
                reduction.name = "wnn.umap", 
                reduction.key = "wnnUMAP_", return.model = TRUE)
 
-DefaultAssay(ref.obj) <- 'SCT'
 DefaultAssay(query.obj) <- 'SCT'
 
 anchors <- FindTransferAnchors(
@@ -97,7 +96,29 @@ query.obj <- MapQuery(
 
 p1 = DimPlot(query.obj, reduction = "ref.umap", group.by = "predicted.celltype.l1", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
 p2 = DimPlot(ref.obj, reduction = "wnn.umap", group.by = cell_column, label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
+p1+p2
+ggsave(glue::glue('Dimplot_predicted.celltype.l1_{add_filename}.pdf'), width = 12, height = 5)
 
-ggsave(glue::glue('Dimplot_predicted.celltype.l1_{add_filename}.pdf'),plot=p1+p2 width = 12, height = 5)
+saveRDS(query.obj, glue::glue('Mapped_object_{add_filename}.rds'))
+query.obj@meta.data %>% fwrite( glue::glue('Metadata_mapped_object_{add_filename}.tsv'), sep = '\t', row.names = T)
+
+
+ref.obj <- DietSeurat(ref.obj, counts = FALSE, dimreducs = "pca")
+query.obj <- DietSeurat(query.obj, counts = FALSE, dimreducs = "ref.pca")
+
+
+ref.obj$id <- 'reference'
+query.obj$id <- 'query'
+refquery <- merge(ref.obj, query.obj)
+refquery[["pca"]] <- merge(ref.obj[["pca"]], query.obj[["ref.pca"]])
+refquery <- RunUMAP(refquery, reduction = 'pca', dims = 1:50, reduction.name = "ref.query.umap", reduction.key = "refqueryUMAP_")
+refquery@meta.data[[cell_column]][is.na(refquery@meta.data[[cell_column]])] <- refquery$predicted.celltype.l1[refquery@meta.data[[cell_column]]]
+
+p1 <- DimPlot(refquery,reduction = "ref.query.umap", group.by = 'id', shuffle = TRUE)
+p2 <- DimPlot(refquery,reduction = cell_column, group.by = 'id', shuffle = TRUE)
+p1+p2
+ggsave(glue::glue('Dimplot_reference_query_merged_predicted.celltype.l1_{add_filename}.pdf'), width = 12, height = 5)
+
+
 
 
