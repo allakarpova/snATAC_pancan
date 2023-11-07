@@ -13,7 +13,7 @@ library(harmony)
 
 
 
-normalize_rna <- function(obj, dims=50) {
+normalize_rna <- function(obj) {
   DefaultAssay(obj) <- "RNA"
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, pattern = "^MT-")
   s.genes <- cc.genes.updated.2019$s.genes
@@ -30,7 +30,8 @@ normalize_rna <- function(obj, dims=50) {
       return.only.var.genes = T,
       verbose = FALSE) %>% 
     RunPCA(assay = 'SCT', do.print = FALSE) %>%
-    RunUMAP(dims = 1:dims,reduction = 'pca', reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
+    RunUMAP(dims = 1:50,reduction = 'pca', 
+            reduction.name = "rna.umap", reduction.key = "rnaUMAP_")
   return(obj)
 }
 
