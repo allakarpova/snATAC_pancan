@@ -118,6 +118,8 @@ refquery <- merge(ref.obj, query.obj)
 refquery[["pca"]] <- merge(ref.obj[["pca"]], query.obj[["ref.pca"]])
 refquery <- RunUMAP(refquery, reduction = 'pca', dims = 1:50, reduction.name = "ref.query.umap", reduction.key = "refqueryUMAP_")
 refquery@meta.data[[cell_column]][is.na(refquery@meta.data[[cell_column]])] <- refquery$predicted.celltype.l1[refquery@meta.data[[cell_column]]]
+saveRDS(refquery, glue::glue('Reference_query_new_umap_object_{add_filename}.rds'))
+
 
 p1 <- DimPlot(refquery,reduction = "ref.query.umap", group.by = 'id', shuffle = TRUE)
 p2 <- DimPlot(refquery,reduction = cell_column, group.by = 'id', shuffle = TRUE)
