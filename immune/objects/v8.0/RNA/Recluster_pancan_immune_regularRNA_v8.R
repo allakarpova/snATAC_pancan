@@ -102,7 +102,7 @@ r.obj$Multiome <- rownames(r.obj@meta.data) %in% multi.cells
 #remove multiome cells
 r.obj <- subset(r.obj, Multiome, invert = TRUE)
 
-r.obj <- r.obj %>% normalize_rna(r.obj)
+r.obj <- r.obj %>% normalize_rna()
 saveRDS(r.obj, glue::glue('PanImmune_merged_regularRNA_{add_filename}.rds'))
 
 colors <- readRDS('/diskmnt/Projects/snATAC_primary/PanCan_immune_ATAC_data_freeze/v8.0/Colors_panatac_v3.0.rds')
