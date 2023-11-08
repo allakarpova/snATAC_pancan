@@ -121,16 +121,7 @@ for (i in 1:length(query.obj.list)) {
   )
 }
 
-query.obj <- MapQuery(
-  anchorset = anchors,
-  query = query.obj,
-  reference = ref.obj,
-  refdata = list(
-    celltype.l1 = cell_column
-  ),
-  reference.reduction = "pca", 
-  reduction.model = "wnn.umap"
-)
+
 
 for (i in 1:length(query.obj)) {
   query.obj[[i]] <- MapQuery(
