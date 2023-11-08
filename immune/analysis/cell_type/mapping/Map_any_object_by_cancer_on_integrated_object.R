@@ -123,10 +123,10 @@ for (i in 1:length(query.obj.list)) {
 
 
 
-for (i in 1:length(query.obj)) {
-  query.obj[[i]] <- MapQuery(
+for (i in 1:length(query.obj.list)) {
+  query.obj.list[[i]] <- MapQuery(
     anchorset = anchors[[i]], 
-    query = query.obj[[i]],
+    query = query.obj.list[[i]],
     reference = ref.obj, 
     refdata = list(
       celltype.l1 = cell_column
