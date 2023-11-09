@@ -107,24 +107,24 @@ ggsave(glue::glue('Dimplot_predicted.celltype.l1_{add_filename}.pdf'), width = 1
 saveRDS(query.obj, glue::glue('Mapped_object_{add_filename}.rds'))
 query.obj@meta.data %>% fwrite( glue::glue('Metadata_mapped_object_{add_filename}.tsv'), sep = '\t', row.names = T)
 
-
-ref.obj <- DietSeurat(ref.obj, counts = FALSE, dimreducs = "pca")
-query.obj <- DietSeurat(query.obj, counts = FALSE, dimreducs = "ref.pca")
-
-
-ref.obj$id <- 'reference'
-query.obj$id <- 'query'
-refquery <- merge(ref.obj, query.obj)
-refquery[["pca"]] <- merge(ref.obj[["pca"]], query.obj[["ref.pca"]])
-refquery <- RunUMAP(refquery, reduction = 'pca', dims = 1:50, reduction.name = "ref.query.umap", reduction.key = "refqueryUMAP_")
-refquery@meta.data[[cell_column]][is.na(refquery@meta.data[[cell_column]])] <- refquery$predicted.celltype.l1[refquery@meta.data[[cell_column]]]
-saveRDS(refquery, glue::glue('Reference_query_new_umap_object_{add_filename}.rds'))
-
-
-p1 <- DimPlot(refquery,reduction = "ref.query.umap", group.by = 'id', shuffle = TRUE)
-p2 <- DimPlot(refquery,reduction = cell_column, group.by = 'id', shuffle = TRUE)
-p1+p2
-ggsave(glue::glue('Dimplot_reference_query_merged_predicted.celltype.l1_{add_filename}.pdf'), width = 12, height = 5)
+# 
+# ref.obj <- DietSeurat(ref.obj, counts = FALSE, dimreducs = "pca")
+# query.obj <- DietSeurat(query.obj, counts = FALSE, dimreducs = "ref.pca")
+# 
+# 
+# ref.obj$id <- 'reference'
+# query.obj$id <- 'query'
+# refquery <- merge(ref.obj, query.obj)
+# refquery[["pca"]] <- merge(ref.obj[["pca"]], query.obj[["ref.pca"]])
+# refquery <- RunUMAP(refquery, reduction = 'pca', dims = 1:50, reduction.name = "ref.query.umap", reduction.key = "refqueryUMAP_")
+# refquery@meta.data[[cell_column]][is.na(refquery@meta.data[[cell_column]])] <- refquery$predicted.celltype.l1[refquery@meta.data[[cell_column]]]
+# saveRDS(refquery, glue::glue('Reference_query_new_umap_object_{add_filename}.rds'))
+# 
+# 
+# p1 <- DimPlot(refquery,reduction = "ref.query.umap", group.by = 'id', shuffle = TRUE)
+# p2 <- DimPlot(refquery,reduction = cell_column, group.by = 'id', shuffle = TRUE)
+# p1+p2
+# ggsave(glue::glue('Dimplot_reference_query_merged_predicted.celltype.l1_{add_filename}.pdf'), width = 12, height = 5)
 
 
 
