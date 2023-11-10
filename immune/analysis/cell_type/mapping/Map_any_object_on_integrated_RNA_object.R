@@ -73,7 +73,7 @@ ref.obj <- AddMetaData(ref.obj, meta)
 
 
 DefaultAssay(ref.obj) <- 'integrated'
-ref.obj <- RunUMAP(ref.obj, return.model = TRUE)
+ref.obj <- RunUMAP(ref.obj, reduction = "pca", return.model = TRUE)
 
 DefaultAssay(query.obj) <- 'SCT'
 
