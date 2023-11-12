@@ -82,7 +82,8 @@ DefaultAssay(query.obj) <- 'SCT'
 anchors <- FindTransferAnchors(
   reference = ref.obj,
   query = query.obj,
-  normalization.method = "SCT",
+  #normalization.method = "SCT",
+  reduction = 'rpca',
   reference.reduction = "pca",
   dims = 1:50
 )
