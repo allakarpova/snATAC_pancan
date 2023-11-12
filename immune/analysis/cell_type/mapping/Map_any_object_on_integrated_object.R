@@ -79,10 +79,11 @@ ref.obj <- RunUMAP(ref.obj, nn.name = "weighted.nn",
 
 DefaultAssay(query.obj) <- 'SCT'
 
+deg <- fread('/diskmnt/Projects/snATAC_analysis/immune/DEGs/v8.0/')
 anchors <- FindTransferAnchors(
   reference = ref.obj,
   query = query.obj,
-  #normalization.method = "SCT",
+  normalization.method = "SCT",
   reduction = 'rpca',
   reference.reduction = "pca",
   dims = 1:50
