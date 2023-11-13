@@ -15,7 +15,7 @@ option_list = list(
               type="character",
               default=NULL,
               help="path to data folder (e.g. cellranger output's raw matrices folder)",
-              metavar="character"),,
+              metavar="character"),
   make_option(c( "--metadata"),
               type="character",
               default=NULL,
