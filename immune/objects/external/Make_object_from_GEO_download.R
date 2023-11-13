@@ -90,7 +90,7 @@ input <- fread(file = matrix, data.table = F) %>%
   column_to_rownames(var='V1')
 
 metadata <- fread(meta, data.table = F) %>% 
-  column_to_rownames(var='V1') 
+  data.frame(row.names = 1) 
 
 panc = CreateSeuratObject(counts = input, meta.data = metadata)
 
