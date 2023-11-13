@@ -71,12 +71,6 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
-# complain if there's no data
-if (is.null(opt$input)){
-  print_help(opt_parser)
-  stop("Path to data is required (--input).n", call.=FALSE)
-}
-
 # read in initial arguments
 sample_id <- opt$sample_id
 out_path <- opt$output
