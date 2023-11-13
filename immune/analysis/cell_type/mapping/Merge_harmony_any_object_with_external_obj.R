@@ -101,10 +101,10 @@ ref.obj <- AddMetaData(ref.obj, meta)
 
 
 DefaultAssay(ref.obj) <- 'RNA'
-ref.obj <- DietSeurat(ref.obj, assays = 'RNA', slot = 'counts')
+  ref.obj <- DietSeurat(ref.obj, assays = 'RNA', counts = TRUE, data = FALSE)
 ref.obj@meta.data$object.type <- 'Internal'
 DefaultAssay(query.obj) <- 'RNA'
-query.obj <- DietSeurat(query.obj, assays = 'RNA', slot = 'counts')
+query.obj <- DietSeurat(query.obj, assays = 'RNA', counts = TRUE, data = FALSE)
 query.obj@meta.data$object.type <- 'External'
 query.obj@meta.data$Batches <- 'External'
 
