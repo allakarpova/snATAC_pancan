@@ -86,8 +86,12 @@ setwd(out_path)
 
 # read in matrix
 cat('read in matrix\n')
-input <- fread(file = matrix, data.table = F) %>% 
-  column_to_rownames(var='V1')
+if (grepl('rds', matrix)) {
+  input <- readRDS( matrix)
+} else {
+  input <- fread(file = matrix, data.table = F) %>% 
+    column_to_rownames(var='V1')
+}
 
 metadata <- fread(meta, data.table = F) %>% 
   data.frame(row.names = 1) 
