@@ -95,7 +95,7 @@ hvgR = VariableFeatures(object = ref.obj)
 hvgR <- intersect(hvgR, deg.for.variable)
 hvgR <- setdiff(hvgR, s.genes)
 hvgR <- setdiff(hvgR, g2m.genes)
-
+print(hvgR)
 ref.obj <- ref.obj %>%
   ScaleData(verbose = T) %>%
   RunPCA(verbose = T, features = hvgR)
@@ -109,7 +109,7 @@ hvgQ <-VariableFeatures(object = query.obj)
 hvgQ <- intersect(hvgQ, deg.for.variable)
 hvgQ <- setdiff(hvgQ, s.genes)
 hvgQ <- setdiff(hvgQ, g2m.genes)
-
+print(hvgQ)
 query.obj <- query.obj %>%
   ScaleData(verbose = T) %>%
   RunPCA(verbose = T, features = hvgQ)
