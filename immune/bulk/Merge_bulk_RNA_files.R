@@ -21,7 +21,7 @@ opt = parse_args(opt_parser);
 
 matrix.path = opt$input
 
-all.counts <- list.files(matrix.path, full.names = T) %>%
+all.counts <- list.files(matrix.path, pattern = 'tsv.gz', full.names = T) %>%
     map(function(p) {
       
         file.name <- basename(p)#
