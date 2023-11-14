@@ -93,7 +93,7 @@ input <- readMM(file = matrix.path)
 feature.names = read.delim(features.path, header = FALSE,stringsAsFactors = FALSE)
 barcode.names = read.delim(barcode.path, header = FALSE,stringsAsFactors = FALSE)
 colnames(input) = barcode.names$V1
-rownames(input) = feature.names$V2
+rownames(input) = feature.names$V1
 
 
 panc = CreateSeuratObject(counts = input)
