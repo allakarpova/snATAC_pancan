@@ -28,8 +28,8 @@ all.counts <- list.files(matrix.path, full.names = T) %>%
         
         clean.file.name <- str_remove(file.name, '_1')
         clean.file.name <- str_replace(clean.file.name, '_', '-')
-        case <- str_split_fixed(clean.file.name, '-', 5)[,1]
-        sample <- str_split_fixed(clean.file.name, '[.]', 5)[,3]
+        case <- str_split_fixed(clean.file.name, '-', 2)[,1]
+        sample <- str_split_fixed(clean.file.name, '[.]', 2)[,1]
         print(sample)
         tb <- fread(p, data.table = F, header = TRUE) %>% select(symbol, read_count, fpkm, fpkm_uq) %>% mutate(Sample=sample)
         if(nrow(tb) < 5) {
