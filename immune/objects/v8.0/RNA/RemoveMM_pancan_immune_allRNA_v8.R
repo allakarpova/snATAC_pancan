@@ -64,7 +64,7 @@ InterferonScoring <- function(obj) {
     ctrl = ctrl)
   
   obj@meta.data <- obj@meta.data %>% 
-    select(-Interferon.response) %>%
+    #select(-Interferon.response) %>%
     rename(Interferon.response=Interferon.response1)
   
   return(obj)
@@ -227,6 +227,8 @@ all.rna.list <- lapply(X = all.rna.list, FUN = function(x) {
   return(x)
 })
 
+saveRDS(all.rna.list, 'List_of_objects_for_integration.rds')
+
 message('Selecting integration features')
 features <- SelectIntegrationFeatures(object.list = all.rna.list, nfeatures = 4500)
 print(length(features))
@@ -255,7 +257,7 @@ all.rna.list <- PrepSCTIntegration(object.list = all.rna.list, anchor.features =
 message('Run PCA on integration features')
 all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features)
 
-saveRDS(all.rna.list, 'List_of_objects_for_integration.rds')
+
 message('Run FindIntegrationAnchors')
 if(opt$do.reference) {
   rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = multiome.batches.n,
