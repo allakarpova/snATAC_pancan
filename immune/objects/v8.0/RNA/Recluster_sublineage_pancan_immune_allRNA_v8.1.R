@@ -128,7 +128,7 @@ all.rna.whole <- subset(x = all.rna.whole, subset = to_remove, invert = TRUE)
 dim(all.rna.whole)
 
 all.rna.whole$CD8 <- grepl('CD8 ', as.character(unlist(all.rna.whole[[cell_column]])))
-all.rna.whole$CD4 <- grepl('CD4 ', as.character(unlist(all.rna.whole[[cell_column]])))
+all.rna.whole$CD4 <- grepl('CD4 |LEF1', as.character(unlist(all.rna.whole[[cell_column]])))
 all.rna.whole$NK <- grepl('NK', as.character(unlist(all.rna.whole[[cell_column]])))
 
 conditions <- c('CD8', 'CD4', 'NK') 
