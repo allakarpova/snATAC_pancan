@@ -136,7 +136,7 @@ conditions <- c('CD8', 'CD4', 'NK')
 conditions %>% walk (function(column) {
   print(column)
   all.rna <- subset(x = all.rna.whole, cells = rownames(dplyr::filter(all.rna.whole@meta.data, .data[[column]])))
-  
+  print(all.rna@assays)
   print(opt$int_batch)
   if(opt$int_batch=='weird.gbm') {
     wierd.gbm <- c('C3N-02783', 'C3L-02705', 'C3N-01334', 'C3N-01798', 'C3L-03968')
