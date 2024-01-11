@@ -223,12 +223,16 @@ conditions %>% walk (function(column) {
   all.rna.list <- lapply(X = all.rna.list, FUN = RunPCA, features = features, verbose=F)
   message('Run FindIntegrationAnchors')
   if(opt$do.reference) {
-    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, reference = multiome.batches.n,
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list,
+                                          k.anchor = 20, # increase integration strength
+                                          reference = multiome.batches.n,
                                           normalization.method = "SCT",
                                           anchor.features = features, dims = 1:50, reduction = "rpca")
     
   } else {
-    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, normalization.method = "SCT",
+    rna.anchors <- FindIntegrationAnchors(object.list = all.rna.list, 
+                                          k.anchor = 20, # increase integration strength
+                                          normalization.method = "SCT",
                                           anchor.features = features, dims = 1:50, reduction = "rpca")
     
   }
