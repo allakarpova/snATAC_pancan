@@ -112,10 +112,11 @@ panc[["percent.mt"]] <- PercentageFeatureSet(panc, pattern = "^MT-")
 
 print(head(panc@meta.data))
 # plot pre-filter metadata
-#panc$percent.mito<-percent.mito
+
 pdf(paste("QC_in_sample_",sample_id, ".pdf", sep=""), width=15, height=9)
 VlnPlot(object = panc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 dev.off()
+
 
 # plot metadata associations
 pdf(paste0("FeatureScatter_in_sample_",sample_id,".pdf",sep=""),width=12,height=7)
@@ -144,8 +145,14 @@ g2m.genes <- cc.genes.updated.2019$g2m.genes
 panc <- NormalizeData(panc, assay = 'RNA')
 panc <- CellCycleScoring(panc, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
 print(head(panc@meta.data))
+if (max(panc[["percent.mt"]])>0) {
 panc <- SCTransform(panc, 
                     vars.to.regress = c("percent.mt","S.Score", "G2M.Score"),return.only.var.genes = T)
+} else{
+  panc <- SCTransform(panc, 
+                      vars.to.regress = c("S.Score", "G2M.Score"),return.only.var.genes = T)
+  
+}
 panc <- RunPCA(panc, npcs = opt$pc_num, verbose = FALSE)
 
 # t-SNE and Clustering
