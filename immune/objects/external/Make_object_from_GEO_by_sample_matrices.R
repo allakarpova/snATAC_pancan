@@ -87,16 +87,16 @@ if(!file.exists(paste0(sample_id, "_raw.rds"))) {
   # read in matrix
   list.of.objects <- list.files(path = matrices.folder, pattern = 'txt.gz', full.names = T) %>%
     map(function(x) {
+    
       file <- basename(x)
       sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
-      input <- fread(x, header = TRUE, data.table = F) %>% 
-        data.frame(row.names = 1)
+      input <- fread("/diskmnt/primary/published_data/GSE123139/by_sample_counts/GSM3496285_AB1889.txt.gz") %>% 
+        data.frame(row.names = 1, check.names = F, check.rows = F)
       obj = CreateSeuratObject(counts = input, project = sample.name)
-      
     })
   list.of.samples <- map(list.of.objects, function(x) {x@meta.data$orig.ident[1]})
   list.of.samples <- unlist(list.of.samples)
-  panc = merge(list.of.objects[[1]], list.of.objects[-1], add.cell.ids = list.of.samples)
+  panc = merge(list.of.objects[[1]], list.of.objects[-1])
   
   saveRDS(panc, file = paste0(sample_id, "_raw.rds"))
 } else {
