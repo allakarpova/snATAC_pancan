@@ -83,27 +83,34 @@ out_path=paste(out_path, '/', sample_id,"/",sep="")
 dir.create(out_path, showWarnings = F, recursive = T)
 setwd(out_path)
 
+if(!file.exists(paste0(sample_id, "_raw.rds"))) {
+  # read in matrix
+  list.of.objects <- list.files(path = matrices.folder, pattern = 'txt.gz', full.names = T) %>%
+    map(function(x) {
+      file <- basename(x)
+      sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
+      input <- fread(x, header = TRUE, data.table = F) %>% 
+        data.frame(row.names = 1)
+      obj = CreateSeuratObject(counts = input, project = sample.name)
+      
+    })
+  list.of.samples <- map(list.of.objects, function(x) {x@meta.data$orig.ident[1]})
+  list.of.samples <- unlist(list.of.samples)
+  panc = merge(list.of.objects[[1]], list.of.objects[-1], add.cell.ids = list.of.samples)
+  
+  saveRDS(panc, file = paste0(sample_id, "_raw.rds"))
+} else {
+  panc <- readRDS(paste0(sample_id, "_raw.rds"))
+}
 
-# read in matrix
-list.of.objects <- list.files(path = matrices.folder, pattern = 'txt.gz', full.names = T) %>%
-  map(function(x) {
-    file <- basename(x)
-    sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
-    input <- fread(x, header = TRUE, data.table = F) %>% 
-      data.frame(row.names = 1)
-    obj = CreateSeuratObject(counts = input, project = sample.name)
-    
-  })
 
-
-panc = merge(list.of.objects[[1]], list.of.objects[-1])
 
 ### QC
 # get percent mitochondrial content
 cat('get percent mitochondrial content\n')
 panc[["percent.mt"]] <- PercentageFeatureSet(panc, pattern = "^MT-")
 
-
+print(head(panc@meta.data))
 # plot pre-filter metadata
 #panc$percent.mito<-percent.mito
 pdf(paste("QC_in_sample_",sample_id, ".pdf", sep=""), width=15, height=9)
