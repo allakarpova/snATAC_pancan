@@ -90,7 +90,7 @@ list.of.objects <- list.files(path = matrices.folder, pattern = 'txt.gz', full.n
     file <- basename(x)
     sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
     input <- fread(x, header = TRUE, data.table = F) %>% 
-      column_to_rownames(var='V1')
+      data.frame(row.names = 1)
     obj = CreateSeuratObject(counts = input, project = sample.name)
     
   })
