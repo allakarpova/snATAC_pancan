@@ -151,7 +151,7 @@ dev.off()
 
 s.genes <- cc.genes.updated.2019$s.genes
 g2m.genes <- cc.genes.updated.2019$g2m.genes
-panc <- NormalizeData(panc, assay = 'RNA')
+
 panc <- CellCycleScoring(panc, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
 print(head(panc@meta.data))
 panc <- SCTransform(panc, 
