@@ -145,8 +145,13 @@ if(opt$regress.cc) {
 }
 print(head(panc@meta.data))
 regress.me <- ifelse(opt$regress.cc, c("percent.mt","S.Score", "G2M.Score"), c("percent.mt"))
-panc <- SCTransform(panc, 
-                    vars.to.regress = regress.me,return.only.var.genes = T)
+if(max(panc$percent.mt)>0) {
+  panc <- SCTransform(panc, 
+                      vars.to.regress = regress.me,return.only.var.genes = T)
+} else {
+  panc <- SCTransform(panc, return.only.var.genes = T)
+}
+
 panc <- RunPCA(panc, npcs = opt$pc_num, verbose = FALSE)
 
 # t-SNE and Clustering
