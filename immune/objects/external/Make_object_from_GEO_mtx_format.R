@@ -65,7 +65,12 @@ option_list = list(
               type="integer",
               default=30,
               help="number of principal components to use",
-              metavar="integer")
+              metavar="integer"),
+  make_option(c("--regress.cc"),
+              type="logical",
+              default=TRUE,
+              help="regress or not regress cell cycle genes ",
+              metavar="logical")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -135,10 +140,13 @@ dev.off()
 s.genes <- cc.genes.updated.2019$s.genes
 g2m.genes <- cc.genes.updated.2019$g2m.genes
 panc <- NormalizeData(panc, assay = 'RNA')
-panc <- CellCycleScoring(panc, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
+if(opt$regress.cc) {
+  panc <- CellCycleScoring(panc, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
+}
 print(head(panc@meta.data))
+regress.me <- ifelse(opt$regress.cc, c("percent.mt","S.Score", "G2M.Score"), c("percent.mt"))
 panc <- SCTransform(panc, 
-                    vars.to.regress = c("percent.mt","S.Score", "G2M.Score"),return.only.var.genes = T)
+                    vars.to.regress = regress.me,return.only.var.genes = T)
 panc <- RunPCA(panc, npcs = opt$pc_num, verbose = FALSE)
 
 # t-SNE and Clustering
