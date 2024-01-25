@@ -72,7 +72,7 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
 # complain if there's no data
-if (is.null(opt$input)){
+if (is.null(opt$input.tpm)){
   print_help(opt_parser)
   stop("Path to data is required (--input).n", call.=FALSE)
 }
