@@ -43,7 +43,7 @@ option_list = list(
               metavar="integer"),
   make_option(c("--ncount_max"),
               type="integer",
-              default=80000,
+              default=4000000,
               help="nCount_RNA max value for filtering",
               metavar="integer"),
   make_option(c("--mito_max"),
