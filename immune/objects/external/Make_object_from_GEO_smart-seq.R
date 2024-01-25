@@ -11,12 +11,12 @@ library(data.table)
 
 # create user options
 option_list = list(
-  make_option(c("-i", "--input.tpm"),
+  make_option(c("--input.tpm"),
               type="character",
               default=NULL,
               help="path to TPM matrix",
               metavar="character"),
-  make_option(c("-i", "--input.raw"),
+  make_option(c("--input.raw"),
               type="character",
               default=NULL,
               help="path to raw count matrix",
