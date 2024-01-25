@@ -93,9 +93,10 @@ setwd(out_path)
 # read in matrix
 cat('read in matrix\n')
 
-  input.tpm <- fread(matrix.tpm, data.table = F) %>% 
-    column_to_rownames(var='V1')
-}
+input.tpm <- fread(matrix.tpm, data.table = F) %>% 
+  column_to_rownames(var='V1')
+input.tpm <- log2(input.tpm/10 + 1) # from https://www.sciencedirect.com/science/article/pii/S0092867418311784?via%3Dihub#sec4.5.1
+
 
 if(!is.null(matrix.raw)) {
   input.raw <- fread(matrix.raw, data.table = F) %>% 
@@ -118,44 +119,35 @@ if(!is.null(meta) & !is.null(matrix.raw)) {
 ### QC
 # get percent mitochondrial content
 cat('get percent mitochondrial content\n')
-panc[["percent.mt"]] <- PercentageFeatureSet(panc, pattern = "^MT-")
-
 
 # plot pre-filter metadata
 #panc$percent.mito<-percent.mito
 pdf(paste("QC_in_sample_",sample_id, ".pdf", sep=""), width=15, height=9)
-VlnPlot(object = panc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(object = panc, features = c("nFeature_RNA", "nCount_RNA"), ncol = 2)
 dev.off()
 
 # plot metadata associations
-pdf(paste0("FeatureScatter_in_sample_",sample_id,".pdf",sep=""),width=12,height=7)
-plot1 <- FeatureScatter(object = panc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+pdf(paste0("FeatureScatter_in_sample_",sample_id,".pdf",sep=""),width=9,height=7)
+
 plot2 <- FeatureScatter(object = panc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-CombinePlots(plots = list(plot1, plot2))
+print(plot2)
 dev.off()
 
 # filter step
 panc<-subset(x = panc, subset = nFeature_RNA > opt$nfeature_min & 
                nFeature_RNA < opt$nfeature_max & 
                nCount_RNA > opt$ncount_min & 
-               nCount_RNA < opt$ncount_max & 
-               percent.mt<opt$mito_max)
+               nCount_RNA < opt$ncount_max )
 panc %>% dim
 
 # plot post-filter metadata
 pdf(paste("After_QC_in_sample_",sample_id, ".pdf", sep=""), width=15, height=9)
-VlnPlot(object = panc, features = c("nCount_RNA", "nFeature_RNA", "percent.mt"), ncol = 3)
+VlnPlot(object = panc, features = c("nCount_RNA", "nFeature_RNA"), ncol = 2)
 dev.off()
 
 # Run the standard workflow for visualization and clustering
-
-s.genes <- cc.genes.updated.2019$s.genes
-g2m.genes <- cc.genes.updated.2019$g2m.genes
-
-panc <- CellCycleScoring(panc, s.features = s.genes, g2m.features = g2m.genes, set.ident = F)
-print(head(panc@meta.data))
-panc <- SCTransform(panc, 
-                    vars.to.regress = c("percent.mt","S.Score", "G2M.Score"),return.only.var.genes = T)
+panc <- ScaleData(panc)
+panc <- FindVariableFeatures(panc)
 panc <- RunPCA(panc, npcs = opt$pc_num, verbose = FALSE)
 
 # t-SNE and Clustering
