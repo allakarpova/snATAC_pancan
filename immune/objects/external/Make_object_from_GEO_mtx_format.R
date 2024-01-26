@@ -70,7 +70,12 @@ option_list = list(
               type="logical",
               default=TRUE,
               help="regress or not regress cell cycle genes ",
-              metavar="logical")
+              metavar="logical"),
+  make_option(c("--feature.column.use"),
+              type="integer",
+              default=1,
+              help="if features mtx contain two columns, use the first one or the second one",
+              metavar="integer")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -98,7 +103,12 @@ input <- readMM(file = matrix.path)
 feature.names = read.delim(features.path, header = FALSE,stringsAsFactors = FALSE)
 barcode.names = read.delim(barcode.path, header = FALSE,stringsAsFactors = FALSE)
 colnames(input) = barcode.names$V1
-rownames(input) = feature.names$V1
+if (opt$feature.column.use==1) {
+  rownames(input) = feature.names$V1
+} else {
+  rownames(input) = feature.names$V2
+}
+
 
 
 panc = CreateSeuratObject(counts = input)
