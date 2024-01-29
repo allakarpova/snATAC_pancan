@@ -95,6 +95,8 @@ list.obj <- list.samples %>% map(function(sample) {
 
 obj <- merge(list.obj[[1]], list.obj[-1], add.cell.ids = list.samples)
 obj <- runAllNormalization(obj)
+# save object so far
+saveRDS(obj, file = paste0(add_filename, "_merged.rds"))
 
 
 # plot the clusters
@@ -106,5 +108,3 @@ pdf(paste0("DimPlot_sample.pdf"),useDingbats=FALSE)
 DimPlot(object = obj,group.by = sample, reduction = "umap",label=TRUE,label.size=6)
 dev.off()
 
-# save object so far
-saveRDS(panc,file = paste0(add_filename, "_merged.rds"))
