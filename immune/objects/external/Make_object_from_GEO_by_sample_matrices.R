@@ -89,10 +89,12 @@ if(!file.exists(paste0(sample_id, "_raw.rds"))) {
     map(function(x) {
     
       file <- basename(x)
+      print(file)
       sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
       input <- fread(glue::glue("{matrices.folder}/{file}")) %>% 
         data.frame(row.names = 1, check.names = F, check.rows = F)
       obj = CreateSeuratObject(counts = input, project = sample.name, min.cells = 5)
+      return(obj)
     })
   list.of.samples <- map(list.of.objects, function(x) {x@meta.data$orig.ident[1]})
   list.of.samples <- unlist(list.of.samples)
