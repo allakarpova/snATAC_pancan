@@ -104,7 +104,7 @@ pdf(paste0("DimPlot_clusters.pdf"),useDingbats=FALSE)
 DimPlot(object = obj, reduction = "umap",label=TRUE,label.size=6)
 dev.off()
 
-pdf(paste0("DimPlot_sample.pdf"),useDingbats=FALSE)
+pdf(paste0("DimPlot_sample.pdf"), useDingbats=FALSE)
 DimPlot(object = obj,group.by = 'sample', reduction = "umap",label=TRUE,label.size=6)
 dev.off()
 
