@@ -85,12 +85,12 @@ setwd(out_path)
 
 if(!file.exists(paste0(sample_id, "_raw.rds"))) {
   # read in matrix
-  list.of.objects <- list.files(path = matrices.folder, pattern = 'txt.gz', full.names = T) %>%
+  list.of.objects <- list.files(path = matrices.folder, pattern = '.gz', full.names = T) %>%
     map(function(x) {
     
       file <- basename(x)
       sample.name <- str_split_fixed(str_sub(file, 12, -1 ), '[.]', 2)[,1]
-      input <- fread("/diskmnt/primary/published_data/GSE123139/by_sample_counts/GSM3496285_AB1889.txt.gz") %>% 
+      input <- fread(glue::glue("{matrices.folder}/{file}")) %>% 
         data.frame(row.names = 1, check.names = F, check.rows = F)
       obj = CreateSeuratObject(counts = input, project = sample.name, min.cells = 5)
     })
