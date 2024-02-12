@@ -90,7 +90,7 @@ if (grepl('rds', matrix)) {
   input <- readRDS( matrix)
 } else {
   input <- fread(file = matrix, data.table = F) %>% 
-    column_to_rownames(var='V1')
+    data.frame(row.names = 1)
 }
 
 metadata <- fread(meta, data.table = F) %>% 
