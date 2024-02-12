@@ -100,8 +100,8 @@ cat('read in matrix\n')
 # read in matrix
 cat('read in matrix\n')
 input <- readMM(file = matrix.path)
-feature.names = read.delim(features.path, header = FALSE,stringsAsFactors = FALSE)
-barcode.names = read.delim(barcode.path, header = FALSE,stringsAsFactors = FALSE)
+feature.names = read.delim(features.path, sep = ",", header = FALSE,stringsAsFactors = FALSE)
+barcode.names = read.delim(barcode.path,sep = ",",  header = FALSE,stringsAsFactors = FALSE)
 colnames(input) = barcode.names$V1
 if (opt$feature.column.use==1) {
   rownames(input) = feature.names$V1
