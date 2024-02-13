@@ -113,6 +113,9 @@ if (opt$feature.column.use==1) {
 
 panc = CreateSeuratObject(counts = input)
 
+print(head(panc@meta.data))
+
+
 ### QC
 # get percent mitochondrial content
 cat('get percent mitochondrial content\n')
