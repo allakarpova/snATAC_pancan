@@ -54,6 +54,8 @@ analysis_type = args["analysis_id"]
 K = [int(args["k_nearest_nbors"])]
 n_nhoods = int(args["nhoods"])
 
+# ID for file names and such
+neighborhood_name = "neighbors" + str(K[0]) + "_hoods" + str(n_nhoods)
 
 
 # ### Fill In:
@@ -76,6 +78,9 @@ file_type = 'csv'
 cluster_col = 'celltype_final'
 keep_cols = [X,Y,reg,cluster_col]
 save_path = '.'
+
+
+
 
 
 def main():
@@ -151,6 +156,13 @@ def main():
 
     ## calculate neighborhoods 
     cells, fc = nhoods_calculate(k=K[0], n_neighborhoods = n_nhoods,cells = cells_raw, windows = windows, sum_cols = sum_cols, values = values)
+    #
+    print(fc.head())
+
+    ## save nhood results
+    cells.to_csv(neighborhood_name + '_nhoods.tsv', sep="\t", index = False, header = True)
+    fc.to_csv(neighborhood_name + '_nhood_enrichment.tsv', sep="\t", index = True, header = True)
+
 
     ## make plots
     nhoods_plot(cells = cells, fc =fc, k=K[0], n_neighborhoods = n_nhoods)
@@ -195,7 +207,6 @@ def nhoods_calculate(k = 10, n_neighborhoods = 10, enrich_plot = True, spatial_p
                     cells = None, windows = None, sum_cols = None, values = None):
     
     ## set up
-    neighborhood_name = "neighbors" + str(k) + "_hoods" + str(n_neighborhoods)
     k_centroids = {}
 
     ### calculate neighborhoods
@@ -226,21 +237,24 @@ def nhoods_calculate(k = 10, n_neighborhoods = 10, enrich_plot = True, spatial_p
 
 
 def nhoods_plot(cells, fc, k, n_neighborhoods):
-    
-    ##
-    neighborhood_name = "neighbors" + str(k) + "_hoods" + str(n_neighborhoods)
-    
+        
     
     ### plot celltype enrichment matrix
+    sns.set(font_scale=2)
+
+
     s2=sns.clustermap(fc.transpose(), vmin =-3,vmax = 3,cmap = 'bwr',
                       row_cluster = True, col_cluster = True,
-                      yticklabels=True,
-                     figsize = (fc.shape[0]*0.5+4,fc.shape[1]*0.3+3))
+                      # yticklabels=True,
+                     figsize = (fc.shape[0]*0.5+4,fc.shape[1]*0.3+3),
+                     **{"xticklabels" : True, "yticklabels" : True}
+                     )
     s2.savefig("celltypes_per_" + neighborhood_name + ".pdf")
     ###
 
     
-    
+    sns.set(font_scale=1)
+
     ### Make nhood spatial plot
     
     ## create random palette
