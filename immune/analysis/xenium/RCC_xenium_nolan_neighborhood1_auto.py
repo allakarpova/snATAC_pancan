@@ -294,7 +294,7 @@ def nhoods_plot(cells, fc, k, n_neighborhoods):
         with plt.style.context('dark_background'):
 
             # Create a seaborn scatter plot
-            p = sns.lmplot(data = cells,x = X,y=Y,hue = neighborhood_name,
+            p = sns.lmplot(data = cells,x = -X, y= -Y,hue = neighborhood_name,
                            palette = pal,
                         height = 10, aspect = 1, fit_reg = False,
                            scatter_kws={"s": 2, "marker" : "circle", "edgecolors" : "none"}
