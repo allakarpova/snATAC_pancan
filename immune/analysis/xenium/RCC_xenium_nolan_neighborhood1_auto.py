@@ -305,6 +305,9 @@ def nhoods_plot(cells, fc, k, n_neighborhoods):
             # change marker size
             for lh in p._legend.legend_handles: 
                 lh._sizes = [150]
+            #invert y axis
+            for ax in p.axes[0]:
+                ax.invert_yaxis()
             # change legend title
             p.legend.set_title("")
             # change legend position
