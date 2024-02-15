@@ -240,7 +240,7 @@ sq.gr.co_occurrence(
 
 ## Plot co-occurence probability
 
-for Type in ["Macrophages","T or NK","ccRCC cancer cell","B or Plasma cells", "Endothelial"]:
+for Type in ["Macrophages","CD8TexhGZMK","Cancer cells","CD8TrmExh","CD8Texh","CD4Treg", "Endothelial", "Fibroblasts"]:
     
     try:
         sq.pl.co_occurrence(
