@@ -1,5 +1,5 @@
 ## Alla Karpova
-### recluster T-cells remove IFN genes and regress out cell cycle
+### recluster T-cells dont remove IFN genes and don't regress out cell cycle
 
 suppressMessages(library(Signac))
 suppressMessages(library(Seurat))
@@ -157,7 +157,7 @@ conditions %>% walk (function(column) {
                                            TRUE ~ all.rna$Chemistry)
   } else if(opt$int_batch=='weird_ccrcc') {
     message('doing weird_ccrcc')
-   
+    
     wierd.ccrcc <- c('C3N-00437-T1', 'C3N-00317-T1', 'C3L-00908-T1', 'C3N-00733-T1')
     all.rna@meta.data$Batches <- case_when(all.rna$Piece_ID_RNA %in% wierd.ccrcc ~  paste(all.rna$Cancer, all.rna$Chemistry, 'weird', sep = '__'),
                                            all.rna$Cancer == 'GBM' ~ all.rna$Cancer,
@@ -190,10 +190,12 @@ conditions %>% walk (function(column) {
     pull(features.plot) %>% 
     unique()
   
-  interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
-    pull(V1)
+  # interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
+  #   pull(V1)
   
-  genes.i.dont.want2 <- Reduce(union, list(interferon.genes, trash.genes))
+  #genes.i.dont.want2 <- Reduce(union, list(interferon.genes, trash.genes))
+  
+  genes.i.dont.want2 <- trash.genes
   cellcycle.genes <- c(cc.genes.updated.2019$s.genes, cc.genes.updated.2019$g2m.genes)
   
   
@@ -217,7 +219,7 @@ conditions %>% walk (function(column) {
     good.variable.genes <- setdiff(rownames(x@assays$SCT@scale.data),genes.i.dont.want2)
     x@assays$SCT@scale.data <- x@assays$SCT@scale.data[good.variable.genes,]
     VariableFeatures(x) <- good.variable.genes
-    x <- GetResidual(x, features = cellcycle.genes)
+    #x <- GetResidual(x, features = cellcycle.genes)
     return(x)
   })
   
@@ -248,10 +250,10 @@ conditions %>% walk (function(column) {
   
   int <- IntegrateData(anchorset = rna.anchors, normalization.method = "SCT", dims = 1:50)
   DefaultAssay(int) <- 'integrated'
-  int <- CellCycleScoring(int, s.features = cc.genes.updated.2019$s.genes, g2m.features = cc.genes.updated.2019$g2m.genes, set.ident = F)
+  #int <- CellCycleScoring(int, s.features = cc.genes.updated.2019$s.genes, g2m.features = cc.genes.updated.2019$g2m.genes, set.ident = F)
   message('Run ScaleData on integrated assay')
   int <- ScaleData(int, 
-                   vars.to.regress = c("S.Score", "G2M.Score"),
+                   #vars.to.regress = c("S.Score", "G2M.Score"),
                    do.scale = FALSE,
                    do.center = TRUE)
   
@@ -299,5 +301,5 @@ conditions %>% walk (function(column) {
   dev.off()
   
   
-
+  
 })
