@@ -172,13 +172,8 @@ trash.genes <- tumor.genes %>%
 interferon.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/cell_typing/v8.0/allRNA2/by_lineage/no_doublets/Int_chemistry_cancer_reference_multiome2/no_doublets2/Interferon.reponse.genes.tsv', data.table = F, header = T) %>%
   pull(V1)
 
-library("biomaRt")
-mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-all_coding_genes <- getBM(attributes = c( "hgnc_symbol"), 
-                             filters = c("biotype"), 
-                             values = list(biotype="protein_coding"), 
-                             mart = mart)
-all_coding_genes
+all_coding_genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/gene_sets/Coding_genes.tsv', header = TRUE)
+head(all_coding_genes)
 #genes.i.dont.want2 <- Reduce(union, list(interferon.genes, trash.genes))
 genes.i.dont.want2 <- trash.genes
 cellcycle.genes <- c(cc.genes.updated.2019$s.genes, cc.genes.updated.2019$g2m.genes)
