@@ -123,22 +123,22 @@ genes.oi <- c(
   'CD3D', 'CD3E', 'CD3G', 'CD4', 'CD8A', 'CD8B', 
   'LEF1', 'CCR7', 'TCF7', 'SELL', 'CD27','ID3', 'FAS', 'ITGA4', 'CXCR3', 'ZEB1', 'FOXP1', 'FHIT',# naive or central memory
   'KLRD1', 'KLRF1', 'KIR2DL3', 'NCAM1', 'FCGR3A', 'KLRC2', 'IKZF3', #different NKs
-  'GZMB', 'GZMA' , 'GNLY','PRF1','IFNG', 'FASLG', # cyctotoxic stuff
-  'KLRG1', 'CX3CR1', 'TNF', 'BHLHE40', 'ZEB2', 'ID2','RORC', 'RORA', # effector CD8 and CD4
+  'GZMB', 'GZMA' ,'GZMK', 'GNLY','PRF1','IFNG', 'FASLG', # cytotoxic stuff
+  'KLRG1', 'CX3CR1', 'TNF', 'BHLHE40', 'ZEB2', 'ID2','RORC', 'RORA', 'STAT1', # effector CD8 and CD4
   'ITGAE',  'ITGA1', 'ENTPD1', 'CXCR6',  'PRDM1','RUNX3', 'ZNF683', # tissue residency
-  'GZMK', 'PDCD1', 'TIGIT','LAG3','TOX','TOX2', 'NFATC2', 'HAVCR2','CXCL13', 'CD200R1', # exhausted
+  'PDCD1', 'TIGIT','LAG3','TOX','TOX2', 'NFATC2', 'HAVCR2','CXCL13', 'CD200R1', 'NR4A2', # exhausted
   'TCF7', 'CXCR5','SLAMF6','CD200','GNG4','IGFBP4', 'TNFRSF4','TNFRSF14', 'ICOS', # pre-exhausted
   'BTLA', 'CXCL13',  'CD200','CD40LG','BATF','ICOS', # Tfh
-  'FOXP3', 'CTLA4', 'IL2RA', 'IKZF2','TNFRSF18' , 'PTPN2', 'TNFRSF9',  #Tregs
+  'FOXP3', 'CTLA4', 'IL2RA', 'IKZF2','TNFRSF18' , 'PTPN2', 'TNFRSF9','CCL4',  #Tregs
   'RORC','IL7R','IL1R1','BCL6','KIT','IL23R','KLRB1','SLC4A10','TRAV1-2','NCR3','DUSP2', #MAIT
   'LTB', 'MAL', 'CCR6','CCR4', 'RORC','IL17A','IL17F','IL1R1', #Th2
   'CCR3','CCR4','CXCR4','GATA3','IL2', 'IL4', #Th17
-  'MKI67', 'TOP2A', 
-  'IFI6', 'IFI44L', 'IFI44', 
+  'MKI67', 'TOP2A', 'MT-CO1', 'MT-ND1',
+  'IFI6', 'IFI44L', 'IFI44', 'IFNG-AS1',
   'TRDV1', 'TRDV2', 'TRGV9', 'CST7', 'KLRG1', 'CCL5', #gdT
-  'GZMK', 'FXYD2', 'NUCB2', 'CD27' # DN t-cells
+  'GZMK', 'FXYD2', 'NUCB2', 'CD27', # DN t-cells
+  'KLRC2', 'KLRF1', 'CMC1', 'TYROBP', 'NKG7' # Temra CD8
 ) 
-
 DotPlot(query.obj, features = unique(genes.oi), group.by = "predicted.celltype.l1") + 
   theme(axis.text.x = element_text(size = 13, face = "bold", angle = 90, hjust = 1, vjust = 0.5),
         axis.text.y = element_text(size = 16)) +
