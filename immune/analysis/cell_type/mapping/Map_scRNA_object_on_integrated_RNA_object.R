@@ -126,7 +126,7 @@ genes.oi <- c(
   'GZMB', 'GZMA' ,'GZMK', 'GNLY','PRF1','IFNG', 'FASLG', # cytotoxic stuff
   'KLRG1', 'CX3CR1', 'TNF', 'BHLHE40', 'ZEB2', 'ID2','RORC', 'RORA', 'STAT1', # effector CD8 and CD4
   'ITGAE',  'ITGA1', 'ENTPD1', 'CXCR6',  'PRDM1','RUNX3', 'ZNF683', # tissue residency
-  'PDCD1', 'TIGIT','LAG3','TOX','TOX2', 'NFATC2', 'HAVCR2','CXCL13', 'CD200R1', 'NR4A2', # exhausted
+  'PDCD1', 'TIGIT','LAG3','TOX','TOX2', 'NFATC2', 'HAVCR2','CXCL13', 'CD200R1','NR4A1',  'NR4A2', 'NR4A3', # exhausted
   'TCF7', 'CXCR5','SLAMF6','CD200','GNG4','IGFBP4', 'TNFRSF4','TNFRSF14', 'ICOS', # pre-exhausted
   'BTLA', 'CXCL13',  'CD200','CD40LG','BATF','ICOS', # Tfh
   'FOXP3', 'CTLA4', 'IL2RA', 'IKZF2','TNFRSF18' , 'PTPN2', 'TNFRSF9','CCL4',  #Tregs
