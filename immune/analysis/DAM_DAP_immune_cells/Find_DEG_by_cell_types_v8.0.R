@@ -75,11 +75,12 @@ options(future.globals.maxSize = 100 * 1024 ^ 3)
 
 if(!is.null(meta.path)) {
   atac.meta <- fread(meta.path) %>% data.frame(row.names = 1) %>%
-    dplyr::select(seurat_clusters)
+    dplyr::select(all_of(cell_column))
   panc <- AddMetaData(panc, atac.meta)
   
 }
 
+print(head(panc@meta.data))
 Idents(panc) <- cell_column
 DefaultAssay(panc) <- 'SCT'
 unique(Idents(panc))
@@ -91,7 +92,7 @@ deg <- FindAllMarkers(
   latent.vars = 'nCount_SCT'
 )
 
-fwrite(deg, paste0('DEG_findAllMarkers_by_',cell_column'_SCT_',add_filename,'.txt'), sep = '\t', row.names = T)
+fwrite(deg, paste0('DEG_findAllMarkers_by_',cell_column,'_SCT_',add_filename,'.txt'), sep = '\t', row.names = T)
 
 
 Idents(panc) <- cell_column
@@ -105,7 +106,7 @@ deg <- FindAllMarkers(
   latent.vars = 'nCount_RNA'
 )
 
-fwrite(deg, paste0('DEG_findAllMarkers_by_',cell_column'_RNA_',add_filename,'.txt'), sep = '\t', row.names = T)
+fwrite(deg, paste0('DEG_findAllMarkers_by_',cell_column,'_RNA_',add_filename,'.txt'), sep = '\t', row.names = T)
 
 
 
