@@ -104,7 +104,7 @@ add_filename <- opt$extra
 meta.path <- opt$metadata.file
 cell_column <- opt$cell_type_column
 
-stroma.obj <- readRDS('/diskmnt/Projects/Users/chouw/pancan_CAF/RDS/stroma_merged_v1_RPCAChemistryIntegration_commonCellTypeOnly.rds')
+stroma.obj <- readRDS('/diskmnt/Projects/snATAC_analysis/stroma/obj/v8.0/allRNA/cleaned_up_seurat5/stroma_merged_v1_RPCAChemistryIntegration_commonCellTypeOnly_seurat4.rds')
 
 dir.create(out_path, showWarnings = F, recursive = T)
 setwd(out_path)
