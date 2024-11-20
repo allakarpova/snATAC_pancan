@@ -123,7 +123,7 @@ all.rna@meta.data$to_remove <- grepl('oublet', as.character(unlist(all.rna[[cell
 DefaultAssay(all.rna) <- 'RNA'
 
 all.rna <- all.rna %>%  DietSeurat(assay = 'RNA', counts = TRUE, data = TRUE)
-
+all.rna <- subset(x = all.rna, subset = to_remove, invert = TRUE)
 dim(all.rna)
 
 
