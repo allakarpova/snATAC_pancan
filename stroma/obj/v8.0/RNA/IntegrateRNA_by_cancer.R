@@ -163,7 +163,7 @@ print(table(all.rna$Batches))
 unique(all.rna$Cancer) %>% walk(function(can) {
   all.rna.can <- subset(all.rna, Cancer==can)
   cat ('Run SCT on batches\n')
-  all.rna.list <- SplitObject(all.rna, split.by = 'Batches')
+  all.rna.list <- SplitObject(all.rna.can, split.by = 'Batches')
   
   batches <- names(all.rna.list)
   multiome.batches.n <- which(grepl('Multiome', batches))
