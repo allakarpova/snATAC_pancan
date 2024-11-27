@@ -161,6 +161,7 @@ if(opt$int_batch=='weird.gbm') {
 print(table(all.rna$Batches))
 
 unique(all.rna$Cancer) %>% walk(function(can) {
+  print(can)
   all.rna.can <- subset(all.rna, Cancer==can)
   cat ('Run SCT on batches\n')
   all.rna.list <- SplitObject(all.rna.can, split.by = 'Batches')
