@@ -52,38 +52,42 @@ head(xenium.tb)
 
 
 pwalk(unname(as.list(xenium.tb)), function( sample,cancer,pathf) {
-  print(sample)
-  obj <- readRDS(pathf)
-  all.celltypes <- fread(glue::glue('/diskmnt/Projects/snATAC_analysis/immune/validation/xenium/{cancer}/{sample}/All_cells_cell_type_v1.tsv'), data.table=F, header = T) %>%
-    column_to_rownames('V1') %>%
-    mutate(cell_type = case_when(cell_type=='Myoepitelial/Normal ducts' ~ 'Myoepitelial_Normal ducts',
-                                 TRUE ~ cell_type))
-  obj <- AddMetaData(obj, all.celltypes)
-  DefaultAssay(obj) <- 'Xenium'
-  obj <- NormalizeData(obj, assay = 'Xenium')
-  obj <- FindVariableFeatures(obj)
-  VariableFeatures(obj) <- VariableFeatures(obj)[!grepl(":|-WT", VariableFeatures(obj))]
-  obj <- ScaleData(obj)
-  
-  #For most modern high resolution technologies like Xenium, Visium HD, StereoSeq, MERFISH, 
-  #STARmap PLUS, SeqFISH+, SlideSeq v2, and CosMx (and others), we recommend the usual defults for lambda: 
-  #For cell typing, use lambda = 0.2 (as shown below, or in this vignette) and for domain segmentation, use lambda = 0.8. 
-  
-  obj <- RunBanksy(obj, lambda = lambda.f, verbose=TRUE, 
-                   assay = 'Xenium', slot = 'data', features = 'variable',
-                   k_geom = k_geom.f)
-  
-  obj <- RunPCA(obj, assay = 'BANKSY', features = rownames(obj), npcs = 30)
-  #obj <- RunUMAP(obj, dims = 1:30)
-  obj <- FindNeighbors(obj, dims = 1:30)
-  obj <- FindClusters(obj, resolution = 0.5)
-  
-  obj <- FindClusters(obj, resolution = 0.1)
-  
-  obj <- FindClusters(obj, resolution = 0.2)
-  
-  niche.tb <- obj@meta.data %>% 
-    select(starts_with('BANKSY'))
-  
-  fwrite(niche.tb, glue::glue('{sample}_Niches_banksy_lambda{lambda.f}_k_geom{k_geom.f}_res_0.1_0.2_0.5.tsv'), sep='\t', col.names = T, row.names = T)
+  if(!file.exists(glue::glue('{sample}_Niches_banksy_lambda{lambda.f}_k_geom{k_geom.f}_res_0.1_0.2_0.5.tsv'))) {
+    print(sample)
+    obj <- readRDS(pathf)
+    all.celltypes <- fread(glue::glue('/diskmnt/Projects/snATAC_analysis/immune/validation/xenium/{cancer}/{sample}/All_cells_cell_type_v1.tsv'), data.table=F, header = T) %>%
+      column_to_rownames('V1') %>%
+      mutate(cell_type = case_when(cell_type=='Myoepitelial/Normal ducts' ~ 'Myoepitelial_Normal ducts',
+                                   TRUE ~ cell_type))
+    obj <- AddMetaData(obj, all.celltypes)
+    DefaultAssay(obj) <- 'Xenium'
+    obj <- NormalizeData(obj, assay = 'Xenium')
+    obj <- FindVariableFeatures(obj)
+    VariableFeatures(obj) <- VariableFeatures(obj)[!grepl(":|-WT", VariableFeatures(obj))]
+    obj <- ScaleData(obj)
+    
+    #For most modern high resolution technologies like Xenium, Visium HD, StereoSeq, MERFISH, 
+    #STARmap PLUS, SeqFISH+, SlideSeq v2, and CosMx (and others), we recommend the usual defults for lambda: 
+    #For cell typing, use lambda = 0.2 (as shown below, or in this vignette) and for domain segmentation, use lambda = 0.8. 
+    
+    obj <- RunBanksy(obj, lambda = lambda.f, verbose=TRUE, 
+                     assay = 'Xenium', slot = 'data', features = 'variable',
+                     k_geom = k_geom.f)
+    
+    obj <- RunPCA(obj, assay = 'BANKSY', features = rownames(obj), npcs = 30)
+    #obj <- RunUMAP(obj, dims = 1:30)
+    obj <- FindNeighbors(obj, dims = 1:30)
+    obj <- FindClusters(obj, resolution = 0.5)
+    
+    obj <- FindClusters(obj, resolution = 0.1)
+    
+    obj <- FindClusters(obj, resolution = 0.2)
+    
+    niche.tb <- obj@meta.data %>% 
+      select(starts_with('BANKSY'))
+    
+    fwrite(niche.tb, glue::glue('{sample}_Niches_banksy_lambda{lambda.f}_k_geom{k_geom.f}_res_0.1_0.2_0.5.tsv'), sep='\t', col.names = T, row.names = T)
+    rm(obj)
+    gc()
+  }
 })
