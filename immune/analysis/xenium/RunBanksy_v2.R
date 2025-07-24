@@ -12,6 +12,7 @@ suppressMessages(library(data.table))
 library(cowplot)
 library(optparse)
 library(googlesheets4)
+options(future.globals.maxSize = 100 * 1024 ^ 3)
 
 filter <- dplyr::filter
 select <- dplyr::select
