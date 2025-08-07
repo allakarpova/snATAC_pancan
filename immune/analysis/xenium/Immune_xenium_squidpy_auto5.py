@@ -265,7 +265,7 @@ def main():
             dpi = 100,
     #         save = "spatial_plot.pdf",
             wspace=0.4)
-        plt.savefig("spatial_plot.pdf")
+        plt.savefig("spatial_plot.pdf",facecolor="black", transparent=False)
     plt.show()
 
 
