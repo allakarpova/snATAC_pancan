@@ -354,7 +354,7 @@ def main():
                     dpi = 100,
             #         save = "spatial_plot.pdf",
                     wspace=0.4)
-                plt.savefig(Type+"_spatial_plot.pdf")
+                plt.savefig(Type+"_spatial_plot.pdf",facecolor="black", transparent=False)
 
         except ValueError as error:
             print(error)
