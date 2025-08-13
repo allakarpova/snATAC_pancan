@@ -322,8 +322,8 @@ def main():
     ## Plot co-occurence probability
 
     # for Type in ["Macrophages","T or NK","ccRCC cancer cell","B or Plasma cells", "Endothelial"]:
-    for Type in [el for el in celltypes if el.find("Macrophages") != -1]:
-        
+    #for Type in [el for el in celltypes if el.find("Macrophages") != -1]:
+    for Type in celltypes:    
         try:
             sq.pl.co_occurrence(
                 adata_mine,
