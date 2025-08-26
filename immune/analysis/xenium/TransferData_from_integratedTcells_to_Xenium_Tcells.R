@@ -94,7 +94,7 @@ walk2(sample.table$V1, sample.table$V2, function(sample, query.path){
     reference = ref.obj,
     refdata = list(
       celltype.l1 = cell_column)
-  )n
+  )
   
   DimPlot(query.obj, group.by = "predicted.celltype.l1", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
   ggsave(glue::glue('Dimplot_predicted.celltype.l1_{sample}.pdf'), width = 7, height = 5)
