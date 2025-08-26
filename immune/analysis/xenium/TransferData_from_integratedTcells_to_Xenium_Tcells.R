@@ -28,11 +28,6 @@ option_list = list(
               default="./", 
               help="output folder path",
               metavar="character"),
-  make_option(c("-e", "--extra"),
-              type="character",
-              default="./", 
-              help="add unique string identifier for your data",
-              metavar="character"),
   make_option(c("-t", "--meta"),
               type="character",
               default="./", 
@@ -52,7 +47,6 @@ opt = parse_args(opt_parser)
 samples.tb.path <- opt$input.samples
 ref.path <- opt$input.reference
 out_path <- opt$output
-add_filename <- opt$extra
 meta.path <- opt$meta
 cell_column <- opt$cell.column
 
@@ -100,7 +94,7 @@ walk2(sample.table$V1, sample.table$V2, function(sample, query.path){
     reference = ref.obj,
     refdata = list(
       celltype.l1 = cell_column)
-  )
+  )n
   
   DimPlot(query.obj, group.by = "predicted.celltype.l1", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
   ggsave(glue::glue('Dimplot_predicted.celltype.l1_{sample}.pdf'), width = 7, height = 5)
