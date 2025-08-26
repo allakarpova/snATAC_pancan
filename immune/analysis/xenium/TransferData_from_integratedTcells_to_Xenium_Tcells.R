@@ -99,21 +99,14 @@ walk2(sample.table$V1, sample.table$V2, function(sample, query.path){
     query = query.obj,
     reference = ref.obj,
     refdata = list(
-      celltype.l0 = 'cell_type_broad',
       celltype.l1 = cell_column)
-    
   )
-  
   
   DimPlot(query.obj, group.by = "predicted.celltype.l1", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
   ggsave(glue::glue('Dimplot_predicted.celltype.l1_{sample}.pdf'), width = 7, height = 5)
   
-  DimPlot(query.obj, group.by = "predicted.celltype.l0", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
-  ggsave(glue::glue('Dimplot_predicted.celltype.l0_{sample}.pdf'), width = 7, height = 5)
-  
   #saveRDS(query.obj, glue::glue('Mapped_object_{sample}.rds'))
   query.obj@meta.data %>% 
-    dplyr::rename(cell_type_predicted = predicted.celltype.l1,
-                  cell_type_broad_predicted = predicted.celltype.l0) %>% 
-    fwrite( glue::glue('{sample}_processed_Xenium_cellTyped.meta.data'), sep = '\t', row.names = T)
+    dplyr::rename(cell_type_predicted = predicted.celltype.l1) %>% 
+    fwrite( glue::glue('{sample}_processed_T.cell.predicted.tsv'), sep = '\t', row.names = T)
 })
