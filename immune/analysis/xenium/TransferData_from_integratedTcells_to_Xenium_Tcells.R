@@ -57,7 +57,7 @@ meta <- fread(meta.path, header = TRUE) %>%
 
 
 meta <- meta %>%    
-  select(all_of(cell_column), cell_type_broad)
+  select(all_of(cell_column))
 
 print (head(meta))
 ref.obj <- AddMetaData(ref.obj, meta)
