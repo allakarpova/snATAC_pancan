@@ -45,7 +45,12 @@ option_list = list(
   make_option(c("--metadata"),
               type="character",
               default=NULL, 
-              help="path to metadata")
+              help="path to metadata"),
+  make_option(c("-c", "--cell.column"),
+              type="character",
+              default="cell_type_sen", 
+              help="column with cell type to transfer",
+              metavar="character")
   
 );
 
@@ -57,6 +62,7 @@ input.path <- opt$input.object
 out_path <- opt$output
 add_filename <- opt$extra
 meta.path <- opt$metadata
+cell_column <- opt$cell.column
 
 dir.create(out_path, showWarnings = F)
 setwd(out_path)
