@@ -59,6 +59,17 @@ renormalize <- function(obj.sub, num_pcs=30) {
   return(obj.sub)
 }
 
+renormalize.again <- function(obj.sub, num_pcs=30) {
+  obj.sub <- SCTransform(obj.sub, vars.to.regress = names(regress.me),
+                         assay = "Xenium", return.only.var.genes = T, vst.flavor="v2")
+  obj.sub <- RunPCA(obj.sub, npcs = num_pcs)
+  obj.sub <- RunUMAP(obj.sub, dims = 1:num_pcs, reduction.name = 'UMAPregress', reduction.key = 'umapregress')
+  obj.sub <- FindNeighbors(obj.sub, reduction = "pca", dims = 1:num_pcs)
+  obj.sub <- FindClusters(obj.sub, resolution = 0.4)
+  return(obj.sub)
+}
+
+
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser)
 ###################################
@@ -90,10 +101,32 @@ panc.sub <- subset(x = panc.my,
                   )
                   )
 )
-
 panc.sub <- renormalize(panc.sub)
 
+sign.genes <- fread('/diskmnt/Projects/snATAC_analysis/immune/validation/xenium/DEGs/HNSCC_top20_signature_genes_per_cell_type.tsv', header = T) 
+sign.genes.list <- split(x = sign.genes$gene, f = sign.genes$cluster)
+sign.genes.list[c('Cancer cells', 'Fibroblasts', 'Endothelial cells', 'Macrophages', 'Pericytes', 'B-cells', 'Plasma', 'Skeletal muscle')]
+
+
+regress.me <- sign.genes.list[c('Cancer cells', 'Fibroblasts', 'Endothelial cells', 'Macrophages', 'Pericytes', 'B-cells', 'Plasma', 'Skeletal muscle')]
+names(regress.me) <- make.names(names(regress.me))
+nct <- length(regress.me)
+
+panc.sub <- AddModuleScore(panc.sub, features = regress.me)
+colnames(panc.sub@meta.data)[(ncol(panc.sub@meta.data)-nct+1):ncol(panc.sub@meta.data)] <- names(regress.me)
+
+
+panc.sub <- renormalize.again(panc.sub)
+
 saveRDS(panc.sub,  paste0(add_filename,"_",make.names(ct), ".rds"))
+
+
+FeaturePlot(panc.sub, features = names(regress.me), reduction = 'umap.30PC', order = TRUE) 
+ggsave('Old_UMAP_featureplot.pdf', width = 12, height = 12)
+FeaturePlot(panc.sub, features = names(regress.me), reduction = 'UMAPregress', order = TRUE)
+ggsave('UMAP_regress_featureplot.pdf', width = 12, height = 12)
+
+
 
 
 
