@@ -67,7 +67,7 @@ setwd(out_path)
 
 cat('opening object \n')
 obj <- readRDS(input.path)
-obj@images[[1]] <- NULL
+
 
 library(future)
 plan("multicore", workers = 4)
