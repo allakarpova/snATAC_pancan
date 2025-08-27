@@ -4,7 +4,7 @@
 
 
 suppressMessages(library(Seurat))
-suppressMessages(library(cellchat))
+suppressMessages(library(CellChat))
 suppressMessages(library(ggplot2))
 suppressMessages(library(RColorBrewer))
 
