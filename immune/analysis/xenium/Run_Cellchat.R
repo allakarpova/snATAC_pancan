@@ -66,8 +66,8 @@ dir.create(out_path, showWarnings = F)
 setwd(out_path)
 
 cat('opening object \n')
-panc <- readRDS(input.path)
-panc@images[[1]] <- NULL
+obj <- readRDS(input.path)
+obj@images[[1]] <- NULL
 
 library(future)
 plan("multicore", workers = 4)
@@ -80,7 +80,7 @@ meta <- meta %>%
   select(all_of(cell_column))
 
 print (head(meta))
-panc <- AddMetaData(panc, meta)
+obj <- AddMetaData(obj, meta)
   
 ct_col  <- cell_column
 species <- "human"            # or "mouse"
