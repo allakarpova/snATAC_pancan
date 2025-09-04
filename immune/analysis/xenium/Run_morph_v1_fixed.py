@@ -49,10 +49,10 @@ def main():
     G = set(args.genes)
 
     print("structuring size: " + S)
-    print("Genes: " G)
-    print("tau: " args.tau)
-    print("lambda: " args.lambda_)
-    print("tile size: " args.d)
+    print("Genes: " +G)
+    print("tau: " +args.tau)
+    print("lambda: " +args.lambda_)
+    print("tile size: " +args.d)
     
     data = Morph.readers.transcripts(transcripts_path)
 
