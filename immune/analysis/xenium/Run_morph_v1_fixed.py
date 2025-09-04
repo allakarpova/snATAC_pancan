@@ -41,6 +41,8 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     transcripts_path = os.path.join(in_dir, "/transcripts.csv.gz")
+    print(in_dir)
+    print(transcripts_path)
     cells_path = os.path.join(in_dir, "/cells.csv.gz")
     polygon_path = args.polygon
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
