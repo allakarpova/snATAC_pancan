@@ -48,12 +48,12 @@ def main():
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
     G = set(args.genes)
 
-    print("structuring size: " + S)
-    print("Genes: " +G)
-    print("tau: " +args.tau)
-    print("lambda: " +args.lambda_)
-    print("tile size: " +args.d)
-    
+    print("structuring size: ", S)
+    print("Genes: ",G)
+    print("tau: " ,args.tau)
+    print("lambda: " ,args.lambda_)
+    print("tile size: " , args.d)
+
     data = Morph.readers.transcripts(transcripts_path)
 
     if polygon_path:
