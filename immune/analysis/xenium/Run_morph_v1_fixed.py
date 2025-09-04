@@ -69,21 +69,21 @@ def main():
 
     from matplotlib import cm
     plt.imshow(image.T, cmap=cm.magma_r)
-    plt.savefig(os.path.join(out_dir,"/output.png"), dpi=300, bbox_inches="tight")
+    plt.savefig(os.path.join(out_dir,"output.png"), dpi=300, bbox_inches="tight")
     plt.close()
 
     cells = Morph.readers.cells(cells_path)
     mapper = Morph.modules.Mapper()
     cells = mapper.xenium(cells, args.d)
-    cells_out = os.path.join(out_dir, '/output.csv')
+    cells_out = os.path.join(out_dir, 'output.csv')
     Morph.writers.xenium(cells_out, image, cells)
 
     layer = Morph.features.Layer()
     layers = layer.minimum(image) # or layer.maximum(image)
     layersmax = layer.maximum(image)
 
-    layers_min_out = os.path.join(out_dir, '/output_layer_min.csv')
-    layers_max_out = os.path.join(out_dir, '/output_layer_max.csv')
+    layers_min_out = os.path.join(out_dir, 'output_layer_min.csv')
+    layers_max_out = os.path.join(out_dir, 'output_layer_max.csv')
 
     Morph.writers.xenium(layers_min_out, layers, cells)
     Morph.writers.xenium(layers_max_out, layersmax, cells)
@@ -92,8 +92,8 @@ def main():
     distances = distance.minimum(image) # or distance.maximum(image)
     distancesmax = distance.maximum(image)
 
-    dist_min_out = os.path.join(out_dir, '/output_distances_min.csv')
-    dist_max_out = os.path.join(out_dir, '/output_distances_max.csv')
+    dist_min_out = os.path.join(out_dir, 'output_distances_min.csv')
+    dist_max_out = os.path.join(out_dir, 'output_distances_max.csv')
 
     Morph.writers.xenium(dist_min_out, distances, cells)
     Morph.writers.xenium(dist_max_out, distancesmax, cells)
