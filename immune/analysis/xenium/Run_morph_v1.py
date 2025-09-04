@@ -47,14 +47,14 @@ def main():
 
     if polygon_path:
 	    with open(polygon_path, 'r') as f:
-	    i=0
-	    c=[]
-	    reader = csv.reader(f)
-	    for line in reader:
-	        i += 1
-	        if i<4:
-	            continue
-	        c.append((int(float(line[0])), int(float(line[1]))))
+		    i=0
+		    c=[]
+		    reader = csv.reader(f)
+		    for line in reader:
+		        i += 1
+		        if i<4:
+		            continue
+		        c.append((int(float(line[0])), int(float(line[1]))))
         
         
 		c = numpy.array(c)        
