@@ -56,25 +56,29 @@ def main():
 		            continue
 		        c.append((int(float(line[0])), int(float(line[1]))))
 		        c = numpy.array(c)  
-		              
-		image = Morph.backbone(data, 
+
+		image = Morph.backbone(
+			data, 
 			['xenium', args.d], 
 			['total', G], 
 			[['maximum'], 
 	    	['closing', args.S], 
 	    	['binary', args.tau], 
 	    	['area_opening', args.lambda_], 
-	    	['blob', args.S])
+	    	['blob', args.S]
+    	)
     
     else:
-	    image = Morph.backbone(data, 
+	    image = Morph.backbone(
+	    	data, 
 	    	['xenium', args.d], 
 	    	['total', G], 
 	    	['maximum'], 
 	    	['closing', args.S], 
 	    	['binary', args.tau], 
 	    	['area_opening', args.lambda_], 
-	    	['blob', args.S])
+	    	['blob', args.S]
+    	)
 
 
     from matplotlib import cm
