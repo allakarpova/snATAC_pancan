@@ -46,7 +46,7 @@ def main():
     cells_path = os.path.join(in_dir, "cells.csv.gz")
     polygon_path = args.polygon
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
-    G = args.genes
+    G = set(args.genes)
 
     print("structuring size: ", S)
     print("Genes: ",G)
