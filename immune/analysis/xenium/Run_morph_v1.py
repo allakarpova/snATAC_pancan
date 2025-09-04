@@ -54,8 +54,8 @@ def main():
 		        i += 1
 		        if i<4:
 		            continue
-		    	c.append((int(float(line[0])), int(float(line[1]))))
-		        c = numpy.array(c)
+				c.append((int(float(line[0])), int(float(line[1]))))
+		c = numpy.array(c)
         image = Morph.backbone(data, ['xenium', args.d], ['total', G], ['maximum'], ['custom', crop, c, S, args.d],['binary', args.tau], ['area_opening', args.lambda_], ['blob', S])
     
     else:
