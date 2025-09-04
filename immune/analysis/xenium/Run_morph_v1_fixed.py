@@ -40,10 +40,10 @@ def main():
     out_dir = os.path.abspath(args.output)
     os.makedirs(out_dir, exist_ok=True)
 
-    transcripts_path = os.path.join(in_dir, "/transcripts.csv.gz")
+    transcripts_path = os.path.join(in_dir, "transcripts.csv.gz")
     print(in_dir)
     print(transcripts_path)
-    cells_path = os.path.join(in_dir, "/cells.csv.gz")
+    cells_path = os.path.join(in_dir, "cells.csv.gz")
     polygon_path = args.polygon
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
     G = set(args.genes)
