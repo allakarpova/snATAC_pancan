@@ -23,7 +23,7 @@ def main():
     parser.add_argument(\"--d\", type=int, default=10, help=\"Tile size / neighborhood parameter (default: 10)\")
     parser.add_argument(\"--genes\", nargs=\"*\", default=[\"KRT14\",\"KRT5\",\"GPRC5A\",\"PI3\",\"SERPINB2\"],
                         help=\"Gene set G used by the pipeline (default from notebook)\")
-    parser.add_argument(\"--S\", type=int, default=3,
+    parser.add_argument(\"--structuring_size\", type=int, default=3,
                         help=\"Size for structuring element S as np.ones((n,n)) (default: 3)\" )
     parser.add_argument(\"--tau\", type=int, default=10, help=\"Number of gene transcripts per tile threshold (default: 10)\" )
     parser.add_argument(\"--lambda_\", dest=\"lambda_\", type=int, default=40,
@@ -42,7 +42,9 @@ def main():
     transcripts_path = os.path.join(in_dir, "/transcripts.csv.gz")
     cells_path = os.path.join(in_dir, "/cells.csv.gz")
     polygon_path = args.polygon
-
+    S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
+    G = set(args.genes)
+    
     if polygon_path:
 	    with open(polygon_path, 'r') as f:
 	    i=0
@@ -58,7 +60,7 @@ def main():
 		c = numpy.array(c)        
 		image = Morph.backbone(data, 
 			['xenium', args.d], 
-			['total', args.genes], 
+			['total', G], 
 			[['maximum'], 
 	    	['closing', args.S], 
 	    	['binary', args.tau], 
@@ -68,7 +70,7 @@ def main():
     else:
 	    image = Morph.backbone(data, 
 	    	['xenium', args.d], 
-	    	['total', args.genes], 
+	    	['total', G], 
 	    	['maximum'], 
 	    	['closing', args.S], 
 	    	['binary', args.tau], 
