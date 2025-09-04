@@ -15,23 +15,23 @@ def crop(image, coord, S, d):
 
 def main():
 
-    parser = argparse.ArgumentParser(description=\"Run Morph pipeline on Xenium data.\" )
-    parser.add_argument(\"--input\", required=True, help=\"Input folder containing transcripts.csv(.gz) and cells.csv(.gz)\")
-    parser.add_argument(\"--output\", required=True, help=\"Output folder to write CSVs (will be created if missing)\" )
+    parser = argparse.ArgumentParser(description="Run Morph pipeline on Xenium data." )
+    parser.add_argument("--input", required=True, help="Input folder containing transcripts.csv(.gz) and cells.csv(.gz)")
+    parser.add_argument("--output", required=True, help="Output folder to write CSVs (will be created if missing)" )
 
     # Parameters from the #parameters cell in the notebook
-    parser.add_argument(\"--d\", type=int, default=10, help=\"Tile size / neighborhood parameter (default: 10)\")
-    parser.add_argument(\"--genes\", nargs=\"*\", default=[\"KRT14\",\"KRT5\",\"GPRC5A\",\"PI3\",\"SERPINB2\"],
-                        help=\"Gene set G used by the pipeline (default from notebook)\")
-    parser.add_argument(\"--structuring_size\", type=int, default=3,
-                        help=\"Size for structuring element S as np.ones((n,n)) (default: 3)\" )
-    parser.add_argument(\"--tau\", type=int, default=10, help=\"Number of gene transcripts per tile threshold (default: 10)\" )
-    parser.add_argument(\"--lambda_\", dest=\"lambda_\", type=int, default=40,
-                        help=\"Minimum region size for area_opening (default: 40)\" )
+    parser.add_argument("--d", type=int, default=10, help="Tile size / neighborhood parameter (default: 10)")
+    parser.add_argument("--genes", nargs="*", default=["KRT14","KRT5","GPRC5A","PI3","SERPINB2"],
+                        help="Gene set G used by the pipeline (default from notebook)")
+    parser.add_argument("--structuring_size", type=int, default=3,
+                        help="Size for structuring element S as np.ones((n,n)) (default: 3)" )
+    parser.add_argument("--tau", type=int, default=10, help="Number of gene transcripts per tile threshold (default: 10)" )
+    parser.add_argument("--lambda_", dest="lambda_", type=int, default=40,
+                        help="Minimum region size for area_opening (default: 40)" )
 
     # Optional polygon file
-    parser.add_argument(\"--polygon\", default=None,
-                        help=\"Optional CSV of polygon coordinates to restrict analysis region (e.g., *_tumor_coordinates.csv).\" )
+    parser.add_argument("--polygon", default=None,
+                        help="Optional CSV of polygon coordinates to restrict analysis region (e.g., *_tumor_coordinates.csv)." )
 
     args = parser.parse_args()
 
@@ -44,7 +44,7 @@ def main():
     polygon_path = args.polygon
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
     G = set(args.genes)
-    
+
     if polygon_path:
 	    with open(polygon_path, 'r') as f:
 	    i=0
@@ -108,10 +108,10 @@ def main():
 
     Morph.writers.xenium(dist_min_out, distances, cells)
 	Morph.writers.xenium(dist_max_out, distancesmax, cells)
-	print(\"[Done] All outputs written to:\", out_dir)
+	print("[Done] All outputs written to:", out_dir)
 
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     main()
 
 
