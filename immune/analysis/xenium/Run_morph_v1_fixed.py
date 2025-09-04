@@ -22,7 +22,7 @@ def main():
 
     # Parameters from the #parameters cell in the notebook
     parser.add_argument("--d", type=int, default=10, help="Tile size / neighborhood parameter (default: 10)")
-    parser.add_argument("--genes", nargs="*", default=["KRT14","KRT5","GPRC5A","PI3","SERPINB2"],
+    parser.add_argument("--genes", nargs="*", default={"KRT14","KRT5","GPRC5A","PI3","SERPINB2"},
                         help="Gene set G used by the pipeline (default from notebook)")
     parser.add_argument("--structuring_size", type=int, default=3,
                         help="Size for structuring element S as np.ones((n,n)) (default: 3)" )
@@ -46,7 +46,7 @@ def main():
     cells_path = os.path.join(in_dir, "cells.csv.gz")
     polygon_path = args.polygon
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
-    G = set(args.genes)
+    G = args.genes
 
     print("structuring size: ", S)
     print("Genes: ",G)
