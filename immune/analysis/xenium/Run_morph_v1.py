@@ -55,9 +55,8 @@ def main():
 		        if i<4:
 		            continue
 		        c.append((int(float(line[0])), int(float(line[1]))))
-		        c = numpy.array(c)  
-
-		image = Morph.backbone(
+		        c = numpy.array(c)
+        image = Morph.backbone(
 			data, 
 			['xenium', args.d], 
 			['total', G], 
