@@ -10,7 +10,7 @@ import Morph.features
 
 def crop(image, coord, S, d):
     mask = polygon2mask(image.shape, coord // d)
-    imagecrop = numpy.multiply(image, mask)
+    imagecrop = np.multiply(image, mask)
     return skimage.morphology.closing(imagecrop, S)
 
 
@@ -60,7 +60,7 @@ def main():
                 if i<4:
                     continue
                 c.append((int(float(line[0])), int(float(line[1]))))
-        c = numpy.array(c)
+        c = np.array(c)
         image = Morph.backbone(data, ['xenium', args.d], ['total', G], ['maximum'], ['custom', crop, c, S, args.d],['binary', args.tau], ['area_opening', args.lambda_], ['blob', S])
 
     else:
