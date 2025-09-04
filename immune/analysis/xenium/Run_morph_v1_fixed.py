@@ -46,6 +46,8 @@ def main():
     S = np.ones((args.structuring_size, args.structuring_size), dtype=np.uint8)
     G = set(args.genes)
 
+    data = Morph.readers.transcripts(transcripts_path)
+
     if polygon_path:
         with open(polygon_path, 'r') as f:
             i=0
