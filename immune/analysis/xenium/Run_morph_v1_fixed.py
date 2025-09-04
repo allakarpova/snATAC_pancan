@@ -1,4 +1,5 @@
-import Morph, numpy
+import Morph
+import numpy as np 
 from skimage.draw import polygon2mask
 import csv
 import skimage
