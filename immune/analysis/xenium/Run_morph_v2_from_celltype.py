@@ -89,7 +89,7 @@ def main():
     plt.savefig(os.path.join(out_dir,"output.png"), dpi=300, bbox_inches="tight")
     plt.close()
 
-    
+    cells = Morph.readers.cells(cells_path)
     mapper = Morph.modules.Mapper()
     cells = mapper.xenium(cells, args.d)
     cells_out = os.path.join(out_dir, 'output.csv')
