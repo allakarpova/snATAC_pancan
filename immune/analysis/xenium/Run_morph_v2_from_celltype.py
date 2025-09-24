@@ -83,6 +83,8 @@ def main():
     else:
         image = Morph.backbone(cells_celltypes, ['xenium', args.d], ['total', G], ['maximum'], ['closing', S], ['binary', args.tau], ['area_opening', args.lambda_], ['blob', S])
 
+    image_out = os.path.join(out_dir, 'image_2d_array.npy')
+    np.save(image_out, image)
 
     
     plt.imshow(image.T, cmap=cm.magma_r)
