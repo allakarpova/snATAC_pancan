@@ -64,6 +64,8 @@ def main():
     plt.close()
 
     cells = Morph.readers.cells(cells_path)
+    mapper = Morph.modules.Mapper()
+    cells = mapper.xenium(cells, 10)
     compute_layers_distance(image_inter, cells, out_dir, 'Endothelial_inside_cancer')
     compute_layers_distance(image_out, cells, out_dir, 'Endothelial_outside_cancer')
 
