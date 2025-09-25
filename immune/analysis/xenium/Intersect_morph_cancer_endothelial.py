@@ -53,12 +53,12 @@ def main():
     image_endo = np.load(in_endo)
     cells_path = os.path.join(in_dir, "cells.csv.gz")
 
-    image_inter = numpy.multiply(image_cancer>0, image_endo>0).astype(int)
+    image_inter = np.multiply(image_cancer>0, image_endo>0).astype(int)
     plt.imshow(image_inter.T, cmap=cm.magma_r)
     plt.savefig(os.path.join(out_dir,"output_endothelial_inside_cancer.png"), dpi=300, bbox_inches="tight")
     plt.close()
 
-    image_out = (image_endo>0).astype(int) - numpy.multiply(image>0, image_endo>0).astype(int)
+    image_out = (image_endo>0).astype(int) - np.multiply(image>0, image_endo>0).astype(int)
     plt.imshow(image_out.T, cmap=cm.magma_r)
     plt.savefig(os.path.join(out_dir,"output_endothelial_outside_cancer.png"), dpi=300, bbox_inches="tight")
     plt.close()
