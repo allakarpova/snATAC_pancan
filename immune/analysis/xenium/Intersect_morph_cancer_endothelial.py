@@ -11,7 +11,7 @@ import os
 import Morph.features
 
 
-def compute_layers_distance(image, cells, nameme):
+def compute_layers_distance(image, cells, out_dir, nameme):
     layer = Morph.features.Layer()
     layers = layer.minimum(image) 
     layersmax = layer.maximum(image)
@@ -64,8 +64,8 @@ def main():
     plt.close()
 
     cells = Morph.readers.cells(cells_path)
-    compute_layers_distance(image_inter, cells, 'Endothelial_inside_cancer')
-    compute_layers_distance(image_out, cells, 'Endothelial_outside_cancer')
+    compute_layers_distance(image_inter, cells, out_dir, 'Endothelial_inside_cancer')
+    compute_layers_distance(image_out, cells, out_dir, 'Endothelial_outside_cancer')
 
     print("[Done] All outputs written to:", out_dir)
 
