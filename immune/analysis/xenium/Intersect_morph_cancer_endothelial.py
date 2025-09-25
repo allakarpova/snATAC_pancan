@@ -12,7 +12,7 @@ import Morph.features
 
 
 def compute_layers_distance(image, cells, nameme):
-	layer = Morph.features.Layer()
+    layer = Morph.features.Layer()
     layers = layer.minimum(image) 
     layersmax = layer.maximum(image)
 
