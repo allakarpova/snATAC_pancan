@@ -66,6 +66,12 @@ def main():
     cells = Morph.readers.cells(cells_path)
     mapper = Morph.modules.Mapper()
     cells = mapper.xenium(cells, 10)
+
+    cells_out = os.path.join(out_dir, 'output_endothelial_outside_cancer.csv')
+    Morph.writers.xenium(cells_out, image_out, cells)
+    cells_in = os.path.join(out_dir, 'output_endothelial_inside_cancer.csv')
+    Morph.writers.xenium(cells_in, image_inter, cells)    
+    
     compute_layers_distance(image_inter, cells, out_dir, 'Endothelial_inside_cancer')
     compute_layers_distance(image_out, cells, out_dir, 'Endothelial_outside_cancer')
 
