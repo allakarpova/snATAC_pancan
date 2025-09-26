@@ -171,7 +171,7 @@ def main():
             ],
             figsize = (12,8),
             size = 0.2,
-            dpi = 100,
+            dpi = 200,
     #         save = "spatial_plot.pdf",
             wspace=0.4)
         plt.savefig("spatial_plot.pdf",facecolor="black", transparent=False)
