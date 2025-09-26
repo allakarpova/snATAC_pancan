@@ -161,10 +161,11 @@ def main():
 
 
     with plt.style.context('dark_background'):
-        sq.pl.spatial_scatter(
+        sq.pl.spatial_scatter( 
             adata_mine,
             library_id="spatial",
             shape=None,
+            pallete = 'tab20',
             color=[
                 "celltype_final",
             ],
