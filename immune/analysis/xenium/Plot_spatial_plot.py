@@ -165,7 +165,7 @@ def main():
             adata_mine,
             library_id="spatial",
             shape=None,
-            pallete = 'tab20',
+            palette = 'tab20',
             color=[
                 "celltype_final",
             ],
