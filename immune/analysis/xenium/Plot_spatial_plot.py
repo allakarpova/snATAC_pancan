@@ -170,7 +170,7 @@ def main():
                 "celltype_final",
             ],
             figsize = (12,8),
-            size = 1,
+            size = 0.2,
             dpi = 100,
     #         save = "spatial_plot.pdf",
             wspace=0.4)
