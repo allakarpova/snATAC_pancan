@@ -159,13 +159,78 @@ def main():
         "savefig.facecolor": (0.0, 0.0, 1.0, 0),  # blue  with alpha = 20%
     })
 
+    celltype_colors = {
+        "Cancer cells": "#B11226",
+        "Cancer cells DCIS": "#D1495B",
+        "CCL28 Cancer cells": "#8C1D18",
+        "Plasma cancer cells": "#E07A8C",
+        "Pre-cancer cells PanIN": "#C44536",
+        "Necrosis": "#5A1A1A",
+        "Necrotic": "#3D0F0F",
 
+        "T-cells": "#1F77B4",
+        "NK cells": "#2C7FB8",
+        "B-cells": "#6BAED6",
+        "Plasma": "#9ECAE1",
+        "Langerhans cells": "#4A90E2",
+        "pDC": "#5DA5DA",
+
+        "Macrophages": "#2CA02C",
+        "Myeloid": "#31A354",
+        "mregDC": "#74C476",
+        "DC": "#41AB5D",
+        "Granulocytes": "#66C2A4",
+        "Neutrophil": "#006D2C",
+        "Neutrophils": "#006D2C",
+        "Myeloid or Neutrophil": "#99D8C9",
+        "GMP": "#A1D99B",
+        "Mast": "#78C679",
+        "Erythroid": "#FB6A4A",
+        "Megakaryocytes": "#CB181D",
+
+        "Endothelial cells": "#17BECF",
+        "Lymphatic endothelial cells": "#9EDAE5",
+        "LSECs": "#6BAED6",
+        "Pericytes": "#8DD3C7",
+        "vSMCs": "#4EB3D3",
+        "Smooth muscle": "#3690C0",
+
+        "Fibroblasts": "#8C6D31",
+        "MSCs": "#B5A642",
+        "Adipocytes": "#D9BF77",
+        "Skeletal muscle": "#A6761D",
+        "Osteoblasts": "#C49C94",
+        "Dermal layer": "#B15928",
+
+        "Normal epithelial": "#9467BD",
+        "Myoepithelial and Normal ducts": "#7B6FD6",
+        "Epithelial collecting duct": "#8E63CE",
+        "Cholangiocytes": "#A55194",
+        "Goblet cells": "#CE6DBD",
+        "Intestinal epithelium": "#DD1C77",
+        "Islets": "#E377C2",
+        "Normal pancreas": "#F781BF",
+        "Keratinocytes": "#FF7F0E",
+        "Basal keratinocytes": "#F28E2B",
+        "Squamous cells": "#E15759",
+        "Hepatocytes": "#BCBD22",
+
+        "Neurons": "#EDC948",
+        "Glial": "#F1CE63",
+        "Astrocytes": "#EFC94C",
+        "Oligodendrocytes": "#FFD92F",
+        "OPC": "#FFED6F",
+
+        "Immune": "#BDBDBD",
+        "Unknown": "#969696",
+        "Low quality": "#737373"
+    }
     with plt.style.context('dark_background'):
         sq.pl.spatial_scatter( 
             adata_mine,
             library_id="spatial",
             shape=None,
-            palette = 'Paired',
+            palette = celltype_colors,
             color=[
                 "celltype_final",
             ],
