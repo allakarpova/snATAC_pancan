@@ -30,6 +30,7 @@ import warnings
 import sys
 import shutil
 import pickle
+from matplotlib.colors import ListedColormap
 
 ###
 
@@ -225,12 +226,17 @@ def main():
         "Unknown": "#969696",
         "Low quality": "#737373"
     }
+    celltypes = adata_mine.obs["celltype_final"].cat.categories
+    colors = [celltype_colors[ct] for ct in celltypes]
+
+    cmap = ListedColormap(colors)
+
     with plt.style.context('dark_background'):
         sq.pl.spatial_scatter( 
             adata_mine,
             library_id="spatial",
             shape=None,
-            palette = celltype_colors,
+            palette = cmap,
             color=[
                 "celltype_final",
             ],
