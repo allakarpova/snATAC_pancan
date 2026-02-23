@@ -77,13 +77,14 @@ options(Seurat.object.assay.version = "v3")
 if (!file.exists(paste0(length(samples.id),"_Merged_not_normalized_",add_filename,".rds"))) {
   cat('creating object \n')
   paths <- samples$`Object path`
-  paths
+  meta.paths <- samples$`Cell type path`
   
   missing_paths <- paths[!file.exists(paths)]
+  missing_paths2 <- meta.paths[!file.exists(meta.paths)]
   
-  if (length(missing_paths) > 0) {
+  if (length(c(missing_paths, missing_paths2)) > 0) {
     message("These paths do not exist:")
-    print(missing_paths)
+    print(c(missing_paths,missing_paths2))
   } else {
     message("All paths exist ✅")
   }
