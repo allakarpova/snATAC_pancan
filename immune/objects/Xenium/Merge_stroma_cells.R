@@ -79,6 +79,8 @@ if (!file.exists(paste0(length(samples.id),"_Merged_not_normalized_",add_filenam
   paths <- samples$`Object path`
   meta.paths <- samples$`Cell type path`
   
+  print(paths)
+  print(meta.paths)
   missing_paths <- paths[!file.exists(paths)]
   missing_paths2 <- meta.paths[!file.exists(meta.paths)]
   
