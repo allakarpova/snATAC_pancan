@@ -93,6 +93,8 @@ if (!file.exists(paste0(length(samples.id),"_Merged_not_normalized_",add_filenam
                   v=samples$Panel, .combine=c) %dopar% {
                     print(s)
                     obj=readRDS(p) 
+                    obj@images[[1]] <- NULL
+                    obj@images[[1]] <- NULL
                     print(paste('opened', s))
                     meta.df <- fread(meta, header = T) %>% column_to_rownames('cell_id')
                     
