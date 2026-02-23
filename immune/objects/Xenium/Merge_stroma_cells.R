@@ -86,7 +86,6 @@ if (!file.exists(paste0(length(samples.id),"_Merged_not_normalized_",add_filenam
   obj <- foreach (s=samples.id, 
                   p = paths, 
                   pid = samples$Case, 
-                  dt = samples$`Data type`, 
                   c = samples$Cancer, 
                   subtype = samples$Subtype, 
                   meta = samples$`Cell type path`,
