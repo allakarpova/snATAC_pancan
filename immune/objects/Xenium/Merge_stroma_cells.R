@@ -61,14 +61,14 @@ samples <- read_sheet("https://docs.google.com/spreadsheets/d/1-YafCxG0eDfLF0vNI
                       sheet = "Xenium T-cells", trim_ws = T)
 
 samples <- samples %>% dplyr::filter(`Can_use` == 'Yes')
-print(samples)
+
 
 if(ver=='5K') {
   samples <- samples %>% dplyr::filter(`5k`)
 } else {
   samples <- samples %>% dplyr::filter(!`5k`)
 }
-
+print(samples)
 samples.id <- samples$Sample %>% as.character()
 
 cat (paste("Samples found:" ,length(samples.id), '\n'))
@@ -78,6 +78,15 @@ if (!file.exists(paste0(length(samples.id),"_Merged_not_normalized_",add_filenam
   cat('creating object \n')
   paths <- samples$`Object path`
   paths
+  
+  missing_paths <- paths[!file.exists(paths)]
+  
+  if (length(missing_paths) > 0) {
+    message("These paths do not exist:")
+    print(missing_paths)
+  } else {
+    message("All paths exist ✅")
+  }
   
   # make the list of objects
   registerDoParallel(cores=10)
