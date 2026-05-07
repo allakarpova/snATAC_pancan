@@ -137,6 +137,7 @@ combined <- combined %>%
   SCTransform(
     ncells = 20000,
     assay = 'Xenium',
+    conserve.memory=TRUE,
     return.only.var.genes = TRUE, 
     verbose = T) %>%
   RunPCA(assay = 'SCT', do.print = FALSE, verbose = T) %>%
