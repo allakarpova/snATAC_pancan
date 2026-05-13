@@ -142,7 +142,7 @@ combined <- combined %>%
     verbose = T) %>%
   RunPCA(assay = 'SCT', do.print = FALSE, verbose = T) %>%
   RunUMAP(dims = 1:30, verbose = T) 
-combined <- RunHarmony(combined, group.by.vars = 'Sample', reduction = 'pca') 
+combined <- RunHarmony(combined, group.by.vars = 'Sample') 
 
 combined <- combined %>%
   FindNeighbors(reduction = "harmony", dims = 1:30) %>%
