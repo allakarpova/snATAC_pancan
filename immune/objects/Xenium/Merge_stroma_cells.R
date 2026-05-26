@@ -16,7 +16,7 @@ suppressMessages(library(googlesheets4))
 suppressMessages(library(stringr))
 suppressMessages(library(harmony))
 library(doParallel)
-options(future.globals.maxSize= 1610612736) #1.5Gb
+options(future.globals.maxSize= 2147483648) #2Gb
 
 ############## FUNCTIONS #####################
 
@@ -165,6 +165,5 @@ ggsave(paste0(length(samples.id),"_Merged_cell.type_", add_filename, ".pdf"),hei
 
 fwrite(combined@meta.data, 
        paste0(length(samples.id),"_Merged_normalized_",add_filename,".metadata.tsv"), sep = '\t', row.names = T)
-
 
 
